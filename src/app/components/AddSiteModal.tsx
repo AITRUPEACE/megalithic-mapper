@@ -30,7 +30,7 @@ export default function AddSiteModal({ isOpen, onClose, onSubmit, coordinates }:
 
 	return (
 		<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-			<DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+			<DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-background/40 backdrop-blur-sm">
 				<DialogHeader>
 					<DialogTitle>Add New Archaeological Site</DialogTitle>
 				</DialogHeader>

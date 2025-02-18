@@ -1,7 +1,49 @@
 import { create } from 'zustand';
-import { Site, SITE_TYPES } from '../types/types';
+import { Site, SiteGroup, SITE_TYPES } from '../types/types';
 
+// Initial site groups
+export const INITIAL_SITE_GROUPS: SiteGroup[] = [
+  {
+    id: "giza-group",
+    name: "Giza Pyramid Complex",
+    description: "The Giza pyramid complex, also called the Giza necropolis, is an archaeological site on the Giza Plateau on the outskirts of Cairo, Egypt.",
+    coordinates: [31.134358, 29.979175], // Using Great Pyramid coordinates as center
+    sites: ["1", "E2", "E3", "E4"], // Great Pyramid, Khafre, Menkaure, Sphinx
+    dateAdded: new Date().toISOString(),
+    lastUpdated: new Date().toISOString(),
+    addedBy: "system",
+    tags: ["egypt", "pyramid", "giza", "complex"],
+    civilization: "Ancient Egyptian"
+  },
+  {
+    id: "cusco-group",
+    name: "Cusco Archaeological Sites",
+    description: "Major Incan archaeological sites around Cusco, Peru.",
+    coordinates: [-71.9670, -13.5187], // Using Sacsayhuamán coordinates as center
+    sites: ["3", "15"], // Sacsayhuamán and Machu Picchu
+    dateAdded: new Date().toISOString(),
+    lastUpdated: new Date().toISOString(),
+    addedBy: "system",
+    tags: ["peru", "inca", "cusco", "complex"],
+    civilization: "Inca"
+  },
+  {
+    id: "lake-van-group",
+    name: "Lake Van Religious Sites",
+    description: "Collection of religious sites around Lake Van, Turkey.",
+    coordinates: [38.5329, 43.2731], // Using Akdamar Church coordinates as center
+    sites: ["A1", "A2", "A3", "A4", "A5", "A6"],
+    dateAdded: new Date().toISOString(),
+    lastUpdated: new Date().toISOString(),
+    addedBy: "system",
+    tags: ["turkey", "van", "religious", "complex"],
+    civilization: "Multiple"
+  }
+];
+
+// Update initial sites with group IDs
 export const INITIAL_SITES: Site[] = [
+  // Giza Group Sites
   {
     id: "1",
     name: "Great Pyramid of Giza",
@@ -15,8 +57,191 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["egypt", "pyramid", "giza"],
-    civilization: "Ancient Egyptian"
+    civilization: "Ancient Egyptian",
+    groupId: "giza-group"
   },
+  {
+    id: "E2",
+    name: "Pyramid of Khafre",
+    coordinates: [29.9760, 31.1304],
+    description: "The second-largest pyramid at Giza, built for Pharaoh Khafre.",
+    type: SITE_TYPES.pyramid,
+    status: "verified",
+    images: [],
+    documents: [],
+    dateAdded: new Date().toISOString(),
+    lastUpdated: new Date().toISOString(),
+    addedBy: "system",
+    tags: ["egypt", "giza", "pyramid", "khafre"],
+    civilization: "Ancient Egyptian",
+    groupId: "giza-group"
+  },
+  {
+    id: "E3",
+    name: "Pyramid of Menkaure",
+    coordinates: [29.9729, 31.1281],
+    description: "The smallest of the three major pyramids at Giza, built for Pharaoh Menkaure.",
+    type: SITE_TYPES.pyramid,
+    status: "verified",
+    images: [],
+    documents: [],
+    dateAdded: new Date().toISOString(),
+    lastUpdated: new Date().toISOString(),
+    addedBy: "system",
+    tags: ["egypt", "giza", "pyramid", "menkaure"],
+    civilization: "Ancient Egyptian",
+    groupId: "giza-group"
+  },
+  {
+    id: "E4",
+    name: "Great Sphinx of Giza",
+    coordinates: [31.1376,29.9753],
+    description: "A colossal limestone statue with a lion's body and a pharaoh's head, guarding the Giza plateau.",
+    type: SITE_TYPES['megalithic-monument'],
+    status: "verified",
+    images: [],
+    documents: [],
+    dateAdded: new Date().toISOString(),
+    lastUpdated: new Date().toISOString(),
+    addedBy: "system",
+    tags: ["egypt", "giza", "sphinx"],
+    civilization: "Ancient Egyptian",
+    groupId: "giza-group"
+  },
+
+  // Cusco Group Sites
+  {
+    id: "3",
+    name: "Sacsayhuamán",
+    coordinates: [-71.9670, -13.5187],
+    description: "An ancient Incan fortress with massive, precisely cut stone walls overlooking Cusco, Peru.",
+    type: SITE_TYPES['megalithic-wall'],
+    status: "verified",
+    images: [],
+    documents: [],
+    dateAdded: new Date().toISOString(),
+    lastUpdated: new Date().toISOString(),
+    addedBy: "system",
+    tags: ["peru", "inca", "fortress", "megalith"],
+    civilization: "Inca",
+    groupId: "cusco-group"
+  },
+  {
+    id: "15",
+    name: "Machu Picchu",
+    coordinates: [-72.5450, -13.1631],
+    description: "An iconic Incan citadel set high in the Andes of Peru, renowned for its stunning architecture and breathtaking views.",
+    type: SITE_TYPES['megalithic-monument'],
+    status: "verified",
+    images: [],
+    documents: [],
+    dateAdded: new Date().toISOString(),
+    lastUpdated: new Date().toISOString(),
+    addedBy: "system",
+    tags: ["peru", "machu picchu", "inca", "archaeology"],
+    civilization: "Inca",
+    groupId: "cusco-group"
+  },
+
+  // Lake Van Group Sites
+  {
+    id: "A1",
+    name: "Ayanis Kalesi",
+    coordinates: [43.21111, 38.70833],
+    description: "An Urartian fortress and settlement near Van that features a 'tower temple' dedicated to the god Haldi.",
+    type: SITE_TYPES.temple,
+    status: "verified",
+    images: [],
+    documents: [],
+    dateAdded: new Date().toISOString(),
+    lastUpdated: new Date().toISOString(),
+    addedBy: "system",
+    tags: ["urartu", "temple", "fortress", "van", "ayanis kalesi"],
+    civilization: "Urartu",
+    groupId: "lake-van-group"
+  },
+  {
+    id: "A2",
+    name: "Akdamar Church",
+    coordinates: [38.5329, 43.2731],
+    description: "A medieval Armenian church on Akdamar Island in Lake Van, renowned for its ornate exterior carvings and religious significance.",
+    type: SITE_TYPES.temple,
+    status: "verified",
+    images: [],
+    documents: [],
+    dateAdded: new Date().toISOString(),
+    lastUpdated: new Date().toISOString(),
+    addedBy: "system",
+    tags: ["armenian", "church", "akdamar", "lake van"],
+    civilization: "Armenian",
+    groupId: "lake-van-group"
+  },
+  {
+    id: "A3",
+    name: "Ktuts Monastery",
+    coordinates: [38.7100, 43.2150],
+    description: "A ruined 15th‑century Armenian monastery on Ktuts Island in Lake Van, once known for its scriptorium and religious role.",
+    type: SITE_TYPES.temple,
+    status: "verified",
+    images: [],
+    documents: [],
+    dateAdded: new Date().toISOString(),
+    lastUpdated: new Date().toISOString(),
+    addedBy: "system",
+    tags: ["armenian", "monastery", "lake van", "ktuts"],
+    civilization: "Armenian",
+    groupId: "lake-van-group"
+  },
+  {
+    id: "A4",
+    name: "St. Thomas Monastery, Van",
+    coordinates: [38.4500, 43.4500],
+    description: "A ruined Armenian monastery overlooking Lake Van, historically a center of Christian worship in the region.",
+    type: SITE_TYPES.temple,
+    status: "verified",
+    images: [],
+    documents: [],
+    dateAdded: new Date().toISOString(),
+    lastUpdated: new Date().toISOString(),
+    addedBy: "system",
+    tags: ["armenian", "monastery", "van", "st. thomas"],
+    civilization: "Armenian",
+    groupId: "lake-van-group"
+  },
+  {
+    id: "A5",
+    name: "Narekavank",
+    coordinates: [38.4000, 43.2000],
+    description: "A prominent 10th‑century Armenian monastery near Lake Van, once a major center of learning and spirituality.",
+    type: SITE_TYPES.temple,
+    status: "verified",
+    images: [],
+    documents: [],
+    dateAdded: new Date().toISOString(),
+    lastUpdated: new Date().toISOString(),
+    addedBy: "system",
+    tags: ["armenian", "monastery", "narekavank", "van"],
+    civilization: "Armenian",
+    groupId: "lake-van-group"
+  },
+  {
+    id: "A6",
+    name: "Bagavan",
+    coordinates: [38.6500, 43.1500],
+    description: "An ancient Armenian temple complex known as 'Bagavan' ('town of the gods'), historically important for pre‑Christian worship.",
+    type: SITE_TYPES.temple,
+    status: "verified",
+    images: [],
+    documents: [],
+    dateAdded: new Date().toISOString(),
+    lastUpdated: new Date().toISOString(),
+    addedBy: "system",
+    tags: ["armenian", "temple", "bagavan", "van"],
+    civilization: "Ancient Armenian",
+    groupId: "lake-van-group"
+  },
+
+  // Ungrouped Sites
   {
     id: "2",
     name: "Pyramid of the Sun",
@@ -31,21 +256,6 @@ export const INITIAL_SITES: Site[] = [
     addedBy: "system",
     tags: ["mexico", "teotihuacan", "step pyramid"],
     civilization: "Teotihuacan"
-  },
-  {
-    id: "3",
-    name: "Sacsayhuamán",
-    coordinates: [-71.9670, -13.5187],
-    description: "An ancient Incan fortress with massive, precisely cut stone walls overlooking Cusco, Peru.",
-    type: SITE_TYPES['megalithic-wall'],
-    status: "verified",
-    images: [],
-    documents: [],
-    dateAdded: new Date().toISOString(),
-    lastUpdated: new Date().toISOString(),
-    addedBy: "system",
-    tags: ["peru", "inca", "fortress", "megalith"],
-    civilization: "Inca"
   },
   {
     id: "4",
@@ -75,7 +285,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["england", "stone circle", "megalith"],
-    civilization: "Ancient Britons"
+    civilization: "Ancient Britons",
+    groupId: "giza-group"
   },
   {
     id: "6",
@@ -90,7 +301,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["france", "carnac", "megalith", "standing stones"],
-    civilization: "Ancient European"
+    civilization: "Ancient European",
+    groupId: "giza-group"
   },
   {
     id: "7",
@@ -105,7 +317,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["turkey", "neolithic", "temple", "megalith"],
-    civilization: "Pre-Pottery Neolithic"
+    civilization: "Pre-Pottery Neolithic",
+    groupId: "lake-van-group"
   },
   {
     id: "8",
@@ -120,7 +333,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["scotland", "stone circle", "megalith", "Callanish"],
-    civilization: "Ancient Celtic"
+    civilization: "Ancient Celtic",
+    groupId: "giza-group"
   },
   {
     id: "9",
@@ -135,7 +349,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["malta", "temple", "megalith", "prehistoric"],
-    civilization: "Ancient Maltese"
+    civilization: "Ancient Maltese",
+    groupId: "giza-group"
   },
   {
     id: "10",
@@ -150,7 +365,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["malta", "temples", "megalith", "Neolithic"],
-    civilization: "Ancient Maltese"
+    civilization: "Ancient Maltese",
+    groupId: "giza-group"
   },
   {
     id: "11",
@@ -165,7 +381,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["easter island", "moai", "quarry", "polynesia"],
-    civilization: "Rapa Nui"
+    civilization: "Rapa Nui",
+    groupId: "giza-group"
   },
   {
     id: "12",
@@ -180,7 +397,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["egypt", "megalithic", "archaeological", "desert"],
-    civilization: "Ancient African"
+    civilization: "Ancient African",
+    groupId: "giza-group"
   },
   {
     id: "13",
@@ -195,7 +413,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["malta", "temples", "megalithic", "Neolithic"],
-    civilization: "Ancient Maltese"
+    civilization: "Ancient Maltese",
+    groupId: "giza-group"
   },
   {
     id: "14",
@@ -210,22 +429,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["bolivia", "puma punku", "megalith", "tiwanaku"],
-    civilization: "Pre-Columbian"
-  },
-  {
-    id: "15",
-    name: "Machu Picchu",
-    coordinates: [-72.5450, -13.1631],
-    description: "An iconic Incan citadel set high in the Andes of Peru, renowned for its stunning architecture and breathtaking views.",
-    type: SITE_TYPES['megalithic-monument'],
-    status: "verified",
-    images: [],
-    documents: [],
-    dateAdded: new Date().toISOString(),
-    lastUpdated: new Date().toISOString(),
-    addedBy: "system",
-    tags: ["peru", "machu picchu", "inca", "archaeology"],
-    civilization: "Inca"
+    civilization: "Pre-Columbian",
+    groupId: "giza-group"
   },
   {
     id: "16",
@@ -240,7 +445,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["turkey", "çatalhöyük", "neolithic", "settlement"],
-    civilization: "Neolithic Anatolian"
+    civilization: "Neolithic Anatolian",
+    groupId: "giza-group"
   },
   {
     id: "17",
@@ -255,7 +461,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["turkey", "karahan tepe", "megalith", "neolithic"],
-    civilization: "Neolithic Anatolian"
+    civilization: "Neolithic Anatolian",
+    groupId: "lake-van-group"
   },
   {
     id: "18",
@@ -270,7 +477,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["india", "hindu", "temple", "chola"],
-    civilization: "Chola"
+    civilization: "Chola",
+    groupId: "giza-group"
   },
   {
     id: "19",
@@ -285,7 +493,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["china", "mogao", "buddhist", "cave"],
-    civilization: "Ancient Chinese"
+    civilization: "Ancient Chinese",
+    groupId: "giza-group"
   },
   {
     id: "20",
@@ -300,7 +509,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["china", "yungang", "grottoes", "buddhist"],
-    civilization: "Ancient Chinese"
+    civilization: "Ancient Chinese",
+    groupId: "giza-group"
   },
   {
     id: "21",
@@ -315,7 +525,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["china", "longmen", "grottoes", "buddhist"],
-    civilization: "Ancient Chinese"
+    civilization: "Ancient Chinese",
+    groupId: "giza-group"
   },
   {
     id: "22",
@@ -330,7 +541,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["india", "barabar", "cave", "rock-cut"],
-    civilization: "Ancient Indian"
+    civilization: "Ancient Indian",
+    groupId: "giza-group"
   },
   {
     id: "23",
@@ -345,7 +557,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["india", "ajanta", "cave", "buddhist"],
-    civilization: "Ancient Indian"
+    civilization: "Ancient Indian",
+    groupId: "giza-group"
   },
   {
     id: "24",
@@ -360,7 +573,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["india", "ellora", "cave", "rock-cut"],
-    civilization: "Ancient Indian"
+    civilization: "Ancient Indian",
+    groupId: "giza-group"
   },
   {
     id: "25",
@@ -375,7 +589,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["india", "elephanta", "cave", "rock-cut"],
-    civilization: "Ancient Indian"
+    civilization: "Ancient Indian",
+    groupId: "giza-group"
   },
   {
     id: "26",
@@ -390,7 +605,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["india", "badami", "cave", "rock-cut"],
-    civilization: "Ancient Indian"
+    civilization: "Ancient Indian",
+    groupId: "giza-group"
   },
   {
     id: "27",
@@ -405,7 +621,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["india", "mahabalipuram", "temple", "rock-cut"],
-    civilization: "Ancient Indian"
+    civilization: "Ancient Indian",
+    groupId: "giza-group"
   },
   {
     id: "28",
@@ -420,7 +637,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["india", "konark", "temple", "sun"],
-    civilization: "Ancient Indian"
+    civilization: "Ancient Indian",
+    groupId: "giza-group"
   },
   {
     id: "29",
@@ -435,7 +653,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["china", "terracotta", "monument"],
-    civilization: "Ancient Chinese"
+    civilization: "Ancient Chinese",
+    groupId: "giza-group"
   },
   {
     id: "30",
@@ -450,7 +669,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["china", "wall", "defense"],
-    civilization: "Ancient Chinese"
+    civilization: "Ancient Chinese",
+    groupId: "giza-group"
   },
   {
     id: "31",
@@ -465,7 +685,8 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["india", "hampi", "ruins", "vijayanagara"],
-    civilization: "Ancient Indian"
+    civilization: "Ancient Indian",
+    groupId: "giza-group"
   },
   {
     id: "32",
@@ -480,46 +701,30 @@ export const INITIAL_SITES: Site[] = [
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
     tags: ["indonesia", "borobudur", "buddhist", "temple"],
-    civilization: "Ancient Indonesian"
-  },
-   {
-    id: "A1",
-    name: "Ayanis Kalesi",
-    coordinates: [38.70833, 43.21111], // [latitude, longitude]
-    description:
-      "An Urartian fortress and settlement near Van that features a 'tower temple' dedicated to the god Haldi.",
-    type: SITE_TYPES.temple,
-    status: "verified",
-    images: [],
-    documents: [],
-    dateAdded: new Date().toISOString(),
-    lastUpdated: new Date().toISOString(),
-    addedBy: "system",
-    tags: ["urartu", "temple", "fortress", "van", "ayanis kalesi"],
-    civilization: "Urartu"
+    civilization: "Ancient Indonesian",
+    groupId: "giza-group"
   },
   {
-    id: "A2",
-    name: "Akdamar Church",
-    coordinates: [38.5329, 43.2731],
-    description:
-      "A medieval Armenian church on Akdamar Island in Lake Van, renowned for its ornate exterior carvings and religious significance.",
-    type: SITE_TYPES.temple,
+    id: "33",
+    name: "Sarmizegetusa Regia",
+    coordinates: [22.9742, 45.7578], // [latitude, longitude]
+    description: "The ancient Dacian fortified capital and religious center of the Dacian Kingdom, Sarmizegetusa Regia was built on a high plateau in the Orăştie Mountains of Romania. The site features impressive earthworks, sanctuaries, and fortification walls that reflect the complex socio-religious organization of the Dacians.",
+    type: SITE_TYPES['megalithic-monument'],
     status: "verified",
     images: [],
     documents: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
-    tags: ["armenian", "church", "akdamar", "lake van"],
-    civilization: "Armenian"
+    tags: ["romania", "dacian", "fortress", "sarmizegetusa", "archaeology"],
+    civilization: "Dacian",
+    groupId: "giza-group"
   },
   {
-    id: "A3",
-    name: "Ktuts Monastery",
-    coordinates: [38.7100, 43.2150],
-    description:
-      "A ruined 15th‑century Armenian monastery on Ktuts Island in Lake Van, once known for its scriptorium and religious role.",
+    id: "E5",
+    name: "Serapeum of Saqqara",
+    coordinates: [31.2166,29.8719],
+    description: "An underground necropolis that housed the sacred Apis bulls in ancient Memphis.",
     type: SITE_TYPES.temple,
     status: "verified",
     images: [],
@@ -527,58 +732,44 @@ export const INITIAL_SITES: Site[] = [
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
-    tags: ["armenian", "monastery", "lake van", "ktuts"],
-    civilization: "Armenian"
+    tags: ["egypt", "saqqara", "serapeum", "memphis"],
+    civilization: "Ancient Egyptian",
+    groupId: "giza-group"
   },
   {
-    id: "A4",
-    name: "St. Thomas Monastery, Van",
-    coordinates: [38.4500, 43.4500],
-    description:
-      "A ruined Armenian monastery overlooking Lake Van, historically a center of Christian worship in the region.",
-    type: SITE_TYPES.temple,
+    id: "E6",
+    name: "Valley of the Kings",
+    coordinates: [32.6014,25.7402],
+    description: "The burial site for New Kingdom pharaohs and nobles, located on the west bank of the Nile near Luxor.",
+    type: SITE_TYPES['megalithic-monument'],
     status: "verified",
     images: [],
     documents: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
-    tags: ["armenian", "monastery", "van", "st. thomas"],
-    civilization: "Armenian"
-  },
-  {
-    id: "A5",
-    name: "Narekavank",
-    coordinates: [38.4000, 43.2000],
-    description:
-      "A prominent 10th‑century Armenian monastery near Lake Van, once a major center of learning and spirituality.",
-    type: SITE_TYPES.temple,
-    status: "verified",
-    images: [],
-    documents: [],
-    dateAdded: new Date().toISOString(),
-    lastUpdated: new Date().toISOString(),
-    addedBy: "system",
-    tags: ["armenian", "monastery", "narekavank", "van"],
-    civilization: "Armenian"
-  },
-  {
-    id: "A6",
-    name: "Bagavan",
-    coordinates: [38.6500, 43.1500],
-    description:
-      "An ancient Armenian temple complex known as 'Bagavan' ('town of the gods'), historically important for pre‑Christian worship.",
-    type: SITE_TYPES.temple,
-    status: "verified",
-    images: [],
-    documents: [],
-    dateAdded: new Date().toISOString(),
-    lastUpdated: new Date().toISOString(),
-    addedBy: "system",
-    tags: ["armenian", "temple", "bagavan", "van"],
-    civilization: "Ancient Armenian"
+    tags: ["egypt", "luxor", "valley of the kings", "burials"],
+    civilization: "Ancient Egyptian",
+    groupId: "giza-group"
   }
 ];
+
+// Update initial sites with group IDs
+export const INITIAL_SITES_UPDATED: Site[] = INITIAL_SITES.map(site => {
+  // Keep groupId only for sites that should be in groups
+  if (site.id === "1" || site.id === "E2" || site.id === "E3" || site.id === "E4") {
+    return { ...site, groupId: "giza-group" };
+  }
+  if (site.id === "3" || site.id === "15") {
+    return { ...site, groupId: "cusco-group" };
+  }
+  if (["A1", "A2", "A3", "A4", "A5", "A6"].includes(site.id)) {
+    return { ...site, groupId: "lake-van-group" };
+  }
+  // Remove groupId from all other sites
+  const { groupId, ...siteWithoutGroup } = site;
+  return siteWithoutGroup;
+});
 
 interface ViewState {
     longitude: number;
@@ -591,25 +782,35 @@ interface ViewState {
 interface SiteStore {
     // State
     sites: Site[];
+    siteGroups: SiteGroup[];
     selectedSite: Site | null;
+    selectedGroup: SiteGroup | null;
     isAddingNewSite: boolean;
     newSiteCoordinates: [number, number] | null;
     viewState: ViewState;
 
     // Actions
     setSites: (sites: Site[]) => void;
+    setSiteGroups: (groups: SiteGroup[]) => void;
     addSite: (site: Site) => void;
+    addSiteGroup: (group: SiteGroup) => void;
     setSelectedSite: (site: Site | null) => void;
+    setSelectedGroup: (group: SiteGroup | null) => void;
     setIsAddingNewSite: (isAdding: boolean) => void;
     setNewSiteCoordinates: (coordinates: [number, number] | null) => void;
     setViewState: (viewState: ViewState) => void;
     updateSite: (updatedSite: Site) => void;
+    updateSiteGroup: (updatedGroup: SiteGroup) => void;
+    addSiteToGroup: (siteId: string, groupId: string) => void;
+    removeSiteFromGroup: (siteId: string, groupId: string) => void;
 }
 
 export const useSiteStore = create<SiteStore>((set) => ({
     // Initial state
-    sites: INITIAL_SITES,
+    sites: INITIAL_SITES_UPDATED,
+    siteGroups: INITIAL_SITE_GROUPS,
     selectedSite: null,
+    selectedGroup: null,
     isAddingNewSite: false,
     newSiteCoordinates: null,
     viewState: {
@@ -622,14 +823,78 @@ export const useSiteStore = create<SiteStore>((set) => ({
 
     // Actions
     setSites: (sites) => set({ sites }),
+    setSiteGroups: (siteGroups) => set({ siteGroups }),
     addSite: (site) => set((state) => ({ sites: [...state.sites, site] })),
+    addSiteGroup: (group) => set((state) => ({ siteGroups: [...state.siteGroups, group] })),
     setSelectedSite: (site) => set({ selectedSite: site }),
+    setSelectedGroup: (group) => set({ selectedGroup: group }),
     setIsAddingNewSite: (isAdding) => set({ isAddingNewSite: isAdding }),
     setNewSiteCoordinates: (coordinates) => set({ newSiteCoordinates: coordinates }),
     setViewState: (viewState) => set({ viewState }),
-    updateSite: (updatedSite: Site) => set((state) => ({
-      sites: state.sites.map((site) => 
-        site.id === updatedSite.id ? updatedSite : site
-      ),
+    updateSite: (updatedSite) => set((state) => ({
+        sites: state.sites.map((site) => 
+            site.id === updatedSite.id ? updatedSite : site
+        ),
     })),
+    updateSiteGroup: (updatedGroup) => set((state) => ({
+        siteGroups: state.siteGroups.map((group) => 
+            group.id === updatedGroup.id ? updatedGroup : group
+        ),
+    })),
+    addSiteToGroup: (siteId, groupId) => set((state) => {
+        const updatedGroups = state.siteGroups.map((group) => {
+            if (group.id === groupId && !group.sites.includes(siteId)) {
+                return {
+                    ...group,
+                    sites: [...group.sites, siteId],
+                    lastUpdated: new Date().toISOString(),
+                };
+            }
+            return group;
+        });
+
+        const updatedSites = state.sites.map((site) => {
+            if (site.id === siteId) {
+                return {
+                    ...site,
+                    groupId,
+                    lastUpdated: new Date().toISOString(),
+                };
+            }
+            return site;
+        });
+
+        return {
+            siteGroups: updatedGroups,
+            sites: updatedSites,
+        };
+    }),
+    removeSiteFromGroup: (siteId, groupId) => set((state) => {
+        const updatedGroups = state.siteGroups.map((group) => {
+            if (group.id === groupId) {
+                return {
+                    ...group,
+                    sites: group.sites.filter((id) => id !== siteId),
+                    lastUpdated: new Date().toISOString(),
+                };
+            }
+            return group;
+        });
+
+        const updatedSites = state.sites.map((site) => {
+            if (site.id === siteId && site.groupId === groupId) {
+                const { groupId: _, ...siteWithoutGroup } = site;
+                return {
+                    ...siteWithoutGroup,
+                    lastUpdated: new Date().toISOString(),
+                };
+            }
+            return site;
+        });
+
+        return {
+            siteGroups: updatedGroups,
+            sites: updatedSites,
+        };
+    }),
 })); 

@@ -3,23 +3,32 @@
 import Map, { Marker, ViewStateChangeEvent, NavigationControl, FullscreenControl } from "react-map-gl/maplibre";
 import * as maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { Site } from "../types/types";
+import { Site, SiteGroup } from "../types/types";
 import AddSiteModal from "./AddSiteModal";
 import SiteMarker from "./SiteMarker";
+import GroupMarker from "./GroupMarker";
 import SiteInfo from "./SiteInfo";
+import SiteList from "./SiteList";
+import Legend from "./Legend";
 import { useSiteStore } from "../store/useSiteStore";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
+// Zoom level threshold for switching between group and individual markers
+const GROUP_ZOOM_THRESHOLD = 8;
 
 export default function MapComponent() {
 	const {
 		sites,
+		siteGroups,
 		selectedSite,
+		selectedGroup,
 		isAddingNewSite,
 		newSiteCoordinates,
 		viewState,
 		setSelectedSite,
+		setSelectedGroup,
 		setIsAddingNewSite,
 		setNewSiteCoordinates,
 		addSite,
@@ -27,9 +36,20 @@ export default function MapComponent() {
 		updateSite,
 	} = useSiteStore();
 
-	const [isUpdatingLocation, setIsUpdatingLocation] = useState(false); // consider moving this to store
+	const [isUpdatingLocation, setIsUpdatingLocation] = useState(false);
 	const [longitude, setLongitude] = useState(0);
 	const [latitude, setLatitude] = useState(0);
+
+	// Determine which sites to show based on zoom level
+	const visibleSites = useMemo(() => {
+		if (viewState.zoom >= GROUP_ZOOM_THRESHOLD) {
+			// Show all sites when zoomed in
+			return sites;
+		} else {
+			// When zoomed out, only show ungrouped sites
+			return sites.filter((site) => !site.groupId);
+		}
+	}, [sites, viewState.zoom]);
 
 	const handleMapClick = (evt: maplibregl.MapLayerMouseEvent) => {
 		if (isAddingNewSite) {
@@ -42,7 +62,6 @@ export default function MapComponent() {
 			};
 			updateSite(updatedSite);
 			setIsUpdatingLocation(false);
-			//setSelectedSite(null) we don't need to de-select the site
 		}
 	};
 
@@ -70,6 +89,17 @@ export default function MapComponent() {
 		}
 	};
 
+	const handleGroupSelect = (group: SiteGroup) => {
+		setSelectedGroup(group);
+		// Zoom to group
+		setViewState({
+			...viewState,
+			longitude: group.coordinates[0],
+			latitude: group.coordinates[1],
+			zoom: GROUP_ZOOM_THRESHOLD + 1, // Zoom in just past the threshold
+		});
+	};
+
 	return (
 		<div className="relative w-full h-full">
 			<Map
@@ -84,11 +114,10 @@ export default function MapComponent() {
 				<NavigationControl position="top-right" />
 				<FullscreenControl position="top-right" />
 
-				{/* Add Site Button - as a map control */}
+				{/* Add Site Button */}
 				<div className="mapboxgl-ctrl mapboxgl-ctrl-group" style={{ position: "absolute", top: 10, right: 60 }}>
 					<Button
-						variant="ghost"
-						className="bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
+						variant="secondary"
 						onClick={() => setIsAddingNewSite(!isAddingNewSite)}
 						title={isAddingNewSite ? "Cancel Adding Site" : "Add New Site"}
 					>
@@ -96,8 +125,12 @@ export default function MapComponent() {
 					</Button>
 				</div>
 
+				{/* Group Markers (shown when zoomed out) */}
+				{viewState.zoom < GROUP_ZOOM_THRESHOLD &&
+					siteGroups.map((group) => <GroupMarker key={group.id} group={group} onSelect={handleGroupSelect} />)}
+
 				{/* Site Markers */}
-				{sites.map((site) => (
+				{visibleSites.map((site) => (
 					<SiteMarker key={site.id} site={site} onSelect={setSelectedSite} />
 				))}
 
@@ -113,10 +146,8 @@ export default function MapComponent() {
 				{/* Instructions Overlay */}
 				{(isAddingNewSite || isUpdatingLocation) && (
 					<div className="mapboxgl-ctrl" style={{ position: "absolute", top: 160, right: 10 }}>
-						<div className="bg-white dark:bg-gray-800 px-3 py-2 rounded shadow-lg space-y-2">
-							<p className="text-sm text-black dark:text-white">
-								{isAddingNewSite ? "Click on the map to place a new site" : "Click on the map to update site location"}
-							</p>
+						<div className="map-overlay px-3 py-2 rounded shadow-lg space-y-2">
+							<p className="text-sm">{isAddingNewSite ? "Click on the map to place a new site" : "Click on the map to update site location"}</p>
 							<div className="flex gap-2 items-center">
 								<Input
 									type="number"
@@ -160,6 +191,12 @@ export default function MapComponent() {
 
 				{/* Selected Site Info */}
 				{selectedSite && <SiteInfo site={selectedSite} onClose={() => setSelectedSite(null)} onUpdateLocation={handleUpdateLocation} />}
+
+				{/* Site List */}
+				<SiteList />
+
+				{/* Legend */}
+				<Legend />
 			</Map>
 
 			<AddSiteModal

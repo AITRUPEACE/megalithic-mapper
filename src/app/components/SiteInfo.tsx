@@ -12,12 +12,12 @@ interface SiteInfoProps {
 export default function SiteInfo({ site, onClose, onUpdateLocation }: SiteInfoProps) {
 	return (
 		<div className="mapboxgl-ctrl" style={{ position: "absolute", top: 10, left: 10 }}>
-			<Card className="w-[350px]">
-				<CardHeader>
+			<Card className="w-[350px] bg-background/70 backdrop-blur-sm">
+				<CardHeader className="bg-background/40">
 					<CardTitle>{site.name}</CardTitle>
 				</CardHeader>
-				<CardContent className="space-y-4">
-					<p className="text-sm text-muted-foreground">{site.description}</p>
+				<CardContent className="space-y-4 bg-background/40">
+					<p className="text-sm text-foreground">{site.description}</p>
 					<div className="flex flex-wrap gap-2">
 						<Badge variant="secondary">{site.type.name}</Badge>
 						{site.civilization && <Badge variant="secondary">{site.civilization}</Badge>}
