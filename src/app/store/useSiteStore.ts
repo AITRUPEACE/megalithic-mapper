@@ -1,47 +1,8 @@
 import { create } from 'zustand';
 import { Site, SiteGroup, SITE_TYPES } from '../types/types';
+import { findSiteClusters } from '../utils/clustering';
 
-// Initial site groups
-export const INITIAL_SITE_GROUPS: SiteGroup[] = [
-  {
-    id: "giza-group",
-    name: "Giza Pyramid Complex",
-    description: "The Giza pyramid complex, also called the Giza necropolis, is an archaeological site on the Giza Plateau on the outskirts of Cairo, Egypt.",
-    coordinates: [31.134358, 29.979175], // Using Great Pyramid coordinates as center
-    sites: ["1", "E2", "E3", "E4"], // Great Pyramid, Khafre, Menkaure, Sphinx
-    dateAdded: new Date().toISOString(),
-    lastUpdated: new Date().toISOString(),
-    addedBy: "system",
-    tags: ["egypt", "pyramid", "giza", "complex"],
-    civilization: "Ancient Egyptian"
-  },
-  {
-    id: "cusco-group",
-    name: "Cusco Archaeological Sites",
-    description: "Major Incan archaeological sites around Cusco, Peru.",
-    coordinates: [-71.9670, -13.5187], // Using Sacsayhuamán coordinates as center
-    sites: ["3", "15"], // Sacsayhuamán and Machu Picchu
-    dateAdded: new Date().toISOString(),
-    lastUpdated: new Date().toISOString(),
-    addedBy: "system",
-    tags: ["peru", "inca", "cusco", "complex"],
-    civilization: "Inca"
-  },
-  {
-    id: "lake-van-group",
-    name: "Lake Van Religious Sites",
-    description: "Collection of religious sites around Lake Van, Turkey.",
-    coordinates: [38.5329, 43.2731], // Using Akdamar Church coordinates as center
-    sites: ["A1", "A2", "A3", "A4", "A5", "A6"],
-    dateAdded: new Date().toISOString(),
-    lastUpdated: new Date().toISOString(),
-    addedBy: "system",
-    tags: ["turkey", "van", "religious", "complex"],
-    civilization: "Multiple"
-  }
-];
-
-// Update initial sites with group IDs
+// Initial sites array with all the archaeological sites
 export const INITIAL_SITES: Site[] = [
   // Giza Group Sites
   {
@@ -754,21 +715,28 @@ export const INITIAL_SITES: Site[] = [
   }
 ];
 
-// Update initial sites with group IDs
+// Generate initial groups using the clustering algorithm
+export const INITIAL_SITE_GROUPS: SiteGroup[] = findSiteClusters(INITIAL_SITES, {
+    maxDistance: 50, // 50km max distance between sites in a cluster
+    minSites: 2, // At least 2 sites to form a cluster
+    civilizationWeight: 0.7, // High weight for matching civilizations
+    typeWeight: 0.3, // Lower weight for matching types
+});
+
+// Update sites with their new group IDs
 export const INITIAL_SITES_UPDATED: Site[] = INITIAL_SITES.map(site => {
-  // Keep groupId only for sites that should be in groups
-  if (site.id === "1" || site.id === "E2" || site.id === "E3" || site.id === "E4") {
-    return { ...site, groupId: "giza-group" };
-  }
-  if (site.id === "3" || site.id === "15") {
-    return { ...site, groupId: "cusco-group" };
-  }
-  if (["A1", "A2", "A3", "A4", "A5", "A6"].includes(site.id)) {
-    return { ...site, groupId: "lake-van-group" };
-  }
-  // Remove groupId from all other sites
-  const { groupId, ...siteWithoutGroup } = site;
-  return siteWithoutGroup;
+    // Find if the site belongs to any cluster
+    const cluster = INITIAL_SITE_GROUPS.find(group => 
+        group.sites.includes(site.id)
+    );
+    
+    if (cluster) {
+        return { ...site, groupId: cluster.id };
+    }
+    
+    // If site doesn't belong to any cluster, remove groupId if it exists
+    const { groupId, ...siteWithoutGroup } = site;
+    return siteWithoutGroup;
 });
 
 interface ViewState {
