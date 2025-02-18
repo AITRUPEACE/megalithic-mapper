@@ -9,6 +9,8 @@ import SiteMarker from "./SiteMarker";
 import SiteInfo from "./SiteInfo";
 import { useSiteStore } from "../store/useSiteStore";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function MapComponent() {
 	const {
@@ -84,13 +86,14 @@ export default function MapComponent() {
 
 				{/* Add Site Button - as a map control */}
 				<div className="mapboxgl-ctrl mapboxgl-ctrl-group" style={{ position: "absolute", top: 10, right: 60 }}>
-					<button
-						className="px-3 py-2 flex items-center justify-center bg-white hover:bg-gray-100 text-black dark:text-white dark:bg-gray-800 dark:hover:bg-gray-700 text-sm font-medium"
+					<Button
+						variant="ghost"
+						className="bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700"
 						onClick={() => setIsAddingNewSite(!isAddingNewSite)}
 						title={isAddingNewSite ? "Cancel Adding Site" : "Add New Site"}
 					>
 						{isAddingNewSite ? "Cancel Adding Site" : "Add New Site"}
-					</button>
+					</Button>
 				</div>
 
 				{/* Site Markers */}
@@ -115,22 +118,23 @@ export default function MapComponent() {
 								{isAddingNewSite ? "Click on the map to place a new site" : "Click on the map to update site location"}
 							</p>
 							<div className="flex gap-2 items-center">
-								<input
+								<Input
 									type="number"
 									placeholder="Longitude"
-									className="input input-sm w-24"
+									className="w-24 h-8"
 									step="0.000001"
 									onChange={(e) => setLongitude(parseFloat(e.target.value))}
 								/>
-								<input
+								<Input
 									type="number"
 									placeholder="Latitude"
-									className="input input-sm w-24"
+									className="w-24 h-8"
 									step="0.000001"
 									onChange={(e) => setLatitude(parseFloat(e.target.value))}
 								/>
-								<button
-									className="btn btn-sm"
+								<Button
+									variant="secondary"
+									size="sm"
 									onClick={() => {
 										if (longitude && latitude) {
 											if (isAddingNewSite) {
@@ -148,7 +152,7 @@ export default function MapComponent() {
 									}}
 								>
 									Set
-								</button>
+								</Button>
 							</div>
 						</div>
 					</div>

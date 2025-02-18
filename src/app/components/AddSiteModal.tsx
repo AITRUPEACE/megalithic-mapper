@@ -2,6 +2,12 @@
 
 import { useState } from "react";
 import { Site, SITE_TYPES } from "../types/types";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface AddSiteModalProps {
 	isOpen: boolean;
@@ -22,12 +28,12 @@ export default function AddSiteModal({ isOpen, onClose, onSubmit, coordinates }:
 		tags: [],
 	});
 
-	if (!isOpen) return null;
-
 	return (
-		<div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
-			<div className="card p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-				<h2 className="text-2xl font-bold mb-4">Add New Archaeological Site</h2>
+		<Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+			<DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+				<DialogHeader>
+					<DialogTitle>Add New Archaeological Site</DialogTitle>
+				</DialogHeader>
 
 				<form
 					onSubmit={(e) => {
@@ -38,84 +44,74 @@ export default function AddSiteModal({ isOpen, onClose, onSubmit, coordinates }:
 							lastUpdated: new Date().toISOString(),
 						});
 					}}
+					className="space-y-4"
 				>
-					<div className="space-y-4">
-						<div>
-							<label className="label">Name</label>
-							<input
-								type="text"
-								className="input"
-								value={formData.name}
-								onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-								required
-							/>
-						</div>
+					<div className="space-y-2">
+						<Label htmlFor="name">Name</Label>
+						<Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
+					</div>
 
-						<div>
-							<label className="label">Description</label>
-							<textarea
-								className="input"
-								rows={4}
-								value={formData.description}
-								onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-								required
-							/>
-						</div>
+					<div className="space-y-2">
+						<Label htmlFor="description">Description</Label>
+						<Textarea
+							id="description"
+							value={formData.description}
+							onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+							required
+							className="min-h-[100px]"
+						/>
+					</div>
 
-						<div>
-							<label className="label">Type</label>
-							<select
-								className="input"
-								value={formData.type?.code || ""}
-								onChange={(e) => setFormData({ ...formData, type: SITE_TYPES[e.target.value] })}
-							>
+					<div className="space-y-2">
+						<Label htmlFor="type">Type</Label>
+						<Select value={formData.type?.code} onValueChange={(value) => setFormData({ ...formData, type: SITE_TYPES[value] })}>
+							<SelectTrigger>
+								<SelectValue placeholder="Select a type" />
+							</SelectTrigger>
+							<SelectContent>
 								{Object.values(SITE_TYPES).map((type) => (
-									<option key={type.code} value={type.code}>
+									<SelectItem key={type.code} value={type.code}>
 										{type.name}
-									</option>
+									</SelectItem>
 								))}
-							</select>
-						</div>
+							</SelectContent>
+						</Select>
+					</div>
 
-						<div>
-							<label className="label">Civilization (optional)</label>
-							<input
-								type="text"
-								className="input"
-								value={formData.civilization || ""}
-								onChange={(e) => setFormData({ ...formData, civilization: e.target.value })}
-							/>
-						</div>
+					<div className="space-y-2">
+						<Label htmlFor="civilization">Civilization (optional)</Label>
+						<Input
+							id="civilization"
+							value={formData.civilization || ""}
+							onChange={(e) => setFormData({ ...formData, civilization: e.target.value })}
+						/>
+					</div>
 
-						<div>
-							<label className="label">Tags (comma-separated)</label>
-							<input
-								type="text"
-								className="input"
-								value={formData.tags?.join(", ")}
-								onChange={(e) =>
-									setFormData({
-										...formData,
-										tags: e.target.value
-											.split(",")
-											.map((tag) => tag.trim())
-											.filter(Boolean),
-									})
-								}
-							/>
-						</div>
+					<div className="space-y-2">
+						<Label htmlFor="tags">Tags (comma-separated)</Label>
+						<Input
+							id="tags"
+							value={formData.tags?.join(", ")}
+							onChange={(e) =>
+								setFormData({
+									...formData,
+									tags: e.target.value
+										.split(",")
+										.map((tag) => tag.trim())
+										.filter(Boolean),
+								})
+							}
+						/>
+					</div>
 
-						<div className="flex justify-end space-x-3 mt-6">
-							<button type="button" onClick={onClose} className="btn btn-secondary">
-								Cancel
-							</button>
-							<button type="submit" className="btn btn-primary">
-								Add Site
-							</button>
-						</div>
+					<div className="flex justify-end space-x-3 mt-6">
+						<Button variant="outline" type="button" onClick={onClose}>
+							Cancel
+						</Button>
+						<Button type="submit">Add Site</Button>
 					</div>
 				</form>
-			</div>
-		</div>
+			</DialogContent>
+		</Dialog>
 	);
 }
