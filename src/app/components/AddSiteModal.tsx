@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Site } from "../types/types";
+import { Site, SITE_TYPES } from "../types/types";
 
 interface AddSiteModalProps {
 	isOpen: boolean;
@@ -14,7 +14,7 @@ export default function AddSiteModal({ isOpen, onClose, onSubmit, coordinates }:
 	const [formData, setFormData] = useState<Partial<Site>>({
 		name: "",
 		description: "",
-		type: "settlement",
+		type: SITE_TYPES.other,
 		coordinates: coordinates || [0, 0],
 		status: "unverified",
 		images: [],
@@ -64,13 +64,16 @@ export default function AddSiteModal({ isOpen, onClose, onSubmit, coordinates }:
 
 						<div>
 							<label className="label">Type</label>
-							<select className="input" value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value as Site["type"] })}>
-								<option value="settlement">Settlement</option>
-								<option value="religious">Religious</option>
-								<option value="burial">Burial</option>
-								<option value="monument">Monument</option>
-								<option value="underwater">Underwater</option>
-								<option value="other">Other</option>
+							<select
+								className="input"
+								value={formData.type?.code || ""}
+								onChange={(e) => setFormData({ ...formData, type: SITE_TYPES[e.target.value] })}
+							>
+								{Object.values(SITE_TYPES).map((type) => (
+									<option key={type.code} value={type.code}>
+										{type.name}
+									</option>
+								))}
 							</select>
 						</div>
 
