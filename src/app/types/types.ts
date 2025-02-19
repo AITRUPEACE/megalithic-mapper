@@ -13,6 +13,17 @@ export interface Document {
     uploadedBy: string;
 }
 
+export interface Resource {
+    id: string;
+    url: string;
+    title: string;
+    description?: string;
+    type: 'article' | 'video' | 'image' | 'other';
+    thumbnail?: string;
+    dateAdded: string;
+    addedBy: string;
+}
+
 export interface SiteType {
   id: string;  // Database ID
   code: string; // Unique identifier like 'pyramid', 'step-pyramid', etc.
@@ -100,6 +111,7 @@ export interface Site {
     discoveredBy?: string;
     images: Image[];
     documents: Document[];
+    resources: Resource[];
     status: 'verified' | 'unverified' | 'under_review';
     dateAdded: string;
     lastUpdated: string;

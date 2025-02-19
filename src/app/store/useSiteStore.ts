@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Site, SiteGroup, SITE_TYPES } from '../types/types';
+import { Site, SiteGroup, SITE_TYPES, Image, Document, Resource } from '../types/types';
 import { findSiteClusters } from '../utils/clustering';
 
 // Initial sites array with all the archaeological sites
@@ -14,6 +14,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -30,6 +31,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -46,6 +48,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -62,6 +65,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -80,6 +84,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -96,6 +101,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -114,6 +120,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -130,6 +137,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -146,6 +154,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -162,6 +171,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -178,6 +188,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -194,6 +205,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -212,6 +224,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -227,6 +240,7 @@ export const INITIAL_SITES: Site[] = [
     status: "unverified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -242,6 +256,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -258,6 +273,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -274,6 +290,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -290,6 +307,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -306,6 +324,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -322,6 +341,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -338,6 +358,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -354,6 +375,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -370,6 +392,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -386,6 +409,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -402,6 +426,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -418,6 +443,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -434,6 +460,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -450,6 +477,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -466,6 +494,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -482,6 +511,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -498,6 +528,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -514,6 +545,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -530,6 +562,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -546,6 +579,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -562,6 +596,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -578,6 +613,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -594,6 +630,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -610,6 +647,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -626,6 +664,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -642,6 +681,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -658,6 +698,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -674,6 +715,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -690,6 +732,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -706,6 +749,7 @@ export const INITIAL_SITES: Site[] = [
     status: "verified",
     images: [],
     documents: [],
+    resources: [],
     dateAdded: new Date().toISOString(),
     lastUpdated: new Date().toISOString(),
     addedBy: "system",
@@ -771,6 +815,17 @@ interface SiteStore {
     updateSiteGroup: (updatedGroup: SiteGroup) => void;
     addSiteToGroup: (siteId: string, groupId: string) => void;
     removeSiteFromGroup: (siteId: string, groupId: string) => void;
+    
+    // New media management actions
+    addImage: (siteId: string, image: Image) => void;
+    removeImage: (siteId: string, imageUrl: string) => void;
+    addDocument: (siteId: string, document: Document) => void;
+    removeDocument: (siteId: string, documentUrl: string) => void;
+    
+    // Resource management actions
+    addResource: (siteId: string, resource: Resource) => void;
+    removeResource: (siteId: string, resourceId: string) => void;
+    updateResource: (siteId: string, resourceId: string, updates: Partial<Resource>) => void;
 }
 
 export const useSiteStore = create<SiteStore>((set) => ({
@@ -865,4 +920,106 @@ export const useSiteStore = create<SiteStore>((set) => ({
             sites: updatedSites,
         };
     }),
+
+    // New media management implementations
+    addImage: (siteId, image) => set((state) => ({
+        sites: state.sites.map((site) => {
+            if (site.id === siteId) {
+                return {
+                    ...site,
+                    images: [...site.images, image],
+                    lastUpdated: new Date().toISOString(),
+                };
+            }
+            return site;
+        }),
+    })),
+
+    removeImage: (siteId, imageUrl) => set((state) => ({
+        sites: state.sites.map((site) => {
+            if (site.id === siteId) {
+                return {
+                    ...site,
+                    images: site.images.filter((img) => img.url !== imageUrl),
+                    lastUpdated: new Date().toISOString(),
+                };
+            }
+            return site;
+        }),
+    })),
+
+    addDocument: (siteId, document) => set((state) => ({
+        sites: state.sites.map((site) => {
+            if (site.id === siteId) {
+                return {
+                    ...site,
+                    documents: [...site.documents, document],
+                    lastUpdated: new Date().toISOString(),
+                };
+            }
+            return site;
+        }),
+    })),
+
+    removeDocument: (siteId, documentUrl) => set((state) => ({
+        sites: state.sites.map((site) => {
+            if (site.id === siteId) {
+                return {
+                    ...site,
+                    documents: site.documents.filter((doc) => doc.url !== documentUrl),
+                    lastUpdated: new Date().toISOString(),
+                };
+            }
+            return site;
+        }),
+    })),
+
+    // Resource management implementations
+    addResource: (siteId: string, resource: Resource) => set((state) => {
+        const updatedSites = state.sites.map((site) => {
+            if (site.id === siteId) {
+                return {
+                    ...site,
+                    resources: [...site.resources, resource],
+                    lastUpdated: new Date().toISOString(),
+                };
+            }
+            return site;
+        });
+        
+        return { 
+            sites: updatedSites,
+            selectedSite: state.selectedSite?.id === siteId 
+                ? updatedSites.find(s => s.id === siteId) || state.selectedSite 
+                : state.selectedSite
+        };
+    }),
+
+    removeResource: (siteId, resourceId) => set((state) => ({
+        sites: state.sites.map((site) => {
+            if (site.id === siteId) {
+                return {
+                    ...site,
+                    resources: site.resources.filter((res) => res.id !== resourceId),
+                    lastUpdated: new Date().toISOString(),
+                };
+            }
+            return site;
+        }),
+    })),
+
+    updateResource: (siteId, resourceId, updates) => set((state) => ({
+        sites: state.sites.map((site) => {
+            if (site.id === siteId) {
+                return {
+                    ...site,
+                    resources: site.resources.map((res) => 
+                        res.id === resourceId ? { ...res, ...updates } : res
+                    ),
+                    lastUpdated: new Date().toISOString(),
+                };
+            }
+            return site;
+        }),
+    })),
 })); 
