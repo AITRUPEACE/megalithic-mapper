@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+🌍 Archaeology Mapping Project
+Reconstructing the Hidden History of Human Civilization
 
-## Getting Started
+Mission:
+The Archaeology Mapping Project is an open, collaborative platform dedicated to uncovering and visualizing patterns in ancient history that challenge conventional timelines. By mapping archaeological sites, myths, geological data, and ancient texts into a unified geospatial framework, this project aims to reveal correlations between civilizations, cataclysms, and technologies that may have been lost to time.
 
-First, run the development server:
+🔭 Vision
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+We believe humanity’s story is far older and more interconnected than current narratives suggest. Ancient civilizations across the globe, from Egypt and Sumer to the Andes and Indus Valley, share strikingly similar myths, architectural styles, and astronomical alignments. These parallels may not be coincidence, but the echoes of a once-global network of knowledge that predates the Younger Dryas (around 12,800 years ago).
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Our goal is to create a living, crowd-driven research atlas that grows as new discoveries are made, academic papers are published, and citizen researchers contribute their findings.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+🗺️ What the Platform Does
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The Archaeology Mapping Project serves as a global knowledge map. Users can:
 
-## Learn More
+🧩 Pin sites: Add ancient sites, ruins, megaliths, geological formations, or unexplained structures on an interactive world map.
 
-To learn more about Next.js, take a look at the following resources:
+📜 Upload evidence: Attach photos, site measurements, academic references, ancient texts, or mythological parallels.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+🌋 Cross-reference data: Overlay geological layers (floodplains, impact craters, volcanic ash, glacial melt paths) with archaeological data.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+🕯️ Analyze patterns: Visualize temporal and spatial relationships between civilizations, trade routes, myths, and natural cataclysms.
 
-## Deploy on Vercel
+🤖 AI-assisted synthesis: Use AI agents trained on academic sources to identify thematic connections and generate new hypotheses.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+🧠 Research Goals
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project bridges archaeology, mythology, geology, and anthropology through data correlation.
+It seeks to explore questions such as:
+
+Were there advanced pre-Ice Age civilizations lost in global cataclysms?
+
+Why do flood myths, sky gods, and sacred geometry appear in every culture?
+
+Do patterns of site placement and alignments suggest an ancient global grid or knowledge system?
+
+How do geological records (for example, meltwater pulses or impact events) align with cultural collapses and mythic resets?
+
+🧰 How We’ll Achieve It
+
+Data Integration:
+
+Aggregate verified datasets, including archaeological site coordinates, LiDAR scans, geological records, and linguistic data.
+
+Include community-sourced observations validated through reputation and citation systems.
+
+Collaborative Research:
+
+Enable teams to form around specific hypotheses such as “Megalithic Energy Network,” “Post-Younger Dryas Survivors,” or “Ancient Global Oceanic Routes.”
+
+Encourage interdisciplinary discourse connecting geology, astronomy, and mythological anthropology.
+
+AI-Driven Analysis:
+
+Train research agents to cross-reference myths, ancient texts, and academic papers.
+
+Use natural language processing and geospatial clustering to uncover non-obvious connections.
+
+Visualization Tools:
+
+Build interactive maps that combine physical data (topography, tectonics, hydrology) with historical narratives.
+
+Allow timeline playback to visualize human migrations, floods, and cultural expansions.
+
+🌐 The Research Approach
+
+The platform operates under open-source scientific principles: transparent, verifiable, and collaborative.
+Our methodology involves:
+
+Correlation before conclusion: using data visualization to observe patterns before forming theories.
+
+Cross-disciplinary synthesis: treating myths, linguistics, and architecture as valid archaeological data points.
+
+Transparency and sourcing: every data point must cite or link to a verifiable reference such as a paper, survey, or field report.
+
+Decentralized contribution: citizen researchers, academics, and field explorers can all participate equally.
+
+🔬 Expected Outcomes
+
+A living global map of ancient structures, myths, and geological evidence.
+
+A centralized research library of credible sources and ongoing analyses.
+
+Hypothesis papers generated collaboratively and published for peer review.
+
+A data-driven narrative of human civilization that integrates myth, memory, and measurable evidence.
+
+🌏 Join the Expedition
+
+This is not just a project. It is an invitation to rediscover who we are.
+Whether you’re an archaeologist, data scientist, geologist, mythologist, or curious explorer, your insights can shape this shared map of our forgotten past.
+
+“The further back you look, the further forward you can see.” – Winston Churchill
+
+🧩 Repository Structure (High-Level)
+/frontend        → Next.js interactive map UI  
+/backend         → Supabase/Postgres + API endpoints  
+/data            → Verified site datasets, myth records, geological overlays  
+/agents          → AI research assistants and training data  
+/docs            → Research methodology, contribution guides, and papers  
+
+🗝️ License
+
+Open-source under MIT License.
+All research and site data remain attributed to original contributors and sources.
