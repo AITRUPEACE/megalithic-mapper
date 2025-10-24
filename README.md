@@ -3,6 +3,20 @@
 
 ---
 
+## 📚 Table of Contents
+- [🧭 Mission](#-mission)
+- [🔭 Vision](#-vision)
+- [🗺️ What the Platform Does](#️-what-the-platform-does)
+- [🧠 Research Goals](#-research-goals)
+- [🧰 How We’ll Achieve It](#-how-well-achieve-it)
+- [🌐 The Research Approach](#-the-research-approach)
+- [🔬 Expected Outcomes](#-expected-outcomes)
+- [🌏 Join the Expedition](#-join-the-expedition)
+- [📁 Repository Structure](#-repository-structure-high-level)
+- [🗝️ License](#️-license)
+
+---
+
 ## 🧭 Mission
 
 The **Archaeology Mapping Project** is an open, collaborative platform dedicated to uncovering and visualizing patterns in ancient history that challenge conventional timelines.  
@@ -99,3 +113,16 @@ Whether you’re an archaeologist, data scientist, geologist, mythologist, or cu
 
 ## 📁 Repository Structure (High-Level)
 
+/frontend → Next.js interactive map UI
+/backend → Supabase/Postgres + API endpoints
+/data → Verified site datasets, myth records, geological overlays
+/agents → AI research assistants and training data
+/docs → Research methodology, contribution guides, and papers
+
+
+---
+
+## 🗝️ License
+
+Open-source under the **MIT License**.  
+All research and site data remain attributed to original contributors and sources.
