@@ -1,106 +1,101 @@
-🌍 Archaeology Mapping Project
-Reconstructing the Hidden History of Human Civilization
+# 🌍 Archaeology Mapping Project
+### Reconstructing the Hidden History of Human Civilization
 
-Mission:
-The Archaeology Mapping Project is an open, collaborative platform dedicated to uncovering and visualizing patterns in ancient history that challenge conventional timelines. By mapping archaeological sites, myths, geological data, and ancient texts into a unified geospatial framework, this project aims to reveal correlations between civilizations, cataclysms, and technologies that may have been lost to time.
+---
 
-🔭 Vision
+## 🧭 Mission
 
-We believe humanity’s story is far older and more interconnected than current narratives suggest. Ancient civilizations across the globe, from Egypt and Sumer to the Andes and Indus Valley, share strikingly similar myths, architectural styles, and astronomical alignments. These parallels may not be coincidence, but the echoes of a once-global network of knowledge that predates the Younger Dryas (around 12,800 years ago).
+The **Archaeology Mapping Project** is an open, collaborative platform dedicated to uncovering and visualizing patterns in ancient history that challenge conventional timelines.  
 
-Our goal is to create a living, crowd-driven research atlas that grows as new discoveries are made, academic papers are published, and citizen researchers contribute their findings.
+By mapping archaeological sites, myths, geological data, and ancient texts into a unified geospatial framework, this project aims to reveal correlations between civilizations, cataclysms, and technologies that may have been lost to time.
 
-🗺️ What the Platform Does
+---
 
-The Archaeology Mapping Project serves as a global knowledge map. Users can:
+## 🔭 Vision
 
-🧩 Pin sites: Add ancient sites, ruins, megaliths, geological formations, or unexplained structures on an interactive world map.
+We believe humanity’s story is far older and more interconnected than current narratives suggest.  
+Ancient civilizations across the globe, from Egypt and Sumer to the Andes and Indus Valley, share strikingly similar myths, architectural styles, and astronomical alignments.  
 
-📜 Upload evidence: Attach photos, site measurements, academic references, ancient texts, or mythological parallels.
+These parallels may not be coincidence, but the echoes of a once-global network of knowledge that predates the Younger Dryas (around 12,800 years ago).
 
-🌋 Cross-reference data: Overlay geological layers (floodplains, impact craters, volcanic ash, glacial melt paths) with archaeological data.
+Our goal is to create a **living, crowd-driven research atlas** that grows as new discoveries are made, academic papers are published, and citizen researchers contribute their findings.
 
-🕯️ Analyze patterns: Visualize temporal and spatial relationships between civilizations, trade routes, myths, and natural cataclysms.
+---
 
-🤖 AI-assisted synthesis: Use AI agents trained on academic sources to identify thematic connections and generate new hypotheses.
+## 🗺️ What the Platform Does
 
-🧠 Research Goals
+The Archaeology Mapping Project serves as a **global knowledge map**. Users can:
 
-This project bridges archaeology, mythology, geology, and anthropology through data correlation.
+- 🧩 **Pin sites:** Add ancient sites, ruins, megaliths, geological formations, or unexplained structures on an interactive world map.  
+- 📜 **Upload evidence:** Attach photos, site measurements, academic references, ancient texts, or mythological parallels.  
+- 🌋 **Cross-reference data:** Overlay geological layers (floodplains, impact craters, volcanic ash, glacial melt paths) with archaeological data.  
+- 🕯️ **Analyze patterns:** Visualize temporal and spatial relationships between civilizations, trade routes, myths, and natural cataclysms.  
+- 🤖 **AI-assisted synthesis:** Use AI agents trained on academic sources to identify thematic connections and generate new hypotheses.
+
+---
+
+## 🧠 Research Goals
+
+This project bridges **archaeology**, **mythology**, **geology**, and **anthropology** through data correlation.  
 It seeks to explore questions such as:
 
-Were there advanced pre-Ice Age civilizations lost in global cataclysms?
+- Were there advanced pre-Ice Age civilizations lost in global cataclysms?  
+- Why do flood myths, sky gods, and sacred geometry appear in every culture?  
+- Do patterns of site placement and alignments suggest an ancient global grid or knowledge system?  
+- How do geological records (for example, meltwater pulses or impact events) align with cultural collapses and mythic resets?
 
-Why do flood myths, sky gods, and sacred geometry appear in every culture?
+---
 
-Do patterns of site placement and alignments suggest an ancient global grid or knowledge system?
+## 🧰 How We’ll Achieve It
 
-How do geological records (for example, meltwater pulses or impact events) align with cultural collapses and mythic resets?
+### 1. Data Integration
+- Aggregate verified datasets, including archaeological site coordinates, LiDAR scans, geological records, and linguistic data.  
+- Include community-sourced observations validated through reputation and citation systems.
 
-🧰 How We’ll Achieve It
+### 2. Collaborative Research
+- Enable teams to form around specific hypotheses such as *Megalithic Energy Network*, *Post-Younger Dryas Survivors*, or *Ancient Global Oceanic Routes.*  
+- Encourage interdisciplinary discourse connecting geology, astronomy, and mythological anthropology.
 
-Data Integration:
+### 3. AI-Driven Analysis
+- Train research agents to cross-reference myths, ancient texts, and academic papers.  
+- Use natural language processing and geospatial clustering to uncover non-obvious connections.
 
-Aggregate verified datasets, including archaeological site coordinates, LiDAR scans, geological records, and linguistic data.
+### 4. Visualization Tools
+- Build interactive maps that combine physical data (topography, tectonics, hydrology) with historical narratives.  
+- Allow timeline playback to visualize human migrations, floods, and cultural expansions.
 
-Include community-sourced observations validated through reputation and citation systems.
+---
 
-Collaborative Research:
+## 🌐 The Research Approach
 
-Enable teams to form around specific hypotheses such as “Megalithic Energy Network,” “Post-Younger Dryas Survivors,” or “Ancient Global Oceanic Routes.”
-
-Encourage interdisciplinary discourse connecting geology, astronomy, and mythological anthropology.
-
-AI-Driven Analysis:
-
-Train research agents to cross-reference myths, ancient texts, and academic papers.
-
-Use natural language processing and geospatial clustering to uncover non-obvious connections.
-
-Visualization Tools:
-
-Build interactive maps that combine physical data (topography, tectonics, hydrology) with historical narratives.
-
-Allow timeline playback to visualize human migrations, floods, and cultural expansions.
-
-🌐 The Research Approach
-
-The platform operates under open-source scientific principles: transparent, verifiable, and collaborative.
+The platform operates under **open-source scientific principles**: transparent, verifiable, and collaborative.  
 Our methodology involves:
 
-Correlation before conclusion: using data visualization to observe patterns before forming theories.
+- **Correlation before conclusion:** Using data visualization to observe patterns before forming theories.  
+- **Cross-disciplinary synthesis:** Treating myths, linguistics, and architecture as valid archaeological data points.  
+- **Transparency and sourcing:** Every data point must cite or link to a verifiable reference such as a paper, survey, or field report.  
+- **Decentralized contribution:** Citizen researchers, academics, and field explorers can all participate equally.
 
-Cross-disciplinary synthesis: treating myths, linguistics, and architecture as valid archaeological data points.
+---
 
-Transparency and sourcing: every data point must cite or link to a verifiable reference such as a paper, survey, or field report.
+## 🔬 Expected Outcomes
 
-Decentralized contribution: citizen researchers, academics, and field explorers can all participate equally.
+- A **living global map** of ancient structures, myths, and geological evidence.  
+- A **centralized research library** of credible sources and ongoing analyses.  
+- **Hypothesis papers** generated collaboratively and published for peer review.  
+- A **data-driven narrative** of human civilization that integrates myth, memory, and measurable evidence.
 
-🔬 Expected Outcomes
+---
 
-A living global map of ancient structures, myths, and geological evidence.
+## 🌏 Join the Expedition
 
-A centralized research library of credible sources and ongoing analyses.
-
-Hypothesis papers generated collaboratively and published for peer review.
-
-A data-driven narrative of human civilization that integrates myth, memory, and measurable evidence.
-
-🌏 Join the Expedition
-
-This is not just a project. It is an invitation to rediscover who we are.
+This is not just a project — it is an **invitation to rediscover who we are.**  
 Whether you’re an archaeologist, data scientist, geologist, mythologist, or curious explorer, your insights can shape this shared map of our forgotten past.
 
-“The further back you look, the further forward you can see.” – Winston Churchill
+> “The further back you look, the further forward you can see.”  
+> — Winston Churchill
 
-🧩 Repository Structure (High-Level)
-/frontend        → Next.js interactive map UI  
-/backend         → Supabase/Postgres + API endpoints  
-/data            → Verified site datasets, myth records, geological overlays  
-/agents          → AI research assistants and training data  
-/docs            → Research methodology, contribution guides, and papers  
+---
 
-🗝️ License
+## 📁 Repository Structure (High-Level)
 
-Open-source under MIT License.
-All research and site data remain attributed to original contributors and sources.
