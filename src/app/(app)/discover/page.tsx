@@ -23,10 +23,10 @@ export default function DiscoverPage() {
         </div>
         <div className="flex flex-wrap gap-3">
           <Button asChild>
-            <Link href="/map">View on map</Link>
+            <Link href="/(app)/map">View on map</Link>
           </Button>
           <Button asChild variant="secondary">
-            <Link href="/research">Join a project</Link>
+            <Link href="/(app)/research">Join a project</Link>
           </Button>
         </div>
       </div>
@@ -55,7 +55,7 @@ export default function DiscoverPage() {
                   </span>
                 ))}
               </div>
-              <Link href={`/map?focus=${site.id}`} className="text-xs text-primary hover:underline">
+              <Link href={`/(app)/map?focus=${site.id}`} className="text-xs text-primary hover:underline">
                 Zoom to location →
               </Link>
             </CardContent>
@@ -94,7 +94,7 @@ export default function DiscoverPage() {
                     </span>
                   ))}
                 </div>
-                <Link href={`/research/${project.id}`} className="mt-4 inline-block text-xs text-primary hover:underline">
+                <Link href={`/(app)/research/${project.id}`} className="mt-4 inline-block text-xs text-primary hover:underline">
                   View project workspace →
                 </Link>
               </div>
@@ -124,7 +124,7 @@ export default function DiscoverPage() {
                   ))}
                   <span className="rounded-full bg-primary/15 px-2 py-1 text-primary">{thread.replies} replies</span>
                 </div>
-                <Link href={`/forum?thread=${thread.id}`} className="mt-3 inline-block text-xs text-primary hover:underline">
+                <Link href={`/(app)/forum?thread=${thread.id}`} className="mt-3 inline-block text-xs text-primary hover:underline">
                   Join conversation →
                 </Link>
               </div>

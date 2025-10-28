@@ -60,10 +60,10 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-wrap gap-4">
               <Button asChild size="lg">
-                <Link href="/map">Launch the collaborative map</Link>
+                <Link href="/(app)/map">Launch the collaborative map</Link>
               </Button>
               <Button asChild variant="secondary" size="lg">
-                <Link href="/research">Explore research projects</Link>
+                <Link href="/(app)/research">Explore research projects</Link>
               </Button>
             </div>
           </div>

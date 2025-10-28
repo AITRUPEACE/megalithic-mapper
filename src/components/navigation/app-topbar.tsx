@@ -26,25 +26,17 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
             onChange={(event) => onGlobalSearch?.(event.target.value)}
           />
         </div>
-        <Link
-          href="/research"
-          className={cn(
-            "hidden items-center gap-1 rounded-md border border-primary/30 px-3 py-1 text-xs font-medium uppercase tracking-wide text-primary md:inline-flex",
-            pathname.startsWith("/research") && "bg-primary/10"
-          )}
-        >
-          Research Hub
-        </Link>
+        <Link href="/(app)/research" className={cn("hidden items-center gap-1 rounded-md border border-primary/30 px-3 py-1 text-xs font-medium uppercase tracking-wide text-primary md:inline-flex", pathname.startsWith("/(app)/research") && "bg-primary/10")}>Research Hub</Link>
       </div>
       <div className="flex items-center gap-3">
         <Button asChild size="sm" variant="secondary">
-          <Link href="/map#new-site">
+          <Link href="/(app)/map#new-site">
             <Plus className="mr-1 h-4 w-4" />
             New Contribution
           </Link>
         </Button>
         <Button asChild size="sm" variant="ghost">
-          <Link href="/profile">
+          <Link href="/(app)/profile">
             <ShieldCheck className="mr-1 h-4 w-4" />
             Request Verification
           </Link>

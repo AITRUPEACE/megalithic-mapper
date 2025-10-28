@@ -3,6 +3,7 @@
 import { MapContainer, TileLayer, CircleMarker, Tooltip, useMap } from "react-leaflet";
 import { useEffect, useMemo } from "react";
 import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import type { MapSite } from "@/lib/types";
 
 const MAP_CENTER: [number, number] = [20, 10];

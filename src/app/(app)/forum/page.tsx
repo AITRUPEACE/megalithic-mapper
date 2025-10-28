@@ -16,7 +16,7 @@ export default function ForumPage() {
           </p>
         </div>
         <Button asChild>
-          <Link href="/forum/new">Start a new thread</Link>
+          <Link href="/(app)/forum/new">Start a new thread</Link>
         </Button>
       </div>
 
@@ -46,7 +46,7 @@ export default function ForumPage() {
                 <span className="rounded-full bg-primary/15 px-2 py-1 text-primary">{thread.replies} replies</span>
               </div>
               <Link
-                href={`/forum/${thread.id}`}
+                href={`/(app)/forum/${thread.id}`}
                 className="mt-3 inline-block text-xs text-primary hover:underline"
               >
                 Open thread →

@@ -17,7 +17,7 @@ export default function MediaPage() {
           </p>
         </div>
         <Button asChild>
-          <Link href="/media/new">Upload media</Link>
+          <Link href="/(app)/media/new">Upload media</Link>
         </Button>
       </div>
 
@@ -55,7 +55,7 @@ export default function MediaPage() {
                 <Link href={media.url} className="text-primary hover:underline">
                   View source →
                 </Link>
-                <Link href={`/research?media=${media.id}`} className="text-primary hover:underline">
+                <Link href={`/(app)/research?media=${media.id}`} className="text-primary hover:underline">
                   Link to hypothesis →
                 </Link>
               </div>

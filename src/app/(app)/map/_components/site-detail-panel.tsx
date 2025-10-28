@@ -65,10 +65,10 @@ export const SiteDetailPanel = ({ site }: SiteDetailPanelProps) => {
           <p className="text-xs uppercase tracking-wide text-muted-foreground">Next actions</p>
           <div className="flex flex-wrap gap-2">
             <Button asChild size="sm">
-              <Link href={`/research?site=${site.id}`}>Open in Research Hub</Link>
+              <Link href={`/(app)/research?site=${site.id}`}>Open in Research Hub</Link>
             </Button>
             <Button asChild size="sm" variant="secondary">
-              <Link href={`/forum?site=${site.id}`}>Discuss with community</Link>
+              <Link href={`/(app)/forum?site=${site.id}`}>Discuss with community</Link>
             </Button>
           </div>
         </div>
