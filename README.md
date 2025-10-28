@@ -111,18 +111,29 @@ Whether you’re an archaeologist, data scientist, geologist, mythologist, or cu
 
 ---
 
+## ⚙️ Local Development
+
+```bash
+npm install
+npm run dev
+```
+
+The app runs on Next.js 15 with the App Router, Tailwind CSS, shadcn/ui components, Supabase client utilities, and Leaflet for mapping. Environment variables such as Supabase keys should be stored in `.env.local` (see `PRD.md` for expected keys).
+
 ## 📁 Repository Structure (High-Level)
 
-/frontend → Next.js interactive map UI
-/backend → Supabase/Postgres + API endpoints
-/data → Verified site datasets, myth records, geological overlays
-/agents → AI research assistants and training data
-/docs → Research methodology, contribution guides, and papers
+- `src/app` – Next.js App Router pages. `/(app)` contains the authenticated shell (map, research hub, forum, media, texts, notifications, profile). The root `page.tsx` renders the public landing page.
+- `src/components` – Shared navigation chrome and shadcn/ui primitives (`button`, `card`, `tabs`, etc.).
+- `src/data` – Seed data used to prototype Leaflet markers, research projects, discussions, media, texts, and notifications.
+- `src/lib` – Utility helpers and shared TypeScript types for sites, research projects, media, and notifications.
+- `src/state` – Client-side state (Zustand store) powering the Leaflet map filters and selections.
+- `PRD.md` – Product requirements document guiding the MVP scope.
 
+Refer to `PRD.md` for feature breakdowns, milestones, and the collaborative research vision.
 
 ---
 
 ## 🗝️ License
 
-Open-source under the **MIT License**.  
+Open-source under the **MIT License**.
 All research and site data remain attributed to original contributors and sources.

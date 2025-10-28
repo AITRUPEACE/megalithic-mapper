@@ -8,8 +8,12 @@ export default {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-  	extend: {
-  		colors: {
+        extend: {
+                fontFamily: {
+                        sans: ["var(--font-sans)", "system-ui"],
+                        serif: ["var(--font-serif)", "serif"],
+                },
+                colors: {
   			background: 'hsl(var(--background) / <alpha-value>)',
   			foreground: 'hsl(var(--foreground) / <alpha-value>)',
   			card: {
