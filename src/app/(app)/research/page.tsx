@@ -109,10 +109,10 @@ function ProjectCard({ project }: { project: (typeof sampleResearchProjects)[num
         </div>
       </CardContent>
       <CardFooter className="flex flex-wrap justify-between gap-3 text-xs text-muted-foreground">
-        <Link href={`/(app)/map?project=${project.id}`} className="text-primary hover:underline">
+        <Link href={`/map?project=${project.id}`} className="text-primary hover:underline">
           View linked sites →
         </Link>
-        <Link href={`/(app)/forum?project=${project.id}`} className="text-primary hover:underline">
+        <Link href={`/forum?project=${project.id}`} className="text-primary hover:underline">
           Open project discussion →
         </Link>
       </CardFooter>

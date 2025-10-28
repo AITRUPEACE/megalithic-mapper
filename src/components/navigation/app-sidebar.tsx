@@ -7,14 +7,14 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/(app)/map", label: "Map", icon: Map },
-  { href: "/(app)/discover", label: "Discover", icon: Compass },
-  { href: "/(app)/forum", label: "Forum", icon: MessageSquare },
-  { href: "/(app)/media", label: "Media", icon: Images },
-  { href: "/(app)/texts", label: "Text Library", icon: BookOpen },
-  { href: "/(app)/research", label: "Research Hub", icon: Network },
-  { href: "/(app)/notifications", label: "Notifications", icon: Bell },
-  { href: "/(app)/profile", label: "Profile", icon: UserCircle },
+  { href: "/map", label: "Map", icon: Map },
+  { href: "/discover", label: "Discover", icon: Compass },
+  { href: "/forum", label: "Forum", icon: MessageSquare },
+  { href: "/media", label: "Media", icon: Images },
+  { href: "/texts", label: "Text Library", icon: BookOpen },
+  { href: "/research", label: "Research Hub", icon: Network },
+  { href: "/notifications", label: "Notifications", icon: Bell },
+  { href: "/profile", label: "Profile", icon: UserCircle },
 ];
 
 export const AppSidebar = () => {
@@ -23,7 +23,7 @@ export const AppSidebar = () => {
   return (
     <aside className="flex h-full w-64 flex-col border-r border-border/60 bg-background/60 backdrop-blur">
       <div className="px-6 py-5">
-        <Link href="/(app)/map" className="flex items-center gap-2 text-lg font-semibold">
+        <Link href="/map" className="flex items-center gap-2 text-lg font-semibold">
           <span className="rounded-full bg-primary/20 px-2 py-1 text-xs uppercase tracking-wide text-primary">
             Megalithic Mapper
           </span>

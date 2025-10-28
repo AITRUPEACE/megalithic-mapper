@@ -7,7 +7,7 @@ export const sampleNotifications: ActivityNotification[] = [
     summary: "Aurelia Quispe mentioned you in the Terrace Resonance log",
     timestamp: "2024-10-11T12:32:00Z",
     unread: true,
-    link: { href: "/(app)/research/andes-sonics", label: "View hypothesis" },
+    link: { href: "/research/andes-sonics", label: "View hypothesis" },
   },
   {
     id: "notif-2",
@@ -15,7 +15,7 @@ export const sampleNotifications: ActivityNotification[] = [
     summary: "Your verification request is awaiting additional documentation",
     timestamp: "2024-09-29T09:10:00Z",
     unread: false,
-    link: { href: "/(app)/profile", label: "Update profile" },
+    link: { href: "/profile", label: "Update profile" },
   },
   {
     id: "notif-3",
@@ -23,7 +23,7 @@ export const sampleNotifications: ActivityNotification[] = [
     summary: "Andean Sonic Cartography added new spectrogram evidence",
     timestamp: "2024-09-01T17:50:00Z",
     unread: false,
-    link: { href: "/(app)/research/andes-sonics", label: "Review" },
+    link: { href: "/research/andes-sonics", label: "Review" },
   },
   {
     id: "notif-4",
@@ -31,6 +31,6 @@ export const sampleNotifications: ActivityNotification[] = [
     summary: "Laila replied to your Derinkuyu ventilation workflow",
     timestamp: "2024-08-21T07:22:00Z",
     unread: true,
-    link: { href: "/(app)/forum", label: "Open discussion" },
+    link: { href: "/forum", label: "Open discussion" },
   },
 ];
