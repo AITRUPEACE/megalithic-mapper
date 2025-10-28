@@ -1,0 +1,48 @@
+import { MediaAsset } from "@/lib/types";
+
+export const sampleMediaAssets: MediaAsset[] = [
+  {
+    id: "media-sphinx-striation",
+    title: "Sphinx erosion striation composite",
+    type: "image",
+    url: "https://example.com/media/sphinx-striation",
+    thumbnail: "https://images.unsplash.com/photo-1549887534-1541e9326642?auto=format&fit=crop&w=400&q=80",
+    contributor: "curator.laila",
+    civilization: "Ancient Egyptian",
+    tags: ["erosion", "stratigraphy"],
+    createdAt: "2024-09-01T12:00:00Z",
+  },
+  {
+    id: "media-quipu-slowmo",
+    title: "Quipu resonance slow motion capture",
+    type: "video",
+    url: "https://youtube.com/watch?v=example",
+    thumbnail: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=400&q=80",
+    contributor: "field.aurelia",
+    civilization: "Inca",
+    tags: ["experiment", "sound"],
+    createdAt: "2024-09-24T09:00:00Z",
+  },
+  {
+    id: "media-derinkuyu-cutaway",
+    title: "Derinkuyu ventilation cutaway render",
+    type: "image",
+    url: "https://example.com/media/derinkuyu-cutaway",
+    thumbnail: "https://images.unsplash.com/photo-1526800544336-d04f0cbfd700?auto=format&fit=crop&w=400&q=80",
+    contributor: "moderator.ipek",
+    civilization: "Anatolian",
+    tags: ["engineering", "visualization"],
+    createdAt: "2024-08-12T10:20:00Z",
+  },
+  {
+    id: "media-harbor-sonar",
+    title: "Phalasarna sonar fly-through",
+    type: "video",
+    url: "https://youtube.com/watch?v=example2",
+    thumbnail: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=400&q=80",
+    contributor: "oceanic.eleni",
+    civilization: "Classical Greek",
+    tags: ["sonar", "harbor"],
+    createdAt: "2024-06-28T14:35:00Z",
+  },
+];
