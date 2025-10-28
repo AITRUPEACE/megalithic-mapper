@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { SiteFilters } from "./site-filters";
 import { SiteList } from "./site-list";
@@ -9,6 +9,7 @@ import { filterSites, getSelectedSite, useSiteStore } from "@/state/site-store";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { MapSite } from "@/lib/types";
+import { useSearchParams } from "next/navigation";
 
 const SiteMap = dynamic(() => import("./site-map").then((module) => module.SiteMap), {
   ssr: false,
@@ -16,6 +17,7 @@ const SiteMap = dynamic(() => import("./site-map").then((module) => module.SiteM
 
 export const SiteExplorer = () => {
   const { sites, filters, selectedSiteId, setFilters, clearFilters, selectSite } = useSiteStore();
+  const searchParams = useSearchParams();
 
   const filteredSites = useMemo(() => filterSites(sites, filters), [sites, filters]);
   const selectedSite = useMemo(() => getSelectedSite(sites, selectedSiteId), [sites, selectedSiteId]);
@@ -28,6 +30,31 @@ export const SiteExplorer = () => {
     () => Array.from(new Set<MapSite["siteType"]>(sites.map((site) => site.siteType))).sort(),
     [sites]
   );
+
+  const focusParam = searchParams.get("focus");
+  const projectParam = searchParams.get("project");
+  const siteParam = searchParams.get("site");
+
+  useEffect(() => {
+    if (!sites.length) return;
+
+    if (focusParam) {
+      selectSite(focusParam);
+      return;
+    }
+
+    if (siteParam) {
+      selectSite(siteParam);
+      return;
+    }
+
+    if (projectParam) {
+      const relatedSite = sites.find((site) => site.relatedResearchIds.includes(projectParam));
+      if (relatedSite) {
+        selectSite(relatedSite.id);
+      }
+    }
+  }, [focusParam, projectParam, siteParam, selectSite, sites]);
 
   return (
     <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">

@@ -35,6 +35,17 @@ const MapBounds = ({ sites }: { sites: MapSite[] }) => {
   return null;
 };
 
+const SelectedSiteFocus = ({ site }: { site: MapSite | null }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!site) return;
+    map.flyTo([site.latitude, site.longitude], 6, { duration: 0.8 });
+  }, [map, site]);
+
+  return null;
+};
+
 export const SiteMap = ({ sites, selectedSiteId, onSelect }: SiteMapProps) => {
   const selectedSite = useMemo(
     () => sites.find((site) => site.id === selectedSiteId) ?? null,
@@ -54,6 +65,7 @@ export const SiteMap = ({ sites, selectedSiteId, onSelect }: SiteMapProps) => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <MapBounds sites={sites} />
+        <SelectedSiteFocus site={selectedSite} />
         {sites.map((site) => {
           const isSelected = site.id === selectedSiteId;
           const radius = isSelected ? 14 : 10;
