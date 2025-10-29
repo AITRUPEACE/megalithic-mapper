@@ -3,6 +3,7 @@
 import { MapContainer, TileLayer, CircleMarker, Tooltip, useMap } from "react-leaflet";
 import { useEffect, useMemo } from "react";
 import L from "leaflet";
+import type { LatLngTuple } from "leaflet";
 import type { MapSite } from "@/lib/types";
 
 const MAP_CENTER: [number, number] = [20, 10];
@@ -25,16 +26,16 @@ const MapBounds = ({ sites }: { sites: MapSite[] }) => {
   useEffect(() => {
     if (!sites.length) return;
 
-    const initialBounds = L.latLngBounds(
-      [sites[0].latitude, sites[0].longitude],
-      [sites[0].latitude, sites[0].longitude]
+    const coordinates = sites.map(
+      (site) => [site.latitude, site.longitude] as LatLngTuple
     );
+    const bounds = L.latLngBounds(coordinates);
 
-    sites.forEach((site) => {
-      initialBounds.extend([site.latitude, site.longitude]);
-    });
+    if (!bounds.isValid()) return;
 
-    map.fitBounds(initialBounds, { padding: [40, 40], animate: true });
+    const targetBounds = coordinates.length === 1 ? bounds.pad(0.25) : bounds;
+
+    map.fitBounds(targetBounds, { padding: [48, 48], animate: false });
   }, [map, sites]);
 
   return null;
