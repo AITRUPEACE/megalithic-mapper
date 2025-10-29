@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { nanoid } from "nanoid";
-import { MapSite, VerificationStatus } from "@/lib/types";
+import { CommunityTier, MapLayer, MapSite, VerificationStatus } from "@/lib/types";
 import { sampleSites } from "@/data/sample-sites";
 
 export interface MapFilters {
@@ -9,6 +9,8 @@ export interface MapFilters {
   verification: "all" | VerificationStatus;
   researchOnly: boolean;
   siteTypes: string[];
+  layer: "composite" | MapLayer;
+  communityTiers: CommunityTier[];
 }
 
 interface MapState {
@@ -31,6 +33,8 @@ const DEFAULT_FILTERS: MapFilters = {
   verification: "all",
   researchOnly: false,
   siteTypes: [],
+  layer: "composite",
+  communityTiers: [],
 };
 
 export const useSiteStore = create<MapState>((set) => ({
@@ -50,6 +54,8 @@ export const useSiteStore = create<MapState>((set) => ({
     const newSite: MapSite = {
       ...siteInput,
       id,
+      layer: siteInput.layer ?? "community",
+      trustTier: siteInput.trustTier ?? "bronze",
       lastUpdated: now,
     };
 
@@ -85,7 +91,23 @@ export const filterSites = (sites: MapSite[], filters: MapFilters): MapSite[] =>
 
     const matchesResearch = !filters.researchOnly || site.relatedResearchIds.length > 0;
 
-    return matchesSearch && matchesCivilization && matchesVerification && matchesSiteType && matchesResearch;
+    const matchesLayer =
+      filters.layer === "composite" ? true : site.layer === filters.layer;
+
+    const matchesCommunityTier =
+      site.layer !== "community" ||
+      filters.communityTiers.length === 0 ||
+      (site.trustTier ? filters.communityTiers.includes(site.trustTier) : false);
+
+    return (
+      matchesSearch &&
+      matchesCivilization &&
+      matchesVerification &&
+      matchesSiteType &&
+      matchesResearch &&
+      matchesLayer &&
+      matchesCommunityTier
+    );
   });
 };
 

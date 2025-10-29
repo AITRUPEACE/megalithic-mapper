@@ -9,6 +9,16 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    // Funnel any legacy `/app/*` URLs introduced before route groups into their new locations.
+    return [
+      {
+        source: "/app/:path*",
+        destination: "/:path*",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

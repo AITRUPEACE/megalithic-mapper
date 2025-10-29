@@ -2,6 +2,10 @@ export type VerificationStatus = "verified" | "under_review" | "unverified";
 
 export type SiteCategory = "site" | "artifact" | "text";
 
+export type MapLayer = "official" | "community";
+
+export type CommunityTier = "bronze" | "silver" | "gold" | "promoted";
+
 export interface MapSite {
   id: string;
   name: string;
@@ -13,6 +17,8 @@ export interface MapSite {
   category: SiteCategory;
   siteType: string;
   verificationStatus: VerificationStatus;
+  layer: MapLayer;
+  trustTier?: CommunityTier;
   tags: string[];
   mediaCount: number;
   relatedResearchIds: string[];
