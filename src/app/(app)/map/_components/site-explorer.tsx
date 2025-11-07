@@ -7,9 +7,11 @@ import { SiteList } from "./site-list";
 import { SiteDetailPanel } from "./site-detail-panel";
 import { filterSites, getSelectedSite, useSiteStore } from "@/state/site-store";
 import { Badge } from "@/components/ui/badge";
-import { CommunityTier, MapSite } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { CommunityTier, MapSite, SiteCategory } from "@/lib/types";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { SiteSubmissionForm } from "./site-submission-form";
 
 const SiteMap = dynamic(() => import("./site-map").then((module) => module.SiteMap), {
   ssr: false,
@@ -19,6 +21,7 @@ export const SiteExplorer = () => {
   const { sites, filters, selectedSiteId, setFilters, clearFilters, selectSite } = useSiteStore();
   const searchParams = useSearchParams();
   const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const [showSubmission, setShowSubmission] = useState(false);
 
   const filteredSites = useMemo(() => filterSites(sites, filters), [sites, filters]);
   const selectedSite = useMemo(() => getSelectedSite(sites, selectedSiteId), [sites, selectedSiteId]);
@@ -31,6 +34,10 @@ export const SiteExplorer = () => {
     () => Array.from(new Set<MapSite["siteType"]>(sites.map((site) => site.siteType))).sort(),
     [sites]
   );
+  const categories = useMemo(() => {
+    const order: SiteCategory[] = ["site", "artifact", "text"];
+    return order.filter((category) => sites.some((site) => site.category === category));
+  }, [sites]);
   const communityTiers = useMemo(() => {
     const tierOrder: CommunityTier[] = ["bronze", "silver", "gold", "promoted"];
     const tiers = new Set<CommunityTier>();
@@ -80,8 +87,25 @@ export const SiteExplorer = () => {
             Explore trusted field submissions, research-linked hypotheses, and community discoveries in one Leaflet view.
           </p>
         </div>
-        <Badge variant="secondary">Leaflet integration</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">Leaflet integration</Badge>
+          <Button
+            size="sm"
+            variant={showSubmission ? "ghost" : "secondary"}
+            onClick={() => setShowSubmission((previous) => !previous)}
+          >
+            {showSubmission ? "Hide submission form" : "Submit new entry"}
+          </Button>
+        </div>
       </div>
+
+      {showSubmission && (
+        <SiteSubmissionForm
+          className="border border-dashed border-primary/40 bg-primary/5"
+          onSubmitted={() => setShowSubmission(false)}
+          onCancel={() => setShowSubmission(false)}
+        />
+      )}
 
       <div className="flex flex-1 flex-col gap-4 lg:grid lg:grid-cols-[320px_1fr] lg:gap-6">
         <div className="order-2 flex min-h-[320px] flex-col overflow-hidden rounded-xl border border-border/40 bg-background/15 lg:order-1 lg:max-h-[calc(100vh-200px)]">
@@ -92,6 +116,7 @@ export const SiteExplorer = () => {
             availableCivilizations={civilizations}
             availableSiteTypes={siteTypes}
             availableCommunityTiers={communityTiers}
+            availableCategories={categories}
             onUpdate={setFilters}
             onClear={clearFilters}
           />

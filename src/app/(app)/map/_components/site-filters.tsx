@@ -4,13 +4,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import type { MapFilters } from "@/state/site-store";
 import { cn } from "@/lib/utils";
-import type { CommunityTier } from "@/lib/types";
+import type { CommunityTier, SiteCategory } from "@/lib/types";
 
 interface SiteFiltersProps {
   filters: MapFilters;
   availableCivilizations: string[];
   availableSiteTypes: string[];
   availableCommunityTiers: CommunityTier[];
+  availableCategories: SiteCategory[];
   onUpdate: (update: Partial<MapFilters>) => void;
   onClear: () => void;
   className?: string;
@@ -22,6 +23,7 @@ export const SiteFilters = ({
   availableCivilizations,
   availableSiteTypes,
   availableCommunityTiers,
+  availableCategories,
   onUpdate,
   onClear,
   className,
@@ -78,6 +80,36 @@ export const SiteFilters = ({
             })}
           </div>
         </div>
+
+        {availableCategories.length > 0 && (
+          <div>
+            <p className="text-sm font-semibold text-foreground">Entry type</p>
+            <div className="mt-2 flex flex-wrap gap-2 sm:flex-nowrap sm:overflow-x-auto sm:pr-2">
+              {availableCategories.map((category) => {
+                const isActive = filters.categories.includes(category);
+                const labelMap: Record<SiteCategory, string> = {
+                  site: "Sites",
+                  artifact: "Artifacts",
+                  text: "Texts",
+                };
+                return (
+                  <Button
+                    key={category}
+                    size="sm"
+                    variant={isActive ? "secondary" : "ghost"}
+                    className={cn(
+                      "rounded-full sm:shrink-0",
+                      isActive && "border border-primary/40"
+                    )}
+                    onClick={() => onUpdate({ categories: toggleArrayValue(filters.categories, category) })}
+                  >
+                    {labelMap[category]}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div>
           <p className="text-sm font-semibold text-foreground">Civilizations</p>

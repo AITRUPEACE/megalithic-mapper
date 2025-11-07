@@ -27,6 +27,12 @@ const communityTierLabel: Record<NonNullable<MapSite["trustTier"]>, string> = {
   promoted: "Promoted to Official",
 };
 
+const categoryLabel: Record<MapSite["category"], string> = {
+  site: "Site",
+  artifact: "Artifact",
+  text: "Text source",
+};
+
 export const SiteList = ({ sites, selectedSiteId, onSelect, className, scrollClassName, variant = "card" }: SiteListProps) => {
   if (!sites.length) {
     const emptyClasses =
@@ -70,6 +76,7 @@ export const SiteList = ({ sites, selectedSiteId, onSelect, className, scrollCla
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="text-sm font-semibold text-foreground">{site.name}</p>
                     <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant="outline">{categoryLabel[site.category]}</Badge>
                       <Badge variant={site.verificationStatus === "verified" ? "success" : "outline"}>
                         {verificationLabel[site.verificationStatus]}
                       </Badge>
@@ -88,6 +95,7 @@ export const SiteList = ({ sites, selectedSiteId, onSelect, className, scrollCla
                         #{tag}
                       </span>
                     ))}
+                    <span className="rounded-full bg-secondary/40 px-2 py-1">{site.siteType}</span>
                     <span>Updated {timeAgo(site.lastUpdated)}</span>
                     {site.relatedResearchIds.length > 0 && (
                       <span className="rounded-full bg-primary/15 px-2 py-1 text-primary text-[11px] uppercase tracking-wide">
