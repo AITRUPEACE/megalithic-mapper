@@ -22,10 +22,16 @@ const statusVariant: Record<MapSite["verificationStatus"], "success" | "warning"
 };
 
 const communityTierLabel: Record<NonNullable<MapSite["trustTier"]>, string> = {
-	bronze: "Community Bronze",
-	silver: "Community Silver",
-	gold: "Community Gold",
-	promoted: "Promoted to Official",
+  bronze: "Community Bronze",
+  silver: "Community Silver",
+  gold: "Community Gold",
+  promoted: "Promoted to Official",
+};
+
+const categoryLabel: Record<MapSite["category"], string> = {
+  site: "Site",
+  artifact: "Artifact",
+  text: "Text source",
 };
 
 export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetailPanelProps) => {
@@ -54,9 +60,10 @@ export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetai
 					{site.civilization} - {site.era}
 				</p>
 			</div>
-			<div className="flex flex-wrap items-center gap-2">
-				<Badge variant={statusVariant[site.verificationStatus]}>
-					{site.verificationStatus === "verified" && "Verified"}
+                        <div className="flex flex-wrap items-center gap-2">
+                                <Badge variant="outline">{categoryLabel[site.category]}</Badge>
+                                <Badge variant={statusVariant[site.verificationStatus]}>
+                                        {site.verificationStatus === "verified" && "Verified"}
 					{site.verificationStatus === "under_review" && "Under review"}
 					{site.verificationStatus === "unverified" && "Unverified submission"}
 				</Badge>
@@ -88,11 +95,12 @@ export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetai
 			<TabsContent value="overview" className="flex-1 overflow-y-auto space-y-4 text-sm text-muted-foreground">
 				<p>{site.summary}</p>
 
-				<div className="flex flex-wrap gap-2 text-xs">
-					<span className="rounded-full bg-secondary/40 px-3 py-1">{site.siteType}</span>
-					<span className="rounded-full bg-secondary/40 px-3 py-1">{site.mediaCount} media assets</span>
-					<span className="rounded-full bg-secondary/40 px-3 py-1">{site.relatedResearchIds.length} research links</span>
-				</div>
+                                <div className="flex flex-wrap gap-2 text-xs">
+                                        <span className="rounded-full bg-secondary/40 px-3 py-1">{site.siteType}</span>
+                                        <span className="rounded-full bg-secondary/40 px-3 py-1">{site.mediaCount} media assets</span>
+                                        <span className="rounded-full bg-secondary/40 px-3 py-1">{site.relatedResearchIds.length} research links</span>
+                                        <span className="rounded-full bg-secondary/40 px-3 py-1">{categoryLabel[site.category]}</span>
+                                </div>
 
 				{isCommunity && (
 					<div className="rounded-lg border border-dashed border-primary/40 bg-primary/5 p-4 text-xs">
@@ -115,17 +123,36 @@ export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetai
 					</div>
 				</div>
 
-				<div className="space-y-2 text-xs text-muted-foreground">
-					<p className="uppercase tracking-wide">Provenance</p>
-					<div className="flex flex-wrap gap-3">
-						<span>
-							Updated {timeAgo(site.lastUpdated)} by {site.updatedBy}
-						</span>
-						<span>
-							Coordinates {site.latitude.toFixed(3)}, {site.longitude.toFixed(3)}
-						</span>
-					</div>
-				</div>
+                                <div className="space-y-2 text-xs text-muted-foreground">
+                                        <p className="uppercase tracking-wide">Provenance</p>
+                                        <div className="flex flex-wrap gap-3">
+                                                <span>
+                                                        Updated {timeAgo(site.lastUpdated)} by {site.updatedBy}
+                                                </span>
+                                                <span>
+                                                        Coordinates {site.latitude.toFixed(3)}, {site.longitude.toFixed(3)}
+                                                </span>
+                                        </div>
+                                        {site.evidenceLinks && site.evidenceLinks.length > 0 && (
+                                                <div className="space-y-1">
+                                                        <p className="uppercase tracking-wide">Evidence links</p>
+                                                        <ul className="space-y-1">
+                                                                {site.evidenceLinks.map((link) => (
+                                                                        <li key={link}>
+                                                                                <a
+                                                                                        href={link}
+                                                                                        className="text-primary hover:underline"
+                                                                                        target="_blank"
+                                                                                        rel="noreferrer"
+                                                                                >
+                                                                                        {link}
+                                                                                </a>
+                                                                        </li>
+                                                                ))}
+                                                        </ul>
+                                                </div>
+                                        )}
+                                </div>
 
 				<div className="space-y-2">
 					<p className="text-xs uppercase tracking-wide text-muted-foreground">Next actions</p>

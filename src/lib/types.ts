@@ -22,6 +22,7 @@ export interface MapSite {
   tags: string[];
   mediaCount: number;
   relatedResearchIds: string[];
+  evidenceLinks?: string[];
   lastUpdated: string;
   updatedBy: string;
 }
