@@ -1,12 +1,12 @@
 "use client";
 
-import type { MapSite } from "@/lib/types";
+import type { MapSiteFeature } from "@/types/map";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { cn, timeAgo } from "@/lib/utils";
 
 interface SiteListProps {
-  sites: MapSite[];
+  sites: MapSiteFeature[];
   selectedSiteId: string | null;
   onSelect: (siteId: string) => void;
   className?: string;
@@ -14,20 +14,20 @@ interface SiteListProps {
   variant?: "card" | "flat";
 }
 
-const verificationLabel: Record<MapSite["verificationStatus"], string> = {
+const verificationLabel: Record<MapSiteFeature["verificationStatus"], string> = {
   verified: "Verified",
   under_review: "Under review",
   unverified: "Unverified",
 };
 
-const communityTierLabel: Record<NonNullable<MapSite["trustTier"]>, string> = {
+const communityTierLabel: Record<NonNullable<MapSiteFeature["trustTier"]>, string> = {
   bronze: "Community Bronze",
   silver: "Community Silver",
   gold: "Community Gold",
   promoted: "Promoted to Official",
 };
 
-const categoryLabel: Record<MapSite["category"], string> = {
+const categoryLabel: Record<MapSiteFeature["category"], string> = {
   site: "Site",
   artifact: "Artifact",
   text: "Text source",
@@ -86,17 +86,24 @@ export const SiteList = ({ sites, selectedSiteId, onSelect, className, scrollCla
                     </div>
                   </div>
                   <p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
-                    {site.civilization} - {site.era}
+                    {(site.tags.cultures[0] ?? "Unattributed culture").toUpperCase()} -
+                    {" "}
+                    {(site.tags.eras[0] ?? "Unknown era").toUpperCase()}
                   </p>
                   <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{site.summary}</p>
+                  {site.zoneMemberships.length > 0 && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Zones: {site.zoneMemberships.map((zone) => zone.name).join(", ")}
+                    </p>
+                  )}
                   <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                    {site.tags.slice(0, 3).map((tag) => (
+                    {site.tags.themes.slice(0, 3).map((tag) => (
                       <span key={tag} className="rounded-full bg-secondary/40 px-2 py-1">
                         #{tag}
                       </span>
                     ))}
                     <span className="rounded-full bg-secondary/40 px-2 py-1">{site.siteType}</span>
-                    <span>Updated {timeAgo(site.lastUpdated)}</span>
+                    <span>Updated {timeAgo(site.updatedAt)}</span>
                     {site.relatedResearchIds.length > 0 && (
                       <span className="rounded-full bg-primary/15 px-2 py-1 text-primary text-[11px] uppercase tracking-wide">
                         Research linked
