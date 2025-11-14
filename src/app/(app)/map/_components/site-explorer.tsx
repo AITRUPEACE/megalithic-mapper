@@ -1,37 +1,74 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import dynamic from "next/dynamic";
 import { SiteFilters } from "./site-filters";
 import { SiteList } from "./site-list";
 import { SiteDetailPanel } from "./site-detail-panel";
-import { filterSites, getSelectedSite, useSiteStore } from "@/state/site-store";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CommunityTier, MapSite, SiteCategory } from "@/lib/types";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { SiteSubmissionForm } from "./site-submission-form";
+import type { BoundingBox, CommunityTier, MapSiteFeature, MapZoneFeature, SiteCategory } from "@/types/map";
+import { useMapStore, applySiteFilters } from "@/state/map-store";
+import { SiteEditor } from "./site-editor";
+import { ZoneEditor } from "./zone-editor";
+import { loadMapData } from "../actions";
+import type L from "leaflet";
 
 const SiteMap = dynamic(() => import("./site-map").then((module) => module.SiteMap), {
   ssr: false,
 });
 
-export const SiteExplorer = () => {
-  const { sites, filters, selectedSiteId, setFilters, clearFilters, selectSite } = useSiteStore();
+interface SiteExplorerProps {
+  initialSites: MapSiteFeature[];
+  initialZones: MapZoneFeature[];
+  initialBounds: BoundingBox;
+}
+
+const toBoundingBox = (bounds: L.LatLngBounds): BoundingBox => ({
+  minLat: bounds.getSouthWest().lat,
+  minLng: bounds.getSouthWest().lng,
+  maxLat: bounds.getNorthEast().lat,
+  maxLng: bounds.getNorthEast().lng,
+});
+
+export const SiteExplorer = ({ initialSites, initialZones, initialBounds }: SiteExplorerProps) => {
+  const {
+    sites,
+    zones,
+    filters,
+    selectedSiteId,
+    setFilters,
+    clearFilters,
+    selectSite,
+    initialize,
+    replaceData,
+    setBounds,
+  } = useMapStore();
   const searchParams = useSearchParams();
   const [isDrawerOpen, setDrawerOpen] = useState(false);
-  const [showSubmission, setShowSubmission] = useState(false);
+  const [activeEditor, setActiveEditor] = useState<"site" | "zone" | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const [isHydrated, setHydrated] = useState(false);
+  const lastBoundsRef = useRef<BoundingBox | null>(null);
 
-  const filteredSites = useMemo(() => filterSites(sites, filters), [sites, filters]);
-  const selectedSite = useMemo(() => getSelectedSite(sites, selectedSiteId), [sites, selectedSiteId]);
+  useEffect(() => {
+    initialize({ sites: initialSites, zones: initialZones, bounds: initialBounds });
+    lastBoundsRef.current = initialBounds;
+    setHydrated(true);
+  }, [initialize, initialSites, initialZones, initialBounds]);
 
-  const civilizations = useMemo(
-    () => Array.from(new Set<MapSite["civilization"]>(sites.map((site) => site.civilization))).sort(),
+  const filteredSites = useMemo(() => applySiteFilters(sites, filters), [sites, filters]);
+  const selectedSite = useMemo(() => sites.find((site) => site.id === selectedSiteId) ?? null, [sites, selectedSiteId]);
+
+  const cultures = useMemo(
+    () => Array.from(new Set(sites.flatMap((site) => site.tags.cultures))).sort(),
     [sites]
   );
+  const eras = useMemo(() => Array.from(new Set(sites.flatMap((site) => site.tags.eras))).sort(), [sites]);
   const siteTypes = useMemo(
-    () => Array.from(new Set<MapSite["siteType"]>(sites.map((site) => site.siteType))).sort(),
+    () => Array.from(new Set(sites.map((site) => site.siteType))).sort(),
     [sites]
   );
   const categories = useMemo(() => {
@@ -48,13 +85,18 @@ export const SiteExplorer = () => {
     });
     return tierOrder.filter((tier) => tiers.has(tier));
   }, [sites]);
+  const zoneOptions = useMemo(() => zones.map((zone) => ({ id: zone.id, name: zone.name })), [zones]);
+  const themeTags = useMemo(
+    () => Array.from(new Set(sites.flatMap((site) => site.tags.themes))).sort(),
+    [sites]
+  );
 
   const focusParam = searchParams.get("focus");
   const projectParam = searchParams.get("project");
   const siteParam = searchParams.get("site");
 
   useEffect(() => {
-    if (!sites.length) return;
+    if (!sites.length || !isHydrated) return;
 
     if (focusParam) {
       selectSite(focusParam);
@@ -72,11 +114,46 @@ export const SiteExplorer = () => {
         selectSite(relatedSite.id);
       }
     }
-  }, [focusParam, projectParam, siteParam, selectSite, sites]);
+  }, [focusParam, projectParam, siteParam, selectSite, sites, isHydrated]);
 
   useEffect(() => {
     setDrawerOpen(selectedSite !== null);
   }, [selectedSite]);
+
+  const handleBoundsChange = useCallback(
+    (bounds: L.LatLngBounds) => {
+      if (!isHydrated) return;
+      const nextBounds = toBoundingBox(bounds);
+      const last = lastBoundsRef.current;
+      const hasMeaningfulChange =
+        !last ||
+        Math.abs(nextBounds.minLat - last.minLat) > 0.1 ||
+        Math.abs(nextBounds.minLng - last.minLng) > 0.1 ||
+        Math.abs(nextBounds.maxLat - last.maxLat) > 0.1 ||
+        Math.abs(nextBounds.maxLng - last.maxLng) > 0.1;
+
+      if (!hasMeaningfulChange) return;
+      lastBoundsRef.current = nextBounds;
+      setBounds(nextBounds);
+
+      const layersFilter = filters.layer === "composite" ? undefined : [filters.layer];
+      const verificationFilter = filters.verification === "all" ? undefined : [filters.verification];
+      const zoneFilter = filters.zones.length ? filters.zones : undefined;
+      const tagFilter = filters.tags.length ? filters.tags : undefined;
+
+      startTransition(async () => {
+        const payload = await loadMapData({
+          bounds: nextBounds,
+          layers: layersFilter,
+          verification: verificationFilter,
+          zoneIds: zoneFilter,
+          tags: tagFilter,
+        });
+        replaceData({ sites: payload.sites, zones: payload.zones });
+      });
+    },
+    [filters.layer, filters.tags, filters.verification, filters.zones, isHydrated, replaceData, setBounds]
+  );
 
   return (
     <div className="flex h-full flex-col gap-4">
@@ -89,21 +166,36 @@ export const SiteExplorer = () => {
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="secondary">Leaflet integration</Badge>
+          {isPending && <Badge variant="outline">Updating viewport</Badge>}
           <Button
             size="sm"
-            variant={showSubmission ? "ghost" : "secondary"}
-            onClick={() => setShowSubmission((previous) => !previous)}
+            variant={activeEditor === "site" ? "ghost" : "secondary"}
+            onClick={() => setActiveEditor((prev) => (prev === "site" ? null : "site"))}
           >
-            {showSubmission ? "Hide submission form" : "Submit new entry"}
+            {activeEditor === "site" ? "Hide site form" : "New site"}
+          </Button>
+          <Button
+            size="sm"
+            variant={activeEditor === "zone" ? "ghost" : "secondary"}
+            onClick={() => setActiveEditor((prev) => (prev === "zone" ? null : "zone"))}
+          >
+            {activeEditor === "zone" ? "Hide zone form" : "New zone"}
           </Button>
         </div>
       </div>
 
-      {showSubmission && (
-        <SiteSubmissionForm
+      {activeEditor === "site" && (
+        <SiteEditor
           className="border border-dashed border-primary/40 bg-primary/5"
-          onSubmitted={() => setShowSubmission(false)}
-          onCancel={() => setShowSubmission(false)}
+          zones={zones}
+          onClose={() => setActiveEditor(null)}
+        />
+      )}
+
+      {activeEditor === "zone" && (
+        <ZoneEditor
+          className="border border-dashed border-secondary/40 bg-secondary/5"
+          onClose={() => setActiveEditor(null)}
         />
       )}
 
@@ -113,10 +205,13 @@ export const SiteExplorer = () => {
             variant="flat"
             className="max-h-[220px] overflow-y-auto border-b border-border/30"
             filters={filters}
-            availableCivilizations={civilizations}
+            availableCultures={cultures}
+            availableEras={eras}
             availableSiteTypes={siteTypes}
             availableCommunityTiers={communityTiers}
             availableCategories={categories}
+            availableZones={zoneOptions}
+            availableTags={themeTags}
             onUpdate={setFilters}
             onClear={clearFilters}
           />
@@ -132,9 +227,11 @@ export const SiteExplorer = () => {
         <div className="order-1 relative flex min-h-[400px] flex-col overflow-hidden rounded-xl border border-border/40 bg-background/10 lg:order-2 lg:max-h-[calc(100vh-200px)]">
           <SiteMap
             sites={filteredSites}
+            zones={zones}
             selectedSiteId={selectedSiteId}
             onSelect={selectSite}
             className="h-[55vh] min-h-[320px] lg:flex-1 lg:h-full"
+            onBoundsChange={handleBoundsChange}
           />
           <SiteDetailDrawer
             site={selectedSite}
