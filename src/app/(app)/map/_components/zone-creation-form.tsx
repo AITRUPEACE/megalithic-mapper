@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { MediaAttachmentField } from "@/components/media/media-attachment-field";
 import type { MediaAttachmentDraft, MediaAttachmentTarget } from "@/types/media";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 
 interface ZoneCreationFormProps {
   className?: string;
@@ -31,6 +32,7 @@ export const ZoneCreationForm = ({ className }: ZoneCreationFormProps) => {
   const [form, setForm] = useState<ZoneFormState>({ ...DEFAULT_ZONE });
   const [attachments, setAttachments] = useState<MediaAttachmentDraft[]>([]);
   const [message, setMessage] = useState<string | null>(null);
+  const mediaAttachmentsEnabled = isFeatureEnabled("mediaAttachments");
 
   const attachmentTarget = useMemo<MediaAttachmentTarget>(() => {
     const slug = form.name
@@ -118,12 +120,18 @@ export const ZoneCreationForm = ({ className }: ZoneCreationFormProps) => {
           />
         </div>
 
-        <MediaAttachmentField
-          value={attachments}
-          onChange={setAttachments}
-          target={attachmentTarget}
-          title="Zone evidence & playlists"
-        />
+        {mediaAttachmentsEnabled ? (
+          <MediaAttachmentField
+            value={attachments}
+            onChange={setAttachments}
+            target={attachmentTarget}
+            title="Zone evidence & playlists"
+          />
+        ) : (
+          <div className="rounded-lg border border-dashed border-border/40 bg-background/40 p-4 text-xs text-muted-foreground">
+            Zone uploads reuse the shared media workflow. Keep drafting locations; the attachments section will appear once both branches merge.
+          </div>
+        )}
 
         <Button type="submit" size="sm">
           Stage zone for moderators

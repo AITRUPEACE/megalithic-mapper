@@ -12,6 +12,7 @@ import Link from "next/link";
 import { MediaCarousel } from "@/components/media/media-carousel";
 import { MediaGallery } from "@/components/media/media-gallery";
 import { sampleMediaAssets } from "@/data/sample-media";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 
 interface SiteDetailPanelProps {
 	site: MapSite | null;
@@ -43,6 +44,7 @@ type TabKey = "overview" | "media" | "documents" | "discussion" | "activity";
 export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetailPanelProps) => {
         const [activeTab, setActiveTab] = useState<TabKey>("overview");
         const [loadedTabs, setLoadedTabs] = useState<Set<TabKey>>(() => new Set(["overview"]));
+        const drawerMediaEnabled = isFeatureEnabled("drawerMediaTabs");
 
         useEffect(() => {
                 setActiveTab("overview");
@@ -61,10 +63,10 @@ export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetai
         };
 
         const siteMedia = useMemo(() => {
-                if (!site) return [];
+                if (!drawerMediaEnabled || !site) return [];
                 const matches = sampleMediaAssets.filter((asset) => asset.attachment.entityId === site.id);
                 return matches.length ? matches : sampleMediaAssets.slice(0, 2);
-        }, [site]);
+        }, [drawerMediaEnabled, site]);
 
         const evidenceDocuments = useMemo(() => {
                 if (!site) return [];
@@ -112,8 +114,12 @@ export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetai
 		</div>
 	);
 
+        const tabsProps = drawerMediaEnabled
+                ? { value: activeTab, onValueChange: handleTabChange }
+                : { defaultValue: "overview" as const };
+
         const tabs = (
-<Tabs value={activeTab} onValueChange={handleTabChange} className="flex h-full flex-col gap-4">
+                <Tabs {...tabsProps} className="flex h-full flex-col gap-4">
                         <TabsList className="flex w-full gap-2 overflow-x-auto rounded-md bg-background/40 p-1 text-xs">
                                 <TabsTrigger value="overview" className="shrink-0 px-3 py-1">
                                         Overview
@@ -213,7 +219,13 @@ export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetai
 			</TabsContent>
 
                         <TabsContent value="media" className="flex-1 overflow-y-auto space-y-3 text-sm text-muted-foreground">
-                                {!loadedTabs.has("media") ? (
+                                {!drawerMediaEnabled ? (
+                                        <p>
+                                                {site.mediaCount > 0
+                                                        ? `Media gallery placeholder - ${site.mediaCount} assets staged for integration.`
+                                                        : "No media have been linked yet. Add photos or videos to strengthen this entry."}
+                                        </p>
+                                ) : !loadedTabs.has("media") ? (
                                         <div className="animate-pulse rounded-lg border border-dashed border-border/40 p-6 text-center">
                                                 Preparing gallery…
                                         </div>
@@ -226,10 +238,12 @@ export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetai
                                                 </Button>
                                         </>
                                 )}
-</TabsContent>
+                        </TabsContent>
 
-<TabsContent value="documents" className="flex-1 overflow-y-auto space-y-3 text-sm text-muted-foreground">
-                                {!loadedTabs.has("documents") ? (
+                        <TabsContent value="documents" className="flex-1 overflow-y-auto space-y-3 text-sm text-muted-foreground">
+                                {!drawerMediaEnabled ? (
+                                        <p>Document library integration coming soon. Attach field notes, PDFs, or external research references to provide supporting evidence.</p>
+                                ) : !loadedTabs.has("documents") ? (
                                         <div className="animate-pulse rounded-lg border border-dashed border-border/40 p-6 text-center">
                                                 Loading document references…
                                         </div>
@@ -259,7 +273,7 @@ export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetai
                                                 </div>
                                         </div>
                                 )}
-</TabsContent>
+                        </TabsContent>
 
 			<TabsContent value="discussion" className="flex-1 overflow-y-auto space-y-3 text-sm text-muted-foreground">
 				<p>

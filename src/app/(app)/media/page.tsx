@@ -5,9 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { sampleMediaAssets } from "@/data/sample-media";
 import { MediaCarousel } from "@/components/media/media-carousel";
 import { MediaGallery } from "@/components/media/media-gallery";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 
 export default function MediaPage() {
-  const featured = sampleMediaAssets.slice(0, 3);
+  const mediaLibraryEnabled = isFeatureEnabled("mediaAttachments");
+  const featured = mediaLibraryEnabled ? sampleMediaAssets.slice(0, 3) : [];
 
   return (
     <div className="space-y-8">
@@ -23,23 +25,41 @@ export default function MediaPage() {
         </Button>
       </div>
 
-      <Card className="glass-panel border-border/40">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold">Featured uploads</CardTitle>
-          <CardDescription>Newest curator-approved media across expeditions and survey zones.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <MediaCarousel assets={featured} />
-        </CardContent>
-      </Card>
+      {mediaLibraryEnabled ? (
+        <>
+          <Card className="glass-panel border-border/40">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold">Featured uploads</CardTitle>
+              <CardDescription>Newest curator-approved media across expeditions and survey zones.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <MediaCarousel assets={featured} />
+            </CardContent>
+          </Card>
 
-      <section className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">All assets</h2>
-          <Badge variant="outline">{sampleMediaAssets.length} items</Badge>
-        </div>
-        <MediaGallery assets={sampleMediaAssets} />
-      </section>
+          <section className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold">All assets</h2>
+              <Badge variant="outline">{sampleMediaAssets.length} items</Badge>
+            </div>
+            <MediaGallery assets={sampleMediaAssets} />
+          </section>
+        </>
+      ) : (
+        <Card className="glass-panel border-border/40">
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">Media workflow syncing</CardTitle>
+            <CardDescription>
+              This branch disables the gallery because master is migrating to a shared implementation. Enable the flag once the merge completes.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              You can still upload reference files in Supabase Storage; they will appear here after the conflicting PR lands in master.
+            </p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

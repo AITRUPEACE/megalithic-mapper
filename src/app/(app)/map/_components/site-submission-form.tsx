@@ -12,6 +12,7 @@ import type { CommunityTier, MapSite, SiteCategory } from "@/lib/types";
 import { useSiteStore } from "@/state/site-store";
 import { MediaAttachmentField } from "@/components/media/media-attachment-field";
 import type { MediaAttachmentDraft, MediaAttachmentTarget } from "@/types/media";
+import { isFeatureEnabled } from "@/lib/feature-flags";
 
 const CATEGORY_OPTIONS = ["site", "artifact", "text"] as const satisfies ReadonlyArray<SiteCategory>;
 
@@ -211,6 +212,7 @@ export const SiteSubmissionForm = ({ onSubmitted, onCancel, className }: Submiss
   const [analysis, setAnalysis] = useState<SubmissionAnalysis | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [attachments, setAttachments] = useState<MediaAttachmentDraft[]>([]);
+  const mediaAttachmentsEnabled = isFeatureEnabled("mediaAttachments");
 
   const isSubmitting = false;
 
@@ -280,7 +282,7 @@ export const SiteSubmissionForm = ({ onSubmitted, onCancel, className }: Submiss
       longitude: parsed.data.longitude,
       tags: toTagArray(parsed.data.tags),
       relatedResearchIds: toResearchArray(parsed.data.relatedResearchIds),
-      mediaCount: attachments.length,
+      mediaCount: mediaAttachmentsEnabled ? attachments.length : 0,
       verificationStatus: result.verificationStatus,
       layer: "community",
       trustTier: result.tier,
@@ -335,7 +337,13 @@ export const SiteSubmissionForm = ({ onSubmitted, onCancel, className }: Submiss
           </div>
         </div>
 
-        <MediaAttachmentField value={attachments} onChange={setAttachments} target={attachmentTarget} />
+        {mediaAttachmentsEnabled ? (
+          <MediaAttachmentField value={attachments} onChange={setAttachments} target={attachmentTarget} />
+        ) : (
+          <div className="rounded-lg border border-dashed border-border/40 bg-background/40 p-4 text-xs text-muted-foreground">
+            Media attachments are managed in a separate workflow on this branch. Merge with master will swap in the shared field once available.
+          </div>
+        )}
 
         <div className="grid gap-3 md:grid-cols-3">
           <div className="space-y-1">
