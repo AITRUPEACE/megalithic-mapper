@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { CommunityTier, MapSite, SiteCategory } from "@/lib/types";
 import { useSiteStore } from "@/state/site-store";
+import { MediaAttachmentField } from "@/components/media/media-attachment-field";
+import type { MediaAttachmentDraft, MediaAttachmentTarget } from "@/types/media";
 
 const CATEGORY_OPTIONS = ["site", "artifact", "text"] as const satisfies ReadonlyArray<SiteCategory>;
 
@@ -208,11 +210,21 @@ export const SiteSubmissionForm = ({ onSubmitted, onCancel, className }: Submiss
   const [errors, setErrors] = useState<SubmissionErrors>({});
   const [analysis, setAnalysis] = useState<SubmissionAnalysis | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [attachments, setAttachments] = useState<MediaAttachmentDraft[]>([]);
 
   const isSubmitting = false;
 
   const suggestions = useMemo(() => analysis?.suggestions ?? [], [analysis]);
   const warnings = useMemo(() => analysis?.warnings ?? [], [analysis]);
+  const attachmentTarget = useMemo<MediaAttachmentTarget>(() => {
+    const slug = form.name
+      ? form.name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "draft-entry"
+      : "draft-entry";
+    return {
+      entityType: form.category === "site" ? "site" : (form.category as MediaAttachmentTarget["entityType"]),
+      entityId: slug,
+    };
+  }, [form.category, form.name]);
 
   const handleChange = (field: keyof SubmissionFormState, value: string) => {
     setForm((prev) => ({
@@ -224,6 +236,7 @@ export const SiteSubmissionForm = ({ onSubmitted, onCancel, className }: Submiss
   const resetForm = () => {
     setForm(() => ({ ...DEFAULT_FORM }));
     setErrors({});
+    setAttachments([]);
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -267,7 +280,7 @@ export const SiteSubmissionForm = ({ onSubmitted, onCancel, className }: Submiss
       longitude: parsed.data.longitude,
       tags: toTagArray(parsed.data.tags),
       relatedResearchIds: toResearchArray(parsed.data.relatedResearchIds),
-      mediaCount: 0,
+      mediaCount: attachments.length,
       verificationStatus: result.verificationStatus,
       layer: "community",
       trustTier: result.tier,
@@ -321,6 +334,8 @@ export const SiteSubmissionForm = ({ onSubmitted, onCancel, className }: Submiss
             {errors.contributor && <p className="text-xs text-destructive">{errors.contributor}</p>}
           </div>
         </div>
+
+        <MediaAttachmentField value={attachments} onChange={setAttachments} target={attachmentTarget} />
 
         <div className="grid gap-3 md:grid-cols-3">
           <div className="space-y-1">

@@ -12,6 +12,8 @@ import { CommunityTier, MapSite, SiteCategory } from "@/lib/types";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { SiteSubmissionForm } from "./site-submission-form";
+import { ZoneCreationForm } from "./zone-creation-form";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const SiteMap = dynamic(() => import("./site-map").then((module) => module.SiteMap), {
   ssr: false,
@@ -22,6 +24,7 @@ export const SiteExplorer = () => {
   const searchParams = useSearchParams();
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [showSubmission, setShowSubmission] = useState(false);
+  const [submissionMode, setSubmissionMode] = useState<"site" | "zone">("site");
 
   const filteredSites = useMemo(() => filterSites(sites, filters), [sites, filters]);
   const selectedSite = useMemo(() => getSelectedSite(sites, selectedSiteId), [sites, selectedSiteId]);
@@ -100,11 +103,26 @@ export const SiteExplorer = () => {
       </div>
 
       {showSubmission && (
-        <SiteSubmissionForm
-          className="border border-dashed border-primary/40 bg-primary/5"
-          onSubmitted={() => setShowSubmission(false)}
-          onCancel={() => setShowSubmission(false)}
-        />
+        <Tabs
+          value={submissionMode}
+          onValueChange={(value) => setSubmissionMode(value as "site" | "zone")}
+          className="rounded-2xl border border-dashed border-primary/40 bg-primary/5 p-4"
+        >
+          <TabsList className="w-full gap-2 bg-transparent">
+            <TabsTrigger value="site" className="flex-1">
+              Site submission
+            </TabsTrigger>
+            <TabsTrigger value="zone" className="flex-1">
+              Research zone
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="site" className="border-none p-0">
+            <SiteSubmissionForm onSubmitted={() => setShowSubmission(false)} onCancel={() => setShowSubmission(false)} />
+          </TabsContent>
+          <TabsContent value="zone" className="border-none p-0">
+            <ZoneCreationForm />
+          </TabsContent>
+        </Tabs>
       )}
 
       <div className="flex flex-1 flex-col gap-4 lg:grid lg:grid-cols-[320px_1fr] lg:gap-6">

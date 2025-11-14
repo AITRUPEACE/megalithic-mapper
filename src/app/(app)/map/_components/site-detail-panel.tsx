@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import type { MapSite } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { cn, timeAgo } from "@/lib/utils";
 import Link from "next/link";
+import { MediaCarousel } from "@/components/media/media-carousel";
+import { MediaGallery } from "@/components/media/media-gallery";
+import { sampleMediaAssets } from "@/data/sample-media";
 
 interface SiteDetailPanelProps {
 	site: MapSite | null;
@@ -34,11 +38,47 @@ const categoryLabel: Record<MapSite["category"], string> = {
   text: "Text source",
 };
 
+type TabKey = "overview" | "media" | "documents" | "discussion" | "activity";
+
 export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetailPanelProps) => {
-	if (!site) {
-		const emptyClasses =
-			variant === "card"
-				? "glass-panel border-border/40 p-6 text-sm text-muted-foreground"
+        const [activeTab, setActiveTab] = useState<TabKey>("overview");
+        const [loadedTabs, setLoadedTabs] = useState<Set<TabKey>>(() => new Set(["overview"]));
+
+        useEffect(() => {
+                setActiveTab("overview");
+                setLoadedTabs(new Set(["overview"]));
+        }, [site?.id]);
+
+        const handleTabChange = (value: string) => {
+                const key = value as TabKey;
+                setActiveTab(key);
+                setLoadedTabs((prev) => {
+                        if (prev.has(key)) return prev;
+                        const next = new Set(prev);
+                        next.add(key);
+                        return next;
+                });
+        };
+
+        const siteMedia = useMemo(() => {
+                if (!site) return [];
+                const matches = sampleMediaAssets.filter((asset) => asset.attachment.entityId === site.id);
+                return matches.length ? matches : sampleMediaAssets.slice(0, 2);
+        }, [site]);
+
+        const evidenceDocuments = useMemo(() => {
+                if (!site) return [];
+                return (site.evidenceLinks ?? []).map((link, index) => ({
+                        id: `${site.id}-doc-${index}`,
+                        title: `Evidence reference ${index + 1}`,
+                        url: link,
+                }));
+        }, [site]);
+
+        if (!site) {
+                const emptyClasses =
+                        variant === "card"
+                                ? "glass-panel border-border/40 p-6 text-sm text-muted-foreground"
 				: "flex h-full flex-col justify-center rounded-xl border border-border/40 bg-background/15 p-6 text-sm text-muted-foreground";
 		return (
 			<div className={cn(emptyClasses, className)}>
@@ -72,11 +112,11 @@ export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetai
 		</div>
 	);
 
-	const tabs = (
-		<Tabs defaultValue="overview" className="flex h-full flex-col gap-4">
-			<TabsList className="flex w-full gap-2 overflow-x-auto rounded-md bg-background/40 p-1 text-xs">
-				<TabsTrigger value="overview" className="shrink-0 px-3 py-1">
-					Overview
+        const tabs = (
+<Tabs value={activeTab} onValueChange={handleTabChange} className="flex h-full flex-col gap-4">
+                        <TabsList className="flex w-full gap-2 overflow-x-auto rounded-md bg-background/40 p-1 text-xs">
+                                <TabsTrigger value="overview" className="shrink-0 px-3 py-1">
+                                        Overview
 				</TabsTrigger>
 				<TabsTrigger value="media" className="shrink-0 px-3 py-1">
 					Media
@@ -172,23 +212,54 @@ export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetai
 				</div>
 			</TabsContent>
 
-			<TabsContent value="media" className="flex-1 overflow-y-auto space-y-3 text-sm text-muted-foreground">
-				<p>
-					{site.mediaCount > 0
-						? `Media gallery placeholder - ${site.mediaCount} assets staged for integration.`
-						: "No media have been linked yet. Add photos or videos to strengthen this entry."}
-				</p>
-				<Button size="sm" variant="ghost">
-					Upload media
-				</Button>
-			</TabsContent>
+                        <TabsContent value="media" className="flex-1 overflow-y-auto space-y-3 text-sm text-muted-foreground">
+                                {!loadedTabs.has("media") ? (
+                                        <div className="animate-pulse rounded-lg border border-dashed border-border/40 p-6 text-center">
+                                                Preparing gallery…
+                                        </div>
+                                ) : (
+                                        <>
+                                                <MediaCarousel assets={siteMedia} />
+                                                <MediaGallery assets={siteMedia} />
+                                                <Button size="sm" variant="ghost">
+                                                        Upload media
+                                                </Button>
+                                        </>
+                                )}
+</TabsContent>
 
-			<TabsContent value="documents" className="flex-1 overflow-y-auto space-y-3 text-sm text-muted-foreground">
-				<p>Document library integration coming soon. Attach field notes, PDFs, or external research references to provide supporting evidence.</p>
-				<Button size="sm" variant="ghost">
-					Attach document
-				</Button>
-			</TabsContent>
+<TabsContent value="documents" className="flex-1 overflow-y-auto space-y-3 text-sm text-muted-foreground">
+                                {!loadedTabs.has("documents") ? (
+                                        <div className="animate-pulse rounded-lg border border-dashed border-border/40 p-6 text-center">
+                                                Loading document references…
+                                        </div>
+                                ) : evidenceDocuments.length > 0 ? (
+                                        <ul className="space-y-2 text-xs">
+                                                {evidenceDocuments.map((document) => (
+                                                        <li key={document.id} className="rounded-lg border border-border/40 bg-background/40 p-3">
+                                                                <p className="font-semibold text-foreground">{document.title}</p>
+                                                                <a
+                                                                        href={document.url}
+                                                                        className="text-primary hover:underline"
+                                                                        target="_blank"
+                                                                        rel="noreferrer"
+                                                                >
+                                                                        {document.url}
+                                                                </a>
+                                                        </li>
+                                                ))}
+                                        </ul>
+                                ) : (
+                                        <div className="rounded-lg border border-dashed border-border/40 p-4">
+                                                No documents linked yet. Add scans, PDFs, or lab notebooks for reviewers.
+                                                <div className="mt-3">
+                                                        <Button size="sm" variant="ghost">
+                                                                Attach document
+                                                        </Button>
+                                                </div>
+                                        </div>
+                                )}
+</TabsContent>
 
 			<TabsContent value="discussion" className="flex-1 overflow-y-auto space-y-3 text-sm text-muted-foreground">
 				<p>

@@ -77,18 +77,6 @@ export interface DiscussionThread {
   isVerifiedOnly?: boolean;
 }
 
-export interface MediaAsset {
-  id: string;
-  title: string;
-  type: "image" | "video";
-  url: string;
-  thumbnail: string;
-  contributor: string;
-  civilization: string;
-  tags: string[];
-  createdAt: string;
-}
-
 export interface TextSource {
   id: string;
   title: string;

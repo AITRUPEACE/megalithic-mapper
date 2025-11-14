@@ -1,12 +1,14 @@
 import Link from "next/link";
-import Image from "next/image";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { sampleMediaAssets } from "@/data/sample-media";
-import { timeAgo } from "@/lib/utils";
+import { MediaCarousel } from "@/components/media/media-carousel";
+import { MediaGallery } from "@/components/media/media-gallery";
 
 export default function MediaPage() {
+  const featured = sampleMediaAssets.slice(0, 3);
+
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -21,48 +23,23 @@ export default function MediaPage() {
         </Button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {sampleMediaAssets.map((media) => (
-          <Card key={media.id} className="glass-panel border-border/40 overflow-hidden">
-            <div className="relative h-48 w-full">
-              <Image
-                src={media.thumbnail}
-                alt={media.title}
-                fill
-                className="object-cover"
-                sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
-              />
-              <Badge className="absolute left-3 top-3 bg-black/60 text-xs uppercase tracking-wide">
-                {media.type}
-              </Badge>
-            </div>
-            <CardHeader className="space-y-1">
-              <CardTitle className="text-lg font-semibold">{media.title}</CardTitle>
-              <CardDescription>
-                {media.civilization} • Contributed by {media.contributor}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-muted-foreground">
-              <div className="flex flex-wrap gap-2 text-xs">
-                {media.tags.map((tag) => (
-                  <span key={tag} className="rounded-full bg-secondary/40 px-2 py-1">
-                    #{tag}
-                  </span>
-                ))}
-              </div>
-              <p className="text-xs text-muted-foreground">Uploaded {timeAgo(media.createdAt)}</p>
-              <div className="flex gap-3 text-xs">
-                <Link href={media.url} className="text-primary hover:underline">
-                  View source →
-                </Link>
-                <Link href={`/research?media=${media.id}`} className="text-primary hover:underline">
-                  Link to hypothesis →
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <Card className="glass-panel border-border/40">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold">Featured uploads</CardTitle>
+          <CardDescription>Newest curator-approved media across expeditions and survey zones.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <MediaCarousel assets={featured} />
+        </CardContent>
+      </Card>
+
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold">All assets</h2>
+          <Badge variant="outline">{sampleMediaAssets.length} items</Badge>
+        </div>
+        <MediaGallery assets={sampleMediaAssets} />
+      </section>
     </div>
   );
 }
