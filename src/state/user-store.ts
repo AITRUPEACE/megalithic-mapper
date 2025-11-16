@@ -18,5 +18,9 @@ export const useUserStore = create<UserState>((set) => ({
       profile,
       defaultViewport: profile?.default_viewport ?? FALLBACK_VIEWPORT,
     }),
-  setDefaultViewport: (viewport) => set({ defaultViewport: viewport }),
+  setDefaultViewport: (viewport) =>
+    set((state) => ({
+      defaultViewport: viewport,
+      profile: state.profile ? { ...state.profile, default_viewport: viewport } : state.profile,
+    })),
 }));
