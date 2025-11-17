@@ -84,7 +84,8 @@ async function getServerClient() {
 export async function getProfileForUser(userId: string): Promise<ProfileRecord | null> {
   if (!userId) return null;
   const supabase = await getServerClient();
-  const { data, error } = await supabase
+  const profileSchema = supabase.schema("megalithic");
+  const { data, error } = await profileSchema
     .from("profiles")
     .select(
       `id, full_name, headline, location, expertise_tags, contribution_intent, collaboration_focus, notify_research_activity, notify_product_updates, onboarding_completed, default_viewport`
@@ -109,6 +110,7 @@ export async function completeOnboarding(values: OnboardingValues) {
   "use server";
 
   const supabase = await getServerClient();
+  const profileSchema = supabase.schema("megalithic");
   const {
     data: { session },
     error: sessionError,
@@ -139,7 +141,7 @@ export async function completeOnboarding(values: OnboardingValues) {
     updated_at: new Date().toISOString(),
   };
 
-  const { data, error } = await supabase
+  const { data, error } = await profileSchema
     .from("profiles")
     .upsert(payload, { onConflict: "id" })
     .select(

@@ -1,4 +1,4 @@
-import type { SiteRow, SiteTagRow, ZoneRow } from "@/types/map";
+import type { SiteRow, SiteTagRow, SiteZoneRow, ZoneRow } from "@/types/map";
 
 export const zoneRows: ZoneRow[] = [
   {
@@ -13,6 +13,8 @@ export const zoneRows: ZoneRow[] = [
     culture_focus: ["Ancient Egyptian"],
     era_focus: ["Old Kingdom", "Middle Kingdom"],
     verification_state: "published",
+    updated_at: "2024-10-12T09:12:00Z",
+    updated_by: "survey.team",
   },
   {
     id: "zone-andean-sierra",
@@ -26,6 +28,8 @@ export const zoneRows: ZoneRow[] = [
     culture_focus: ["Inca"],
     era_focus: ["Late Horizon"],
     verification_state: "published",
+    updated_at: "2024-08-22T11:10:00Z",
+    updated_by: "andes.lab",
   },
   {
     id: "zone-atlantic-shelf",
@@ -39,6 +43,23 @@ export const zoneRows: ZoneRow[] = [
     culture_focus: ["Atlantis theories"],
     era_focus: ["Speculative"],
     verification_state: "draft",
+    updated_at: "2024-09-02T17:40:00Z",
+    updated_by: "bluewater.collective",
+  },
+  {
+    id: "zone-caledonia",
+    slug: "caledonian-rings",
+    name: "Caledonian Stone Rings",
+    description:
+      "Community stone circle mapping effort tying Brodgar-style rings to broader Atlantic façade alignments.",
+    color: "#a855f7",
+    bounds: { minLat: 55.7, minLng: -6.5, maxLat: 58.9, maxLng: -2.1 },
+    centroid: { lat: 57.1, lng: -3.8 },
+    culture_focus: ["Neolithic", "Pictish"],
+    era_focus: ["Late Neolithic"],
+    verification_state: "draft",
+    updated_at: "2024-08-14T09:22:00Z",
+    updated_by: "north.sea.heroes",
   },
 ];
 
@@ -109,7 +130,7 @@ export const siteRows: SiteRow[] = [
     verification_status: "unverified",
     layer: "community",
     trust_tier: "silver",
-    zone_ids: [],
+    zone_ids: ["zone-caledonia"],
     media_count: 9,
     related_research_ids: [],
     updated_at: "2024-10-01T12:00:00Z",
@@ -133,6 +154,24 @@ export const siteRows: SiteRow[] = [
     updated_at: "2024-09-20T17:42:00Z",
     updated_by: "explorer.maya",
   },
+  {
+    id: "site-ring-of-brodgar",
+    slug: "ring-of-brodgar",
+    name: "Ring of Brodgar",
+    summary:
+      "Stone circle with astronomical alignments; lidar plus historical diaries combined to test solstice procession modeling.",
+    site_type: "stone circle",
+    category: "site",
+    coordinates: { lat: 59.0, lng: -3.23 },
+    verification_status: "under_review",
+    layer: "community",
+    trust_tier: "gold",
+    zone_ids: ["zone-caledonia"],
+    media_count: 12,
+    related_research_ids: ["atlantic-façade"],
+    updated_at: "2024-09-12T11:00:00Z",
+    updated_by: "orcadev",
+  },
 ];
 
 export const siteTagRows: SiteTagRow[] = [
@@ -153,10 +192,22 @@ export const siteTagRows: SiteTagRow[] = [
   { site_id: "site-bimini-road", tag: "Atlantis theories", tag_type: "culture" },
   { site_id: "site-bimini-road", tag: "Speculative", tag_type: "era" },
   { site_id: "site-bimini-road", tag: "oceanic", tag_type: "theme" },
+  { site_id: "site-ring-of-brodgar", tag: "Neolithic", tag_type: "culture" },
+  { site_id: "site-ring-of-brodgar", tag: "Late Neolithic", tag_type: "era" },
+  { site_id: "site-ring-of-brodgar", tag: "astronomy", tag_type: "theme" },
+];
+
+export const siteZoneRows: SiteZoneRow[] = [
+  { site_id: "site-giza-gp", zone_id: "zone-lower-nile", assigned_by: "dr.aminah.s" },
+  { site_id: "site-machu-intihuatana", zone_id: "zone-andean-sierra", assigned_by: "andes.lab" },
+  { site_id: "site-bimini-road", zone_id: "zone-atlantic-shelf", assigned_by: "bluewater.collective" },
+  { site_id: "site-bosnia-community", zone_id: "zone-caledonia", assigned_by: "orcadev" },
+  { site_id: "site-ring-of-brodgar", zone_id: "zone-caledonia", assigned_by: "orcadev" },
 ];
 
 export const mapRecords = {
   zones: zoneRows,
   sites: siteRows,
   siteTags: siteTagRows,
+  siteZones: siteZoneRows,
 };

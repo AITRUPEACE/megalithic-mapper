@@ -188,6 +188,7 @@ export const SiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
         <SiteEditor
           className="border border-dashed border-primary/40 bg-primary/5"
           zones={zones}
+          site={selectedSite}
           onClose={() => setActiveEditor(null)}
         />
       )}

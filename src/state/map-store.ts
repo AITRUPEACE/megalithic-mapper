@@ -50,7 +50,13 @@ const inflateSite = (input: DraftSiteInput, zones: MapZoneFeature[]): MapSiteFea
   const zoneMemberships = input.zoneIds
     .map((zoneId) => zones.find((zone) => zone.id === zoneId))
     .filter(Boolean)
-    .map((zone) => ({ id: zone!.id, name: zone!.name, color: zone!.color }));
+    .map((zone) => ({
+      id: zone!.id,
+      slug: zone!.slug,
+      name: zone!.name,
+      color: zone!.color,
+      verificationState: zone!.verificationState,
+    }));
 
   return {
     id: input.id ?? `local-${nanoid(8)}`,
@@ -83,7 +89,13 @@ const updateSiteZoneMemberships = (sites: MapSiteFeature[], zone: MapZoneFeature
       ...site,
       zoneMemberships: site.zoneMemberships.map((membership) =>
         membership.id === zone.id
-          ? { ...membership, name: zone.name, color: zone.color }
+          ? {
+              ...membership,
+              name: zone.name,
+              color: zone.color,
+              slug: zone.slug,
+              verificationState: zone.verificationState,
+            }
           : membership
       ),
     } satisfies MapSiteFeature;
@@ -204,6 +216,9 @@ export const useMapStore = create<MapStoreState>((set, get) => ({
       centroid: input.centroid,
       cultureFocus: Array.from(new Set(input.cultureFocus)),
       eraFocus: Array.from(new Set(input.eraFocus)),
+      verificationState: input.verificationState,
+      updatedAt: new Date().toISOString(),
+      updatedBy: input.updatedBy,
     };
 
     set((state) => {

@@ -2,6 +2,7 @@ export type VerificationStatus = "verified" | "under_review" | "unverified";
 export type MapLayer = "official" | "community";
 export type CommunityTier = "bronze" | "silver" | "gold" | "promoted";
 export type SiteCategory = "site" | "artifact" | "text";
+export type ZoneVerificationState = "draft" | "published";
 
 export interface CoordinatePair {
   lat: number;
@@ -48,6 +49,13 @@ export interface SiteTagRow {
   tag_type: SiteTagType;
 }
 
+export interface SiteZoneRow {
+  site_id: string;
+  zone_id: string;
+  assigned_by?: string;
+  assigned_at?: string;
+}
+
 export interface ZoneRow {
   id: string;
   slug: string;
@@ -58,7 +66,9 @@ export interface ZoneRow {
   centroid: CoordinatePair;
   culture_focus: string[];
   era_focus: string[];
-  verification_state: "draft" | "published";
+  verification_state: ZoneVerificationState;
+  updated_at?: string;
+  updated_by?: string;
 }
 
 export interface TagCollection {
@@ -77,12 +87,17 @@ export interface MapZoneFeature {
   centroid: CoordinatePair;
   cultureFocus: string[];
   eraFocus: string[];
+  verificationState: ZoneVerificationState;
+  updatedAt?: string;
+  updatedBy?: string;
 }
 
 export interface MapZoneSummary {
   id: string;
+  slug: string;
   name: string;
   color: string;
+  verificationState: ZoneVerificationState;
 }
 
 export interface MapSiteFeature {
@@ -111,6 +126,7 @@ export interface MapDataResult {
   zones: MapZoneFeature[];
   meta: {
     totalSites: number;
+    totalZones: number;
     bounds: BoundingBox;
     tagCounts: Record<string, number>;
   };
@@ -159,4 +175,6 @@ export interface DraftZoneInput {
   centroid: CoordinatePair;
   cultureFocus: string[];
   eraFocus: string[];
+  verificationState: ZoneVerificationState;
+  updatedBy?: string;
 }

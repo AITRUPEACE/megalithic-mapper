@@ -1,10 +1,17 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import type { MapZoneFeature, SiteCategory, VerificationStatus, MapLayer, CommunityTier } from "@/types/map";
+import type {
+  MapSiteFeature,
+  MapZoneFeature,
+  SiteCategory,
+  VerificationStatus,
+  MapLayer,
+  CommunityTier,
+} from "@/types/map";
 import { useMapStore } from "@/state/map-store";
 import { CoordinatePicker } from "./coordinate-picker";
 import { TagSelector } from "./tag-selector";
@@ -12,6 +19,7 @@ import { cn } from "@/lib/utils";
 
 interface SiteEditorProps {
   zones: MapZoneFeature[];
+  site?: MapSiteFeature | null;
   onClose?: () => void;
   className?: string;
 }
@@ -49,10 +57,11 @@ const slugify = (value: string) =>
     .replace(/^-+|-+$/g, "")
     .slice(0, 60);
 
-export const SiteEditor = ({ zones, onClose, className }: SiteEditorProps) => {
-  const { optimisticUpsertSite, sites } = useMapStore((state) => ({
+export const SiteEditor = ({ zones, site, onClose, className }: SiteEditorProps) => {
+  const { optimisticUpsertSite, sites, selectSite } = useMapStore((state) => ({
     optimisticUpsertSite: state.optimisticUpsertSite,
     sites: state.sites,
+    selectSite: state.selectSite,
   }));
   const [form, setForm] = useState<DraftFormState>(DEFAULT_SITE);
   const [cultureTags, setCultureTags] = useState<string[]>([]);
@@ -77,6 +86,32 @@ export const SiteEditor = ({ zones, onClose, className }: SiteEditorProps) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  useEffect(() => {
+    if (!site) {
+      setForm(DEFAULT_SITE);
+      setCultureTags([]);
+      setEraTags([]);
+      setThemeTags([]);
+      return;
+    }
+
+    setForm({
+      name: site.name,
+      summary: site.summary,
+      siteType: site.siteType,
+      category: site.category,
+      layer: site.layer,
+      trustTier: site.trustTier ?? "bronze",
+      verificationStatus: site.verificationStatus,
+      updatedBy: site.updatedBy,
+      zoneIds: site.zoneMemberships.map((zone) => zone.id),
+      coordinates: site.coordinates,
+    });
+    setCultureTags(site.tags.cultures);
+    setEraTags(site.tags.eras);
+    setThemeTags(site.tags.themes);
+  }, [site]);
+
   const toggleZone = (zoneId: string) => {
     setForm((prev) => ({
       ...prev,
@@ -94,7 +129,7 @@ export const SiteEditor = ({ zones, onClose, className }: SiteEditorProps) => {
     }
 
     optimisticUpsertSite({
-      id: undefined,
+      id: site?.id,
       name: form.name.trim(),
       slug: slugify(form.name),
       summary: form.summary.trim(),
@@ -119,22 +154,40 @@ export const SiteEditor = ({ zones, onClose, className }: SiteEditorProps) => {
     setCultureTags([]);
     setEraTags([]);
     setThemeTags([]);
-    setMessage("Site saved locally. Supabase mutation pending integration.");
+    setMessage(site ? "Site updated locally. Supabase mutation pending integration." : "Site saved locally. Supabase mutation pending integration.");
     onClose?.();
   };
 
   return (
     <form onSubmit={handleSubmit} className={cn("space-y-4 rounded-xl p-4", className)}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-semibold text-foreground">Create or edit site</p>
+        <p className="text-sm font-semibold text-foreground">
+          {site ? `Edit site: ${site.name}` : "Create or edit site"}
+        </p>
         <div className="flex gap-2">
           {onClose && (
             <Button type="button" variant="ghost" size="sm" onClick={onClose}>
               Cancel
             </Button>
           )}
+          {site && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setForm(DEFAULT_SITE);
+                setCultureTags([]);
+                setEraTags([]);
+                setThemeTags([]);
+                selectSite(null);
+              }}
+            >
+              New site
+            </Button>
+          )}
           <Button type="submit" size="sm">
-            Save site
+            {site ? "Save changes" : "Save site"}
           </Button>
         </div>
       </div>
