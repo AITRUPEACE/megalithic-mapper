@@ -1,6 +1,8 @@
 create extension if not exists "uuid-ossp";
 
-create table if not exists public.zones (
+create schema if not exists megalithic;
+
+create table if not exists megalithic.zones (
   id uuid primary key default uuid_generate_v4(),
   slug text unique not null,
   name text not null,
@@ -15,7 +17,7 @@ create table if not exists public.zones (
   updated_at timestamptz not null default timezone('utc', now())
 );
 
-create table if not exists public.sites (
+create table if not exists megalithic.sites (
   id uuid primary key default uuid_generate_v4(),
   slug text unique not null,
   name text not null,
@@ -34,8 +36,8 @@ create table if not exists public.sites (
   constraint sites_zone_ids_check check (zone_ids is not null)
 );
 
-create table if not exists public.site_tags (
-  site_id uuid references public.sites(id) on delete cascade,
+create table if not exists megalithic.site_tags (
+  site_id uuid references megalithic.sites(id) on delete cascade,
   tag text not null,
   tag_type text not null check (tag_type in ('culture','era','theme')),
   created_at timestamptz not null default timezone('utc', now()),
