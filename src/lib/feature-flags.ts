@@ -1,7 +1,9 @@
 export const FEATURE_FLAGS = {
-  mediaAttachments: true,
-  drawerMediaTabs: true,
-  zonePlanning: true,
+  // Keep these disabled by default so master retains the existing flows until
+  // the parallel media + zone planning work is fully reconciled.
+  mediaAttachments: false,
+  drawerMediaTabs: false,
+  zonePlanning: false,
 };
 
 export type FeatureFlag = keyof typeof FEATURE_FLAGS;
