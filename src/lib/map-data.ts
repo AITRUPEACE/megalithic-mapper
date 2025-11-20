@@ -89,6 +89,8 @@ export const normalizeMapData = (records: MapRecordSet = mapRecords) => {
       trustTier: site.trust_tier,
       tags,
       zoneMemberships,
+      mediaAssets: [],
+      documentAssets: [],
       mediaCount: site.media_count,
       relatedResearchIds: site.related_research_ids,
       evidenceLinks: [],

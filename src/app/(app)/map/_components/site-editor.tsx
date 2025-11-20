@@ -9,6 +9,8 @@ import { useMapStore } from "@/state/map-store";
 import { CoordinatePicker } from "./coordinate-picker";
 import { TagSelector } from "./tag-selector";
 import { cn } from "@/lib/utils";
+import type { MediaAsset } from "@/types/media";
+import { MediaFormSection } from "@/components/media/media-form-section";
 
 interface SiteEditorProps {
   zones: MapZoneFeature[];
@@ -17,6 +19,7 @@ interface SiteEditorProps {
 }
 
 type DraftFormState = {
+  id?: string;
   name: string;
   summary: string;
   siteType: string;
@@ -30,6 +33,7 @@ type DraftFormState = {
 };
 
 const DEFAULT_SITE: DraftFormState = {
+  id: undefined,
   name: "",
   summary: "",
   siteType: "",
@@ -58,6 +62,7 @@ export const SiteEditor = ({ zones, onClose, className }: SiteEditorProps) => {
   const [cultureTags, setCultureTags] = useState<string[]>([]);
   const [eraTags, setEraTags] = useState<string[]>([]);
   const [themeTags, setThemeTags] = useState<string[]>([]);
+  const [mediaAssets, setMediaAssets] = useState<MediaAsset[]>([]);
   const [message, setMessage] = useState<string | null>(null);
 
   const cultureSuggestions = useMemo(
@@ -111,7 +116,8 @@ export const SiteEditor = ({ zones, onClose, className }: SiteEditorProps) => {
       },
       zoneIds: form.zoneIds,
       updatedBy: form.updatedBy.trim() || "field.builder",
-      mediaCount: 0,
+      mediaAssets,
+      mediaCount: mediaAssets.length,
       relatedResearchIds: [],
     });
 
@@ -119,6 +125,7 @@ export const SiteEditor = ({ zones, onClose, className }: SiteEditorProps) => {
     setCultureTags([]);
     setEraTags([]);
     setThemeTags([]);
+    setMediaAssets([]);
     setMessage("Site saved locally. Supabase mutation pending integration.");
     onClose?.();
   };
@@ -239,6 +246,13 @@ export const SiteEditor = ({ zones, onClose, className }: SiteEditorProps) => {
         value={themeTags}
         onChange={setThemeTags}
         suggestions={themeSuggestions}
+      />
+
+      <MediaFormSection
+        targetId={form.id ?? "draft-site"}
+        targetType="site"
+        assets={mediaAssets}
+        onChange={setMediaAssets}
       />
 
       {zones.length > 0 && (

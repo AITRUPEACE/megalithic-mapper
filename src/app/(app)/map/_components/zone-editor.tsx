@@ -9,6 +9,8 @@ import { TagSelector } from "./tag-selector";
 import type { BoundingBox, CoordinatePair } from "@/types/map";
 import { useMapStore } from "@/state/map-store";
 import { cn } from "@/lib/utils";
+import type { MediaAsset } from "@/types/media";
+import { MediaFormSection } from "@/components/media/media-form-section";
 
 interface ZoneEditorProps {
   onClose?: () => void;
@@ -27,6 +29,7 @@ export const ZoneEditor = ({ onClose, className }: ZoneEditorProps) => {
   const [centroid, setCentroid] = useState<CoordinatePair>(DEFAULT_POINT);
   const [cultureFocus, setCultureFocus] = useState<string[]>([]);
   const [eraFocus, setEraFocus] = useState<string[]>([]);
+  const [mediaAssets, setMediaAssets] = useState<MediaAsset[]>([]);
   const [message, setMessage] = useState<string | null>(null);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -54,7 +57,8 @@ export const ZoneEditor = ({ onClose, className }: ZoneEditorProps) => {
     setCentroid(DEFAULT_POINT);
     setCultureFocus([]);
     setEraFocus([]);
-    setMessage("Zone saved and linked to local markers.");
+    setMediaAssets([]);
+    setMessage("Zone saved and linked to local markers. Media will sync once storage is wired.");
     onClose?.();
   };
 
@@ -107,6 +111,13 @@ export const ZoneEditor = ({ onClose, className }: ZoneEditorProps) => {
 
       <TagSelector label="Culture focus" value={cultureFocus} onChange={setCultureFocus} />
       <TagSelector label="Era focus" value={eraFocus} onChange={setEraFocus} />
+
+      <MediaFormSection
+        targetId={name || "draft-zone"}
+        targetType="zone"
+        assets={mediaAssets}
+        onChange={setMediaAssets}
+      />
     </form>
   );
 };

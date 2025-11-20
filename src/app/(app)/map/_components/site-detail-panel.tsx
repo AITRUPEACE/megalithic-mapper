@@ -1,13 +1,16 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import type { MapSiteFeature } from "@/types/map";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
 import { cn, timeAgo } from "@/lib/utils";
 import Link from "next/link";
+import type { MediaAsset } from "@/types/media";
+import { MediaCarousel } from "@/components/media/media-carousel";
+import { MediaAttachmentList } from "@/components/media/media-attachment-list";
 
 interface SiteDetailPanelProps {
 site: MapSiteFeature | null;
@@ -35,7 +38,116 @@ const categoryLabel: Record<MapSiteFeature["category"], string> = {
 };
 
 export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetailPanelProps) => {
-	if (!site) {
+        const [activeTab, setActiveTab] = useState("overview");
+        const [loadedTabs, setLoadedTabs] = useState({ media: false, documents: false });
+        const [loadingTab, setLoadingTab] = useState<"media" | "documents" | null>(null);
+        const [mediaAssets, setMediaAssets] = useState<MediaAsset[]>([]);
+        const [documentAssets, setDocumentAssets] = useState<MediaAsset[]>([]);
+
+        const buildMockAssets = useMemo(
+                () =>
+                        (currentSite: MapSiteFeature, category: "media" | "documents"): MediaAsset[] => {
+                                const baseTarget = { entityId: currentSite.id, entityType: "site" as const };
+                                if (category === "media") {
+                                        return [
+                                                {
+                                                        id: `mock-image-${currentSite.id}`,
+                                                        type: "image",
+                                                        uri: `https://placehold.co/640x360?text=${encodeURIComponent(currentSite.name)}`,
+                                                        title: `${currentSite.name} overview`,
+                                                        description: "Placeholder preview. Upload images via Supabase storage to replace.",
+                                                        target: baseTarget,
+                                                        attribution: { author: "Field archivist" },
+                                                        createdAt: new Date().toISOString(),
+                                                },
+                                                {
+                                                        id: `mock-video-${currentSite.id}`,
+                                                        type: "external_video",
+                                                        uri: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                                                        title: "Expedition footage",
+                                                        description: "Example YouTube embed placeholder.",
+                                                        target: baseTarget,
+                                                        attribution: { author: "Expedition media" },
+                                                        createdAt: new Date().toISOString(),
+                                                },
+                                        ];
+                                }
+
+                                return [
+                                        {
+                                                id: `mock-doc-${currentSite.id}`,
+                                                type: "document",
+                                                uri: "https://example.com/field-notes.pdf",
+                                                title: "Field notes PDF",
+                                                description: "Attach survey notes, citations, or scans for review.",
+                                                target: baseTarget,
+                                                attribution: { author: "Research desk" },
+                                                createdAt: new Date().toISOString(),
+                                        },
+                                        {
+                                                id: `mock-text-${currentSite.id}`,
+                                                type: "text",
+                                                uri: "Add short observations or captions to contextualize the gallery.",
+                                                title: "Inline annotation",
+                                                target: baseTarget,
+                                                attribution: null,
+                                                createdAt: new Date().toISOString(),
+                                        },
+                                ];
+                        },
+                []
+        );
+
+        useEffect(() => {
+                if (!site) {
+                        setMediaAssets([]);
+                        setDocumentAssets([]);
+                        setActiveTab("overview");
+                        return;
+                }
+
+                setActiveTab("overview");
+                setLoadedTabs({ media: false, documents: false });
+                setLoadingTab(null);
+                setMediaAssets(site.mediaAssets ?? []);
+                setDocumentAssets(site.documentAssets ?? []);
+        }, [site?.id]);
+
+        const loadMediaTab = (targetTab: "media" | "documents") => {
+                if (!site || loadedTabs[targetTab]) return;
+                setLoadingTab(targetTab);
+                const fallbackAssets =
+                        targetTab === "media"
+                                ? site.mediaAssets?.length
+                                        ? site.mediaAssets
+                                        : buildMockAssets(site, "media")
+                                : site.documentAssets?.length
+                                        ? site.documentAssets
+                                        : buildMockAssets(site, "documents");
+
+                setTimeout(() => {
+                        if (targetTab === "media") {
+                                setMediaAssets(fallbackAssets);
+                        } else {
+                                setDocumentAssets(fallbackAssets);
+                        }
+
+                        setLoadedTabs((prev) => ({ ...prev, [targetTab]: true }));
+                        setLoadingTab(null);
+                }, 240);
+        };
+
+        const handleTabChange = (value: string) => {
+                setActiveTab(value);
+                if (value === "media") {
+                        loadMediaTab("media");
+                }
+                if (value === "documents") {
+                        loadMediaTab("documents");
+                }
+        };
+
+        if (!site) {
 		const emptyClasses =
 			variant === "card"
 				? "glass-panel border-border/40 p-6 text-sm text-muted-foreground"
@@ -72,27 +184,21 @@ const header = (
 		</div>
 	);
 
-	const tabs = (
-		<Tabs defaultValue="overview" className="flex h-full flex-col gap-4">
-			<TabsList className="flex w-full gap-2 overflow-x-auto rounded-md bg-background/40 p-1 text-xs">
-				<TabsTrigger value="overview" className="shrink-0 px-3 py-1">
-					Overview
-				</TabsTrigger>
-				<TabsTrigger value="media" className="shrink-0 px-3 py-1">
-					Media
-				</TabsTrigger>
-				<TabsTrigger value="documents" className="shrink-0 px-3 py-1">
-					Documents
-				</TabsTrigger>
-				<TabsTrigger value="discussion" className="shrink-0 px-3 py-1">
-					Discussion
-				</TabsTrigger>
-				<TabsTrigger value="activity" className="shrink-0 px-3 py-1">
-					Activity
-				</TabsTrigger>
-			</TabsList>
+        const tabs = (
+                <Tabs value={activeTab} onValueChange={handleTabChange} className="flex h-full flex-col gap-4">
+                        <TabsList className="flex w-full gap-2 overflow-x-auto rounded-md bg-background/40 p-1 text-xs">
+                                <TabsTrigger value="overview" className="shrink-0 px-3 py-1">
+                                        Overview
+                                </TabsTrigger>
+                                <TabsTrigger value="media" className="shrink-0 px-3 py-1">
+                                        Media
+                                </TabsTrigger>
+                                <TabsTrigger value="documents" className="shrink-0 px-3 py-1">
+                                        Documents
+                                </TabsTrigger>
+                        </TabsList>
 
-			<TabsContent value="overview" className="flex-1 overflow-y-auto space-y-4 text-sm text-muted-foreground">
+                        <TabsContent value="overview" className="flex-1 overflow-y-auto space-y-4 text-sm text-muted-foreground">
 <p>{site.summary}</p>
 
                                 <div className="flex flex-wrap gap-2 text-xs">
@@ -194,55 +300,30 @@ Coordinates {site.coordinates.lat.toFixed(3)}, {site.coordinates.lng.toFixed(3)}
 				</div>
 			</TabsContent>
 
-			<TabsContent value="media" className="flex-1 overflow-y-auto space-y-3 text-sm text-muted-foreground">
-				<p>
-					{site.mediaCount > 0
-						? `Media gallery placeholder - ${site.mediaCount} assets staged for integration.`
-						: "No media have been linked yet. Add photos or videos to strengthen this entry."}
-				</p>
-				<Button size="sm" variant="ghost">
-					Upload media
-				</Button>
-			</TabsContent>
+                        <TabsContent value="media" className="flex-1 overflow-y-auto space-y-3 text-sm text-muted-foreground">
+                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                        <span>
+                                                {site.mediaCount > 0
+                                                        ? `${site.mediaCount} media assets referenced`
+                                                        : "Media gallery will display Supabase storage uploads and embeds."}
+                                        </span>
+                                        <Button size="sm" variant="ghost" onClick={() => loadMediaTab("media")}>Refresh</Button>
+                                </div>
+                                <MediaCarousel assets={mediaAssets} loading={loadingTab === "media" || !loadedTabs.media} />
+                        </TabsContent>
 
-			<TabsContent value="documents" className="flex-1 overflow-y-auto space-y-3 text-sm text-muted-foreground">
-				<p>Document library integration coming soon. Attach field notes, PDFs, or external research references to provide supporting evidence.</p>
-				<Button size="sm" variant="ghost">
-					Attach document
-				</Button>
-			</TabsContent>
-
-			<TabsContent value="discussion" className="flex-1 overflow-y-auto space-y-3 text-sm text-muted-foreground">
-				<p>
-					Join the conversation with researchers and community members exploring this entry. Deep-link to active threads or start a new discussion.
-				</p>
-				<div className="flex flex-wrap gap-2">
-					<Button asChild size="sm">
-						<Link href={`/forum?site=${site.id}`}>View discussions</Link>
-					</Button>
-					<Button size="sm" variant="ghost">
-						Start a thread
-					</Button>
-				</div>
-			</TabsContent>
-
-			<TabsContent value="activity" className="flex-1 overflow-y-auto space-y-3 text-sm text-muted-foreground">
-				<p>Recent activity timeline will surface edits, promotions, and moderator reviews.</p>
-				<Separator className="border-border/40" />
-				<ul className="space-y-2 text-xs">
-					<li>
-						<span className="font-semibold text-foreground">Last updated:</span> {timeAgo(site.lastUpdated)} by {site.updatedBy}
-					</li>
-					{isCommunity && tierLabel && (
-						<li>
-							<span className="font-semibold text-foreground">Current tier:</span> {tierLabel}
-						</li>
-					)}
-					<li>
-						<span className="font-semibold text-foreground">Research links:</span> {site.relatedResearchIds.length}
-					</li>
-				</ul>
-			</TabsContent>
+                        <TabsContent value="documents" className="flex-1 overflow-y-auto space-y-3 text-sm text-muted-foreground">
+                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                        <span>Attach reports, PDFs, and inline notes to document provenance.</span>
+                                        <Button size="sm" variant="ghost" onClick={() => loadMediaTab("documents")}>
+                                                Refresh
+                                        </Button>
+                                </div>
+                                <MediaAttachmentList
+                                        assets={documentAssets.filter((asset) => asset.type === "document" || asset.type === "text")}
+                                        loading={loadingTab === "documents" || !loadedTabs.documents}
+                                />
+                        </TabsContent>
 		</Tabs>
 	);
 

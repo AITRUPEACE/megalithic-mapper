@@ -1,3 +1,5 @@
+import type { MediaAsset } from "./media";
+
 export type VerificationStatus = "verified" | "under_review" | "unverified";
 export type MapLayer = "official" | "community";
 export type CommunityTier = "bronze" | "silver" | "gold" | "promoted";
@@ -98,6 +100,8 @@ export interface MapSiteFeature {
   trustTier?: CommunityTier;
   tags: TagCollection;
   zoneMemberships: MapZoneSummary[];
+  mediaAssets?: MediaAsset[];
+  documentAssets?: MediaAsset[];
   mediaCount: number;
   relatedResearchIds: string[];
   evidenceLinks?: string[];
@@ -143,6 +147,8 @@ export interface DraftSiteInput {
   trustTier?: CommunityTier;
   tags: TagCollection;
   zoneIds: string[];
+  mediaAssets?: MediaAsset[];
+  documentAssets?: MediaAsset[];
   mediaCount?: number;
   relatedResearchIds?: string[];
   evidenceLinks?: string[];
