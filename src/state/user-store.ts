@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { MapViewport, ProfileRecord } from "@/lib/supabase/profile";
+import type { MapViewport, ProfileRecord } from "@/lib/repos/profile-repo";
 
 const FALLBACK_VIEWPORT: MapViewport = { latitude: 20, longitude: 0, zoom: 2 };
 

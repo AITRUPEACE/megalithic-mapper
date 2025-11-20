@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import type { ProfileRecord } from "@/lib/supabase/profile";
+import type { ProfileRecord } from "@/lib/repos/profile-repo";
 import { useUserStore } from "@/state/user-store";
 
 export function UserStoreHydrator({ profile }: { profile: ProfileRecord | null }) {

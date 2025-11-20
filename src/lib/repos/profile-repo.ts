@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { getServerSupabaseClient } from "@/lib/supabase/client";
+
 export interface MapViewport {
   latitude: number;
   longitude: number;
@@ -54,36 +56,10 @@ export type OnboardingValues = z.infer<typeof onboardingSchema>;
 
 export const DEFAULT_VIEWPORT: MapViewport = { latitude: 20, longitude: 0, zoom: 2 };
 
-async function getServerClient() {
-  if (typeof window !== "undefined") {
-    throw new Error("Supabase server helpers must be invoked on the server.");
-  }
-
-  const [{ cookies }, { createServerComponentClient }] = await Promise.all([
-    import("next/headers"),
-    import("@supabase/auth-helpers-nextjs"),
-  ]);
-
-  const cookieStore = cookies();
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseKey) {
-    throw new Error("Missing Supabase configuration for server client.");
-  }
-
-  return createServerComponentClient(
-    {
-      cookies: () => cookieStore,
-    },
-    { supabaseUrl, supabaseKey }
-  );
-}
-
 export async function getProfileForUser(userId: string): Promise<ProfileRecord | null> {
   if (!userId) return null;
-  const supabase = await getServerClient();
+
+  const supabase = await getServerSupabaseClient();
   const { data, error } = await supabase
     .from("profiles")
     .select(
@@ -105,10 +81,10 @@ export async function getProfileForUser(userId: string): Promise<ProfileRecord |
   } as ProfileRecord;
 }
 
-export async function completeOnboarding(values: OnboardingValues) {
+export async function upsertOnboardingProfile(values: OnboardingValues) {
   "use server";
 
-  const supabase = await getServerClient();
+  const supabase = await getServerSupabaseClient();
   const {
     data: { session },
     error: sessionError,

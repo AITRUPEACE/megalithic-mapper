@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { SiteExplorer } from "./_components/site-explorer";
+import { SiteExplorer } from "./components/site-explorer";
 import { fetchMapEntities } from "@/lib/map-data";
 import { WORLD_BOUNDS } from "@/types/map";
 

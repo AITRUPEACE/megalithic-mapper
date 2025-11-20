@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 import { CheckCircle2, Sparkles } from "lucide-react";
 import {
   onboardingSchema,
-  completeOnboarding,
+  upsertOnboardingProfile,
   type OnboardingValues,
   type ProfileRecord,
   type MapViewport,
   DEFAULT_VIEWPORT,
-} from "@/lib/supabase/profile";
+} from "@/lib/repos/profile-repo";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -158,7 +158,7 @@ export function OnboardingWizard({ profile }: OnboardingWizardProps) {
     setServerSuccess(null);
     startTransition(async () => {
       try {
-        const saved = await completeOnboarding(result.data);
+        const saved = await upsertOnboardingProfile(result.data);
         hydrateStore(saved);
         setServerSuccess("Profile saved. Redirecting to the map...");
         setTimeout(() => router.push("/map"), 1200);
