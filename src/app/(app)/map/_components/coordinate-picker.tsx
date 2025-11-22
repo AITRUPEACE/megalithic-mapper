@@ -1,8 +1,8 @@
 "use client";
 
-import type { BoundingBox, CoordinatePair } from "@/types/map";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import type { BoundingBox, CoordinatePair } from "@/entities/map/model/types";
+import { Input } from "@/shared/ui/input";
+import { cn } from "@/shared/lib/utils";
 
 interface BaseProps {
   label?: string;

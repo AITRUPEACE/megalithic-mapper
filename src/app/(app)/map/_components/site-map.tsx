@@ -3,8 +3,8 @@
 import { MapContainer, TileLayer, CircleMarker, Tooltip, useMap, useMapEvents, Rectangle } from "react-leaflet";
 import { useEffect, useMemo } from "react";
 import L from "leaflet";
-import type { BoundingBox, MapSiteFeature, MapZoneFeature } from "@/types/map";
-import { cn } from "@/lib/utils";
+import type { BoundingBox, MapSiteFeature, MapZoneFeature } from "@/entities/map/model/types";
+import { cn } from "@/shared/lib/utils";
 
 const MAP_CENTER: [number, number] = [20, 10];
 

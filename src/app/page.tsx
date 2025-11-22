@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/shared/ui/button";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Compass, Network, Map, BookOpen, ShieldCheck, MessageSquare } from "lucide-react";
 
 const featureCards = [

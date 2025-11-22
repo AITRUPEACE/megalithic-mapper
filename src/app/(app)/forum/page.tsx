@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { sampleThreads } from "@/data/sample-discussions";
-import { timeAgo } from "@/lib/utils";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { sampleThreads } from "@/shared/mocks/sample-discussions";
+import { timeAgo } from "@/shared/lib/utils";
 
 export default function ForumPage() {
   return (

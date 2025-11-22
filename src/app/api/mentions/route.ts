@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import type { MentionTarget, NotificationFanoutPayload } from "@/types/discussion";
+import type { MentionTarget, NotificationFanoutPayload } from "@/entities/discussion/model/types";
 
 const mapProfileToMention = (record: any): MentionTarget => ({
   id: record.id,

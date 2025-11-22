@@ -1,9 +1,9 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import type { MapFilters, CommunityTier, SiteCategory } from "@/types/map";
-import { cn } from "@/lib/utils";
+import { Input } from "@/shared/ui/input";
+import { Button } from "@/shared/ui/button";
+import type { MapFilters, CommunityTier, SiteCategory } from "@/entities/map/model/types";
+import { cn } from "@/shared/lib/utils";
 
 interface SiteFiltersProps {
   filters: MapFilters;

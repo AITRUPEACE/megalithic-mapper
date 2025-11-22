@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Textarea } from "@/shared/ui/textarea";
+import { Button } from "@/shared/ui/button";
 import { CoordinatePicker } from "./coordinate-picker";
 import { TagSelector } from "./tag-selector";
-import type { BoundingBox, CoordinatePair, ZoneVerificationState } from "@/types/map";
-import { useMapStore } from "@/state/map-store";
-import { cn } from "@/lib/utils";
+import type { BoundingBox, CoordinatePair, ZoneVerificationState } from "@/entities/map/model/types";
+import { useMapStore } from "@/features/map-explorer/model/map-store";
+import { cn } from "@/shared/lib/utils";
 
 interface ZoneEditorProps {
   onClose?: () => void;

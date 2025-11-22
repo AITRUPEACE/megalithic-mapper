@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { AppSidebar } from "@/components/navigation/app-sidebar";
-import { AppTopbar } from "@/components/navigation/app-topbar";
+import { AppSidebar } from "@/widgets/navigation/app-sidebar";
+import { AppTopbar } from "@/widgets/navigation/app-topbar";
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
