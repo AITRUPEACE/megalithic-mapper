@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+<<<<<<< HEAD
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +9,14 @@ import { Badge } from "@/components/ui/badge";
 import { ContentCard } from "@/components/content/content-card";
 import { useContentStore, filterContent } from "@/state/content-store";
 import { Search, Grid3x3, List, SlidersHorizontal } from "lucide-react";
+=======
+import Image from "next/image";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { sampleMediaAssets } from "@/shared/mocks/sample-media";
+import { timeAgo } from "@/shared/lib/utils";
+>>>>>>> 520337dfb48b4ef3f55d0edf1ade0738f592525b
 
 export default function MediaPage() {
 	const { contentItems, filters, setFilters, likeContent, bookmarkContent } = useContentStore();

@@ -1,12 +1,12 @@
 "use client";
 
-import type { MapSite } from "@/lib/types";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { cn, timeAgo } from "@/lib/utils";
+import type { MapSiteFeature } from "@/entities/map/model/types";
+import { ScrollArea } from "@/shared/ui/scroll-area";
+import { Badge } from "@/shared/ui/badge";
+import { cn, timeAgo } from "@/shared/lib/utils";
 
 interface SiteListProps {
-  sites: MapSite[];
+  sites: MapSiteFeature[];
   selectedSiteId: string | null;
   onSelect: (siteId: string) => void;
   className?: string;
@@ -14,17 +14,23 @@ interface SiteListProps {
   variant?: "card" | "flat";
 }
 
-const verificationLabel: Record<MapSite["verificationStatus"], string> = {
+const verificationLabel: Record<MapSiteFeature["verificationStatus"], string> = {
   verified: "Verified",
   under_review: "Under review",
   unverified: "Unverified",
 };
 
-const communityTierLabel: Record<NonNullable<MapSite["trustTier"]>, string> = {
+const communityTierLabel: Record<NonNullable<MapSiteFeature["trustTier"]>, string> = {
   bronze: "Community Bronze",
   silver: "Community Silver",
   gold: "Community Gold",
   promoted: "Promoted to Official",
+};
+
+const categoryLabel: Record<MapSiteFeature["category"], string> = {
+  site: "Site",
+  artifact: "Artifact",
+  text: "Text source",
 };
 
 export const SiteList = ({ sites, selectedSiteId, onSelect, className, scrollClassName, variant = "card" }: SiteListProps) => {
@@ -70,6 +76,7 @@ export const SiteList = ({ sites, selectedSiteId, onSelect, className, scrollCla
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="text-sm font-semibold text-foreground">{site.name}</p>
                     <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant="outline">{categoryLabel[site.category]}</Badge>
                       <Badge variant={site.verificationStatus === "verified" ? "success" : "outline"}>
                         {verificationLabel[site.verificationStatus]}
                       </Badge>
@@ -79,7 +86,9 @@ export const SiteList = ({ sites, selectedSiteId, onSelect, className, scrollCla
                     </div>
                   </div>
                   <p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
-                    {site.civilization} - {site.era}
+                    {(site.tags.cultures[0] ?? "Unattributed culture").toUpperCase()} -
+                    {" "}
+                    {(site.tags.eras[0] ?? "Unknown era").toUpperCase()}
                   </p>
                   {site.geography.zone && (
                     <p className="mt-1 text-xs font-semibold text-primary">
@@ -87,16 +96,26 @@ export const SiteList = ({ sites, selectedSiteId, onSelect, className, scrollCla
                     </p>
                   )}
                   <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{site.summary}</p>
+                  {site.zoneMemberships.length > 0 && (
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      Zones: {site.zoneMemberships.map((zone) => zone.name).join(", ")}
+                    </p>
+                  )}
                   <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+<<<<<<< HEAD
                     <span className="text-[11px]">
                       {site.geography.country}
                     </span>
                     {site.tags.slice(0, 2).map((tag) => (
+=======
+                    {site.tags.themes.slice(0, 3).map((tag) => (
+>>>>>>> 520337dfb48b4ef3f55d0edf1ade0738f592525b
                       <span key={tag} className="rounded-full bg-secondary/40 px-2 py-1">
                         #{tag}
                       </span>
                     ))}
-                    <span>Updated {timeAgo(site.lastUpdated)}</span>
+                    <span className="rounded-full bg-secondary/40 px-2 py-1">{site.siteType}</span>
+                    <span>Updated {timeAgo(site.updatedAt)}</span>
                     {site.relatedResearchIds.length > 0 && (
                       <span className="rounded-full bg-primary/15 px-2 py-1 text-primary text-[11px] uppercase tracking-wide">
                         Research linked

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+<<<<<<< HEAD
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +9,11 @@ import { Badge } from "@/components/ui/badge";
 import { ContentCard } from "@/components/content/content-card";
 import { useContentStore, filterContent } from "@/state/content-store";
 import { Search, Grid3x3, List, SlidersHorizontal, FileText } from "lucide-react";
+=======
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { sampleTextSources } from "@/shared/mocks/sample-texts";
+>>>>>>> 520337dfb48b4ef3f55d0edf1ade0738f592525b
 
 export default function TextLibraryPage() {
 	const { contentItems, filters, setFilters, likeContent, bookmarkContent } = useContentStore();

@@ -1,5 +1,6 @@
 "use client";
 
+<<<<<<< HEAD
 import { useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,14 +11,27 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { FilterX, Settings2, Search } from "lucide-react";
+=======
+import { Input } from "@/shared/ui/input";
+import { Button } from "@/shared/ui/button";
+import type { MapFilters, CommunityTier, SiteCategory } from "@/entities/map/model/types";
+import { cn } from "@/shared/lib/utils";
+>>>>>>> 520337dfb48b4ef3f55d0edf1ade0738f592525b
 
 interface SiteFiltersProps {
   filters: MapFilters;
-  availableCivilizations: string[];
+  availableCultures: string[];
+  availableEras: string[];
   availableSiteTypes: string[];
   availableCommunityTiers: CommunityTier[];
+<<<<<<< HEAD
   availableContinents: string[];
   availableZones: string[];
+=======
+  availableCategories: SiteCategory[];
+  availableZones: { id: string; name: string }[];
+  availableTags: string[];
+>>>>>>> 520337dfb48b4ef3f55d0edf1ade0738f592525b
   onUpdate: (update: Partial<MapFilters>) => void;
   onClear: () => void;
   className?: string;
@@ -26,11 +40,18 @@ interface SiteFiltersProps {
 
 export const SiteFilters = ({
   filters,
-  availableCivilizations,
+  availableCultures,
+  availableEras,
   availableSiteTypes,
   availableCommunityTiers,
+<<<<<<< HEAD
   availableContinents,
   availableZones,
+=======
+  availableCategories,
+  availableZones,
+  availableTags,
+>>>>>>> 520337dfb48b4ef3f55d0edf1ade0738f592525b
   onUpdate,
   onClear,
   className,
@@ -224,9 +245,205 @@ export const SiteFilters = ({
               </Badge>
             ))}
           </div>
+<<<<<<< HEAD
           <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" onClick={onClear}>
             <FilterX className="mr-1 h-3 w-3" />
             Reset
+=======
+        </div>
+
+        {availableCategories.length > 0 && (
+          <div>
+            <p className="text-sm font-semibold text-foreground">Entry type</p>
+            <div className="mt-2 flex flex-wrap gap-2 sm:flex-nowrap sm:overflow-x-auto sm:pr-2">
+              {availableCategories.map((category) => {
+                const isActive = filters.categories.includes(category);
+                const labelMap: Record<SiteCategory, string> = {
+                  site: "Sites",
+                  artifact: "Artifacts",
+                  text: "Texts",
+                };
+                return (
+                  <Button
+                    key={category}
+                    size="sm"
+                    variant={isActive ? "secondary" : "ghost"}
+                    className={cn(
+                      "rounded-full sm:shrink-0",
+                      isActive && "border border-primary/40"
+                    )}
+                    onClick={() => onUpdate({ categories: toggleArrayValue(filters.categories, category) })}
+                  >
+                    {labelMap[category]}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <div>
+          <p className="text-sm font-semibold text-foreground">Cultures</p>
+          <div className="mt-2 flex flex-wrap gap-2 sm:flex-nowrap sm:overflow-x-auto sm:pr-2">
+            {availableCultures.map((culture) => {
+              const isActive = filters.cultures.includes(culture);
+              return (
+                <Button
+                  key={culture}
+                  size="sm"
+                  variant={isActive ? "secondary" : "ghost"}
+                  className={cn("rounded-full sm:shrink-0", isActive && "border border-primary/40")}
+                  onClick={() => onUpdate({ cultures: toggleArrayValue(filters.cultures, culture) })}
+                >
+                  {culture}
+                </Button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div>
+          <p className="text-sm font-semibold text-foreground">Eras</p>
+          <div className="mt-2 flex flex-wrap gap-2 sm:flex-nowrap sm:overflow-x-auto sm:pr-2">
+            {availableEras.map((era) => {
+              const isActive = filters.eras.includes(era);
+              return (
+                <Button
+                  key={era}
+                  size="sm"
+                  variant={isActive ? "secondary" : "ghost"}
+                  className={cn("rounded-full sm:shrink-0", isActive && "border border-primary/40")}
+                  onClick={() => onUpdate({ eras: toggleArrayValue(filters.eras, era) })}
+                >
+                  {era}
+                </Button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div>
+          <p className="text-sm font-semibold text-foreground">Site types</p>
+          <div className="mt-2 flex flex-wrap gap-2 sm:flex-nowrap sm:overflow-x-auto sm:pr-2">
+            {availableSiteTypes.map((type) => {
+              const isActive = filters.siteTypes.includes(type);
+              return (
+                <Button
+                  key={type}
+                  size="sm"
+                  variant={isActive ? "secondary" : "ghost"}
+                  className={cn(
+                    "rounded-full sm:shrink-0",
+                    isActive && "border border-primary/40"
+                  )}
+                  onClick={() => onUpdate({ siteTypes: toggleArrayValue(filters.siteTypes, type) })}
+                >
+                  {type}
+                </Button>
+              );
+            })}
+          </div>
+        </div>
+
+        {availableZones.length > 0 && (
+          <div>
+            <p className="text-sm font-semibold text-foreground">Zones</p>
+            <div className="mt-2 flex flex-wrap gap-2 sm:flex-nowrap sm:overflow-x-auto sm:pr-2">
+              {availableZones.map((zone) => {
+                const isActive = filters.zones.includes(zone.id);
+                return (
+                  <Button
+                    key={zone.id}
+                    size="sm"
+                    variant={isActive ? "secondary" : "ghost"}
+                    className={cn("rounded-full sm:shrink-0", isActive && "border border-primary/40")}
+                    onClick={() => onUpdate({ zones: toggleArrayValue(filters.zones, zone.id) })}
+                  >
+                    {zone.name}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {availableTags.length > 0 && (
+          <div>
+            <p className="text-sm font-semibold text-foreground">Themes</p>
+            <div className="mt-2 flex flex-wrap gap-2 sm:flex-nowrap sm:overflow-x-auto sm:pr-2">
+              {availableTags.map((tag) => {
+                const isActive = filters.tags.includes(tag);
+                return (
+                  <Button
+                    key={tag}
+                    size="sm"
+                    variant={isActive ? "secondary" : "ghost"}
+                    className={cn("rounded-full sm:shrink-0", isActive && "border border-primary/40")}
+                    onClick={() => onUpdate({ tags: toggleArrayValue(filters.tags, tag) })}
+                  >
+                    #{tag}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {availableCommunityTiers.length > 0 && filters.layer !== "official" && (
+          <div>
+            <p className="text-sm font-semibold text-foreground">Community tier</p>
+            <div className="mt-2 flex flex-wrap gap-2 sm:flex-nowrap sm:overflow-x-auto sm:pr-2">
+              {availableCommunityTiers.map((tier) => {
+                const isActive = filters.communityTiers.includes(tier);
+                const labelMap: Record<CommunityTier, string> = {
+                  bronze: "Bronze",
+                  silver: "Silver",
+                  gold: "Gold",
+                  promoted: "Promoted",
+                };
+                return (
+                  <Button
+                    key={tier}
+                    size="sm"
+                    variant={isActive ? "secondary" : "ghost"}
+                    className={cn(
+                      "rounded-full sm:shrink-0",
+                      isActive && "border border-primary/40"
+                    )}
+                    onClick={() =>
+                      onUpdate({
+                        communityTiers: toggleArrayValue(filters.communityTiers, tier),
+                      })
+                    }
+                  >
+                    {labelMap[tier]}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            size="sm"
+            variant={filters.verification === "verified" ? "secondary" : "ghost"}
+            onClick={() =>
+              onUpdate({ verification: filters.verification === "verified" ? "all" : "verified" })
+            }
+          >
+            Verified only
+          </Button>
+          <Button
+            size="sm"
+            variant={filters.researchOnly ? "secondary" : "ghost"}
+            onClick={() => onUpdate({ researchOnly: !filters.researchOnly })}
+          >
+            Linked to research projects
+          </Button>
+          <Button size="sm" variant="ghost" onClick={onClear}>
+            Reset filters
+>>>>>>> 520337dfb48b4ef3f55d0edf1ade0738f592525b
           </Button>
         </div>
       )}
