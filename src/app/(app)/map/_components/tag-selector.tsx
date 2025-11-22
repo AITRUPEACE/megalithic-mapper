@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { Input } from "@/shared/ui/input";
+import { Button } from "@/shared/ui/button";
+import { Badge } from "@/shared/ui/badge";
+import { cn } from "@/shared/lib/utils";
 
 interface TagSelectorProps {
   label: string;

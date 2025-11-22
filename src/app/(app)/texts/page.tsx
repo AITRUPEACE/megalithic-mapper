@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { sampleTextSources } from "@/data/sample-texts";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { sampleTextSources } from "@/shared/mocks/sample-texts";
 
 export default function TextLibraryPage() {
   return (

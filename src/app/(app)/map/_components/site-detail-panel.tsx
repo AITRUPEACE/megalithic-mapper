@@ -1,17 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import type { MapSiteFeature } from "@/types/map";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
-import { cn, timeAgo } from "@/lib/utils";
-import { CommentThread } from "@/components/discussion/comment-thread";
-import { sampleThreadSnapshot } from "@/data/sample-thread";
-import { NotificationBell } from "@/components/navigation/notification-bell";
-import { sampleNotifications } from "@/data/sample-notifications";
+import type { MapSiteFeature } from "@/entities/map/model/types";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { Separator } from "@/shared/ui/separator";
+import { cn, timeAgo } from "@/shared/lib/utils";
+import { CommentThread } from "@/features/discussion/ui/comment-thread";
+import { sampleThreadSnapshot } from "@/shared/mocks/sample-thread";
+import { NotificationBell } from "@/widgets/navigation/notification-bell";
+import { sampleNotifications } from "@/shared/mocks/sample-notifications";
 
 interface SiteDetailPanelProps {
   site: MapSiteFeature | null;

@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { sampleResearchProjects } from "@/data/sample-research";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { sampleResearchProjects } from "@/shared/mocks/sample-research";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { Separator } from "@/shared/ui/separator";
 
 export default function ResearchPage() {
   const active = sampleResearchProjects.filter((project) => project.status === "active");

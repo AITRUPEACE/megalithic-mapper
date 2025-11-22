@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { sampleSites } from "@/data/sample-sites";
-import { sampleResearchProjects } from "@/data/sample-research";
-import { sampleThreads } from "@/data/sample-discussions";
-import { Button } from "@/components/ui/button";
-import { timeAgo } from "@/lib/utils";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { sampleSites } from "@/shared/mocks/sample-sites";
+import { sampleResearchProjects } from "@/shared/mocks/sample-research";
+import { sampleThreads } from "@/shared/mocks/sample-discussions";
+import { Button } from "@/shared/ui/button";
+import { timeAgo } from "@/shared/lib/utils";
 
 export default function DiscoverPage() {
   const featuredSites = sampleSites.slice(0, 3);

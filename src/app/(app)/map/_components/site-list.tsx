@@ -1,9 +1,9 @@
 "use client";
 
-import type { MapSiteFeature } from "@/types/map";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { cn, timeAgo } from "@/lib/utils";
+import type { MapSiteFeature } from "@/entities/map/model/types";
+import { ScrollArea } from "@/shared/ui/scroll-area";
+import { Badge } from "@/shared/ui/badge";
+import { cn, timeAgo } from "@/shared/lib/utils";
 
 interface SiteListProps {
   sites: MapSiteFeature[];

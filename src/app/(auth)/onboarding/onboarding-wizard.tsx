@@ -11,14 +11,14 @@ import {
   type MapViewport,
   DEFAULT_VIEWPORT,
 } from "@/lib/supabase/profile";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { VerificationReadinessCard } from "@/components/verification-readiness-card";
-import { useUserStore } from "@/state/user-store";
+import { cn } from "@/shared/lib/utils";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Textarea } from "@/shared/ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { VerificationReadinessCard } from "@/features/verification/ui/verification-readiness-card";
+import { useUserStore } from "@/entities/user/model/user-store";
 
 const viewportPresets: { id: string; label: string; description: string; viewport: MapViewport }[] = [
   {

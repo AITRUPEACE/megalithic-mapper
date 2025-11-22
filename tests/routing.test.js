@@ -18,8 +18,8 @@ describe("legacy route redirects", () => {
 describe("map entry points", () => {
   const entryPoints = [
     { file: "src/app/page.tsx", snippet: 'href="/map"', description: "Landing CTA" },
-    { file: "src/components/navigation/app-sidebar.tsx", snippet: 'href: "/map"', description: "Sidebar navigation" },
-    { file: "src/components/navigation/app-topbar.tsx", snippet: 'href="/map#new-site"', description: "Topbar quick action" },
+    { file: "src/widgets/navigation/app-sidebar.tsx", snippet: 'href: "/map"', description: "Sidebar navigation" },
+    { file: "src/widgets/navigation/app-topbar.tsx", snippet: 'href="/map#new-site"', description: "Topbar quick action" },
     { file: "src/app/(app)/discover/page.tsx", snippet: 'href="/map"', description: "Discover featured cards" },
     { file: "src/app/(app)/discover/page.tsx", snippet: 'href={`/map?focus=', description: "Discover focus deep-links" },
     { file: "src/app/(app)/research/page.tsx", snippet: 'href={`/map?project=', description: "Research project hand-off" },

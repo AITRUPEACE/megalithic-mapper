@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { sampleNotifications } from "@/data/sample-notifications";
-import { timeAgo } from "@/lib/utils";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { sampleNotifications } from "@/shared/mocks/sample-notifications";
+import { timeAgo } from "@/shared/lib/utils";
 
 const notificationLabels: Record<(typeof sampleNotifications)[number]["type"], string> = {
   mention: "Mention",
