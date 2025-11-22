@@ -81,9 +81,17 @@ export const SiteList = ({ sites, selectedSiteId, onSelect, className, scrollCla
                   <p className="mt-1 text-xs uppercase tracking-wide text-muted-foreground">
                     {site.civilization} - {site.era}
                   </p>
+                  {site.geography.zone && (
+                    <p className="mt-1 text-xs font-semibold text-primary">
+                      📍 {site.geography.zone}
+                    </p>
+                  )}
                   <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{site.summary}</p>
                   <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                    {site.tags.slice(0, 3).map((tag) => (
+                    <span className="text-[11px]">
+                      {site.geography.country}
+                    </span>
+                    {site.tags.slice(0, 2).map((tag) => (
                       <span key={tag} className="rounded-full bg-secondary/40 px-2 py-1">
                         #{tag}
                       </span>

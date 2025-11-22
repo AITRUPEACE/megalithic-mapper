@@ -11,6 +11,8 @@ export interface MapFilters {
   siteTypes: string[];
   layer: "composite" | MapLayer;
   communityTiers: CommunityTier[];
+  continents: string[];
+  zones: string[];
 }
 
 interface MapState {
@@ -35,6 +37,8 @@ const DEFAULT_FILTERS: MapFilters = {
   siteTypes: [],
   layer: "composite",
   communityTiers: [],
+  continents: [],
+  zones: [],
 };
 
 export const useSiteStore = create<MapState>((set) => ({
@@ -74,7 +78,7 @@ export const useSiteStore = create<MapState>((set) => ({
 export const filterSites = (sites: MapSite[], filters: MapFilters): MapSite[] => {
   return sites.filter((site) => {
     const matchesSearch = filters.search
-      ? [site.name, site.summary, site.civilization, site.siteType, site.era, site.tags.join(" ")]
+      ? [site.name, site.summary, site.civilization, site.siteType, site.era, site.tags.join(" "), site.geography.zone || ""]
           .join(" ")
           .toLowerCase()
           .includes(filters.search.toLowerCase())
@@ -99,6 +103,12 @@ export const filterSites = (sites: MapSite[], filters: MapFilters): MapSite[] =>
       filters.communityTiers.length === 0 ||
       (site.trustTier ? filters.communityTiers.includes(site.trustTier) : false);
 
+    const matchesContinent =
+      filters.continents.length === 0 || filters.continents.includes(site.geography.continent);
+
+    const matchesZone =
+      filters.zones.length === 0 || (site.geography.zone && filters.zones.includes(site.geography.zone));
+
     return (
       matchesSearch &&
       matchesCivilization &&
@@ -106,7 +116,9 @@ export const filterSites = (sites: MapSite[], filters: MapFilters): MapSite[] =>
       matchesSiteType &&
       matchesResearch &&
       matchesLayer &&
-      matchesCommunityTier
+      matchesCommunityTier &&
+      matchesContinent &&
+      matchesZone
     );
   });
 };

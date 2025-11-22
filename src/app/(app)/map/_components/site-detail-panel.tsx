@@ -7,7 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { cn, timeAgo } from "@/lib/utils";
+import { ContentCard } from "@/components/content/content-card";
+import { useContentStore, filterContent } from "@/state/content-store";
 import Link from "next/link";
+import { Plus } from "lucide-react";
 
 interface SiteDetailPanelProps {
 	site: MapSite | null;
@@ -29,6 +32,9 @@ const communityTierLabel: Record<NonNullable<MapSite["trustTier"]>, string> = {
 };
 
 export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetailPanelProps) => {
+	// Get content linked to this site - must be called before any early returns
+	const { contentItems, likeContent, bookmarkContent } = useContentStore();
+
 	if (!site) {
 		const emptyClasses =
 			variant === "card"
@@ -64,29 +70,106 @@ export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetai
 			</div>
 		</div>
 	);
+	const siteContent = filterContent(contentItems, { linkedToSite: site.id });
+	const siteContentCount = siteContent.length;
+
+	const handleLike = (contentId: string) => {
+		likeContent(contentId, "current-user");
+	};
+
+	const handleBookmark = (contentId: string) => {
+		bookmarkContent(contentId, "current-user");
+	};
 
 	const tabs = (
 		<Tabs defaultValue="overview" className="flex h-full flex-col gap-4">
-			<TabsList className="flex w-full gap-2 overflow-x-auto rounded-md bg-background/40 p-1 text-xs">
-				<TabsTrigger value="overview" className="shrink-0 px-3 py-1">
+			<TabsList className="flex w-full gap-1 rounded-md bg-background/40 p-1 text-xs">
+				<TabsTrigger value="overview" className="flex-1 px-2 py-1 text-[11px]">
 					Overview
 				</TabsTrigger>
-				<TabsTrigger value="media" className="shrink-0 px-3 py-1">
+				<TabsTrigger value="content" className="flex-1 px-2 py-1 text-[11px]">
+					Content {siteContentCount > 0 && `(${siteContentCount})`}
+				</TabsTrigger>
+				<TabsTrigger value="media" className="flex-1 px-2 py-1 text-[11px]">
 					Media
 				</TabsTrigger>
-				<TabsTrigger value="documents" className="shrink-0 px-3 py-1">
+				<TabsTrigger value="documents" className="flex-1 px-2 py-1 text-[11px]">
 					Documents
 				</TabsTrigger>
-				<TabsTrigger value="discussion" className="shrink-0 px-3 py-1">
+				<TabsTrigger value="discussion" className="flex-1 px-2 py-1 text-[11px]">
 					Discussion
 				</TabsTrigger>
-				<TabsTrigger value="activity" className="shrink-0 px-3 py-1">
+				<TabsTrigger value="activity" className="flex-1 px-2 py-1 text-[11px]">
 					Activity
 				</TabsTrigger>
 			</TabsList>
 
+			<TabsContent value="content" className="flex-1 overflow-y-auto space-y-4">
+				<div className="space-y-4">
+					{siteContentCount > 0 ? (
+						<>
+							<div className="flex items-center justify-between">
+								<p className="text-sm text-muted-foreground">
+									{siteContentCount} {siteContentCount === 1 ? "item" : "items"} linked to this site
+								</p>
+								<Button size="sm" variant="outline" asChild>
+									<Link href={`/content/upload?site=${site.id}`}>
+										<Plus className="h-3 w-3 mr-1" />
+										Add Content
+									</Link>
+								</Button>
+							</div>
+							<div className="space-y-3">
+								{siteContent.map((content) => (
+									<ContentCard
+										key={content.id}
+										content={content}
+										variant="list"
+										showStats={true}
+										showRelationships={false}
+										onLike={handleLike}
+										onBookmark={handleBookmark}
+									/>
+								))}
+							</div>
+						</>
+					) : (
+						<div className="flex flex-col items-center justify-center py-8 text-center">
+							<p className="text-sm text-muted-foreground mb-4">
+								No content linked to this site yet
+							</p>
+							<Button size="sm" asChild>
+								<Link href={`/content/upload?site=${site.id}`}>
+									<Plus className="h-4 w-4 mr-2" />
+									Add Content
+								</Link>
+							</Button>
+						</div>
+					)}
+				</div>
+			</TabsContent>
+
 			<TabsContent value="overview" className="flex-1 overflow-y-auto space-y-4 text-sm text-muted-foreground">
 				<p>{site.summary}</p>
+
+				<div className="space-y-2">
+					<p className="text-xs uppercase tracking-wide text-muted-foreground">Location</p>
+					<div className="flex flex-col gap-1 text-xs">
+						<span className="text-foreground">
+							🌍 {site.geography.continent} → {site.geography.country}
+						</span>
+						{site.geography.region && (
+							<span className="text-muted-foreground pl-4">
+								📍 {site.geography.region}
+							</span>
+						)}
+						{site.geography.zone && (
+							<span className="rounded-full bg-primary/10 px-3 py-1 text-primary font-semibold self-start">
+								⛰️ {site.geography.zone}
+							</span>
+						)}
+					</div>
+				</div>
 
 				<div className="flex flex-wrap gap-2 text-xs">
 					<span className="rounded-full bg-secondary/40 px-3 py-1">{site.siteType}</span>

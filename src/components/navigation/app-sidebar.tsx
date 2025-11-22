@@ -54,8 +54,7 @@ export const AppSidebar = () => {
 
 	return (
 		<aside
-			className={cn("relative z-40 h-full overflow-visible", isMapRoute ? "w-16 xl:w-20" : "w-64")}
-			aria-expanded={isExpanded}
+			className={cn("relative z-40 h-full overflow-visible hidden md:block", isMapRoute ? "w-10 xl:w-20" : "w-64")}
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
 			onFocus={handleFocus}
@@ -66,7 +65,7 @@ export const AppSidebar = () => {
 				className={cn(
 					"flex h-full flex-col overflow-hidden border-r border-border/60 bg-background/60 backdrop-blur transition-[width] duration-300 ease-out",
 					isMapRoute ? "absolute inset-y-0 left-0" : "",
-					isExpanded ? "w-64" : "w-16 xl:w-20"
+					isExpanded ? "w-64" : "w-16 xl:w-16"
 				)}
 			>
 				<div className={cn("flex h-16 min-w-0 items-center gap-2 px-4 transition-all duration-200", "justify-start")}>
