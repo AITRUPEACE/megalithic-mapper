@@ -1,0 +1,112 @@
+import { FeedPost } from "@/shared/types/content";
+
+export const samplePosts: FeedPost[] = [
+  {
+    id: "1",
+    type: "official",
+    author: {
+      id: "u1",
+      username: "dr_hawass",
+      displayName: "Dr. Zahi Hawass",
+      isVerified: true,
+      title: "Egyptologist",
+    },
+    title: "New GPR Scan Results from KV62",
+    content:
+      "We have completed the latest ground-penetrating radar scans of the area north of Tutankhamun's tomb. The preliminary data suggests a void consistent with a corridor. Full report coming next week on my Substack.",
+    timestamp: "2024-11-21T10:00:00Z",
+    externalLink: {
+      url: "https://substack.com",
+      title: "Read the full preliminary report",
+      domain: "substack.com",
+    },
+    likes: 1240,
+    commentsCount: 86,
+    shares: 45,
+    tags: ["Egypt", "ValleyOfTheKings", "Radar"],
+  },
+  {
+    id: "2",
+    type: "community",
+    author: {
+      id: "u2",
+      username: "stone_hunter",
+      displayName: "Ben from UnchartedX",
+      isVerified: true,
+      title: "Independent Researcher",
+    },
+    title: "Precision in the Serapeum Boxes",
+    content:
+      "Just got back from Saqqara. I brought a machinist's square this time. The internal corners of the granite boxes are absolutely dead on. Look at this light gap test.",
+    timestamp: "2024-11-20T15:30:00Z",
+    media: [
+      {
+        type: "youtube",
+        url: "https://youtube.com/watch?v=example",
+        thumbnail: "/api/placeholder/400/320",
+      },
+    ],
+    likes: 850,
+    commentsCount: 210,
+    shares: 120,
+    tags: ["Egypt", "Serapeum", "Engineering"],
+    topicId: "topic-stonework",
+  },
+  {
+    id: "3",
+    type: "community",
+    author: {
+      id: "u3",
+      username: "geo_enthusiast",
+      displayName: "Sarah Jenkins",
+      isVerified: false,
+    },
+    title: "Weird alignment in Peru?",
+    content:
+      "I was messing around on Google Earth and noticed this line of sites connects perfectly with the solstice sunrise. Has anyone else mapped this?",
+    timestamp: "2024-11-22T09:15:00Z",
+    likes: 45,
+    commentsCount: 12,
+    shares: 2,
+    tags: ["Peru", "Alignments", "Speculation"],
+    topicId: "topic-alignments",
+  },
+  {
+    id: "4",
+    type: "community",
+    author: {
+      id: "u4",
+      username: "megalith_mike",
+      displayName: "Mike D",
+      isVerified: false,
+    },
+    title: "Nubs at Ollantaytambo",
+    content: "Found these nubs on the Wall of Six Monoliths. They look exactly like the ones in the Osirion. Thoughts?",
+    timestamp: "2024-11-18T12:00:00Z",
+    likes: 320,
+    commentsCount: 45,
+    shares: 12,
+    tags: ["Peru", "Nubs", "Comparisons"],
+    topicId: "topic-nubs",
+  },
+  {
+    id: "5",
+    type: "community",
+    author: {
+      id: "u2",
+      username: "stone_hunter",
+      displayName: "Ben from UnchartedX",
+      isVerified: true,
+      title: "Independent Researcher",
+    },
+    title: "Tubular Drill Core #7",
+    content: "Analysis of the striations on this granite core from Abusir. The feed rate implied is impossible for copper tools.",
+    timestamp: "2024-11-15T09:30:00Z",
+    likes: 560,
+    commentsCount: 120,
+    shares: 89,
+    tags: ["Egypt", "Machining", "Granite"],
+    topicId: "topic-machining",
+  },
+];
+

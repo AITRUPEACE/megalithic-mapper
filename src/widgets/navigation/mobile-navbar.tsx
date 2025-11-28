@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Map, Compass, MessageSquare, Images, BookOpen } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/lib/utils";
 
 const mobileNavItems = [
 	{ href: "/map", label: "Map", icon: Map },

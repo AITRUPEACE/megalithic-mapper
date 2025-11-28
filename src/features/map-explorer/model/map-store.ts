@@ -153,7 +153,7 @@ export const applySiteFilters = (sites: MapSiteFeature[], filters: MapFilters): 
     );
   });
 
-interface MapStoreState {
+export interface MapStoreState {
   sites: MapSiteFeature[];
   zones: MapZoneFeature[];
   bounds: BoundingBox;

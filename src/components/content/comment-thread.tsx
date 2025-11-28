@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Comment as CommentType } from "@/lib/types";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
+import { Comment as CommentType } from "@/shared/types/content";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
+import { Button } from "@/shared/ui/button";
+import { Textarea } from "@/shared/ui/textarea";
+import { Badge } from "@/shared/ui/badge";
 import { Heart, MessageCircle, Flag, MoreHorizontal, VerifiedIcon } from "lucide-react";
-import { timeAgo } from "@/lib/utils";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { timeAgo } from "@/shared/lib/utils";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/shared/ui/dropdown-menu";
 
 interface CommentProps {
 	comment: CommentType;
@@ -26,7 +26,7 @@ function Comment({ comment, depth = 0, onReply, onLike, onFlag, onEdit, onDelete
 	const [isReplying, setIsReplying] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
 	const [replyText, setReplyText] = useState("");
-	const [editText, setEditText] = useState(comment.body);
+	const [editText, setEditText] = useState(comment.content);
 	const maxDepth = 3;
 
 	const handleReply = () => {
@@ -44,7 +44,7 @@ function Comment({ comment, depth = 0, onReply, onLike, onFlag, onEdit, onDelete
 		}
 	};
 
-	const isAuthor = currentUserId === comment.author.userId;
+	const isAuthor = currentUserId === comment.author.id;
 
 	if (comment.isDeleted) {
 		return (
@@ -62,23 +62,23 @@ function Comment({ comment, depth = 0, onReply, onLike, onFlag, onEdit, onDelete
 					<div className="flex items-center gap-2">
 						<Link href={`/profile/${comment.author.username}`}>
 							<Avatar className="h-8 w-8">
-								<AvatarImage src={comment.author.avatar} />
+								<AvatarImage src={comment.author.avatarUrl} />
 								<AvatarFallback>{comment.author.displayName[0]}</AvatarFallback>
 							</Avatar>
 						</Link>
 						<div>
 							<Link href={`/profile/${comment.author.username}`} className="flex items-center gap-1 text-sm font-medium hover:underline">
 								{comment.author.displayName}
-								{comment.author.verificationStatus === "verified" && <VerifiedIcon className="h-3 w-3 text-blue-500" />}
+								{comment.author.isVerified && <VerifiedIcon className="h-3 w-3 text-blue-500" />}
+								{comment.author.role === "expert" && (
+									<Badge variant="outline" className="text-[10px] h-4 px-1 border-amber-500 text-amber-500">
+										Expert
+									</Badge>
+								)}
 							</Link>
 							<div className="flex items-center gap-2 text-xs text-muted-foreground">
-								<span>{timeAgo(comment.createdAt)}</span>
-								{comment.isEdited && <span>• edited</span>}
-							{comment.flagCount > 0 && (
-								<Badge variant="warning" className="text-xs h-4 px-1">
-									{comment.flagCount} flags
-								</Badge>
-							)}
+								<span>{timeAgo(comment.timestamp)}</span>
+								{/* {comment.isEdited && <span>• edited</span>} */}
 							</div>
 						</div>
 					</div>
@@ -122,7 +122,7 @@ function Comment({ comment, depth = 0, onReply, onLike, onFlag, onEdit, onDelete
 								variant="outline"
 								onClick={() => {
 									setIsEditing(false);
-									setEditText(comment.body);
+									setEditText(comment.content);
 								}}
 							>
 								Cancel
@@ -130,7 +130,7 @@ function Comment({ comment, depth = 0, onReply, onLike, onFlag, onEdit, onDelete
 						</div>
 					</div>
 				) : (
-					<p className="text-sm text-foreground whitespace-pre-wrap">{comment.body}</p>
+					<p className="text-sm text-foreground whitespace-pre-wrap">{comment.content}</p>
 				)}
 
 				{/* Comment Actions */}
@@ -147,11 +147,11 @@ function Comment({ comment, depth = 0, onReply, onLike, onFlag, onEdit, onDelete
 						</Button>
 					)}
 
-					{comment.replyCount > 0 && (
+					{/* {comment.replyCount > 0 && (
 						<span className="text-xs text-muted-foreground">
 							{comment.replyCount} {comment.replyCount === 1 ? "reply" : "replies"}
 						</span>
-					)}
+					)} */}
 				</div>
 			</div>
 
@@ -178,7 +178,7 @@ function Comment({ comment, depth = 0, onReply, onLike, onFlag, onEdit, onDelete
 			)}
 
 			{/* Nested Replies */}
-			{comment.replies.length > 0 && (
+			{comment.replies && comment.replies.length > 0 && (
 				<div className="space-y-3">
 					{comment.replies.map((reply) => (
 						<Comment

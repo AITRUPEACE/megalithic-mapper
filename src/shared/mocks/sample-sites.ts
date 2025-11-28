@@ -338,6 +338,13 @@ export const sampleSites: MapSite[] = [
     ],
     lastUpdated: "2024-09-30T14:18:00Z",
     updatedBy: "lab.akhet-team",
+    geography: {
+      continent: "Africa",
+      country: "Egypt",
+      region: "Cairo Governorate",
+      zone: "Giza Plateau",
+    },
+    zoneId: "giza-plateau",
   },
   {
     id: "artifact-andes-tuning-stone",
@@ -359,6 +366,13 @@ export const sampleSites: MapSite[] = [
     evidenceLinks: ["https://example.org/media/andes-tone-measurements"],
     lastUpdated: "2024-10-08T06:45:00Z",
     updatedBy: "citizen.tomas",
+    geography: {
+      continent: "South America",
+      country: "Peru",
+      region: "Cusco Region",
+      zone: "Cusco Sacred Valley",
+    },
+    zoneId: "cusco-region",
   },
   {
     id: "text-bremner-rhind",
@@ -380,6 +394,11 @@ export const sampleSites: MapSite[] = [
     evidenceLinks: ["https://example.org/texts/bremner-rhind.pdf"],
     lastUpdated: "2024-08-12T11:11:00Z",
     updatedBy: "scribe.ayesha",
+    geography: {
+      continent: "Europe",
+      country: "United Kingdom",
+      region: "London",
+    },
   },
   {
     id: "text-quipu-ledger",
@@ -401,5 +420,12 @@ export const sampleSites: MapSite[] = [
     evidenceLinks: ["https://example.org/data/quipu-expedition-notes"],
     lastUpdated: "2024-10-10T19:22:00Z",
     updatedBy: "field.renata",
+    geography: {
+      continent: "South America",
+      country: "Peru",
+      region: "Cusco Region",
+      zone: "Cusco Sacred Valley",
+    },
+    zoneId: "cusco-region",
   },
 ];

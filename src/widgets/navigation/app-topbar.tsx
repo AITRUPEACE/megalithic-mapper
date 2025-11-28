@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-<<<<<<< HEAD:src/components/navigation/app-topbar.tsx
+import { usePathname, useRouter } from "next/navigation";
 import {
 	Search,
 	Plus,
@@ -19,10 +18,11 @@ import {
 	MessageSquare,
 	Images,
 	BookOpen,
+	Loader2,
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Input } from "@/shared/ui/input";
+import { Button } from "@/shared/ui/button";
+import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -30,16 +30,10 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { cn } from "@/lib/utils";
-=======
-import { Search, Plus, ShieldCheck } from "lucide-react";
-import { Input } from "@/shared/ui/input";
-import { Button } from "@/shared/ui/button";
-import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
+} from "@/shared/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/shared/ui/sheet";
 import { cn } from "@/shared/lib/utils";
->>>>>>> 520337dfb48b4ef3f55d0edf1ade0738f592525b:src/widgets/navigation/app-topbar.tsx
+import { useAuth } from "@/components/providers/AuthProvider";
 
 interface AppTopbarProps {
 	onGlobalSearch?: (query: string) => void;
@@ -58,7 +52,33 @@ const navItems = [
 
 export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 	const pathname = usePathname();
+	const router = useRouter();
 	const [isSheetOpen, setIsSheetOpen] = useState(false);
+	const [isSigningOut, setIsSigningOut] = useState(false);
+	const { profile, user, loading: authLoading, signOut } = useAuth();
+
+	const profileHref = profile?.username ? `/profile/${profile.username}` : "/profile";
+	const initials = useMemo(() => {
+		const source = profile?.full_name ?? user?.email ?? "MM";
+		return source
+			.split(/\s+/)
+			.map((part) => part[0])
+			.join("")
+			.slice(0, 2)
+			.toUpperCase();
+	}, [profile?.full_name, user?.email]);
+	const displayName = profile?.full_name ?? profile?.username ?? user?.email ?? "Explorer";
+	const email = user?.email ?? profile?.username ?? "authenticated";
+
+	const handleSignOut = async () => {
+		setIsSigningOut(true);
+		try {
+			await signOut();
+			router.replace("/login");
+		} finally {
+			setIsSigningOut(false);
+		}
+	};
 
 	return (
 		<header className="relative z-[450] flex h-16 items-center justify-between border-b border-border/60 bg-background/50 px-4 backdrop-blur md:px-6">
@@ -81,11 +101,12 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 						<nav className="mt-6 flex flex-col gap-2">
 							{navItems.map((item) => {
 								const Icon = item.icon;
+								const targetHref = item.href === "/profile" ? profileHref : item.href;
 								const isActive = pathname.startsWith(item.href);
 								return (
 									<Link
 										key={item.href}
-										href={item.href}
+										href={targetHref}
 										onClick={() => setIsSheetOpen(false)}
 										className={cn(
 											"flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
@@ -155,7 +176,7 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 
 				{/* Desktop verification button */}
 				<Button asChild size="sm" variant="ghost" className="hidden lg:flex">
-					<Link href="/profile">
+					<Link href={profileHref}>
 						<ShieldCheck className="mr-1 h-4 w-4" />
 						Request Verification
 					</Link>
@@ -174,20 +195,22 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 					<DropdownMenuTrigger asChild>
 						<Button variant="ghost" className="relative h-8 w-8 rounded-full">
 							<Avatar className="h-8 w-8">
-								<AvatarFallback>AZ</AvatarFallback>
+								<AvatarFallback>{initials}</AvatarFallback>
 							</Avatar>
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent className="w-56" align="end" forceMount>
 						<DropdownMenuLabel className="font-normal">
 							<div className="flex flex-col space-y-1">
-								<p className="text-sm font-medium leading-none">Alex Zahn</p>
-								<p className="text-xs leading-none text-muted-foreground">alex@example.com</p>
+								<p className="text-sm font-medium leading-none">
+									{authLoading ? "Loading profile…" : displayName}
+								</p>
+								<p className="text-xs leading-none text-muted-foreground">{email}</p>
 							</div>
 						</DropdownMenuLabel>
 						<DropdownMenuSeparator />
 						<DropdownMenuItem asChild>
-							<Link href="/profile" className="cursor-pointer">
+							<Link href={profileHref} className="cursor-pointer">
 								<UserCircle className="mr-2 h-4 w-4" />
 								<span>Profile</span>
 							</Link>
@@ -199,7 +222,7 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 							</Link>
 						</DropdownMenuItem>
 						<DropdownMenuItem asChild className="lg:hidden">
-							<Link href="/profile" className="cursor-pointer">
+							<Link href={profileHref} className="cursor-pointer">
 								<ShieldCheck className="mr-2 h-4 w-4" />
 								<span>Request Verification</span>
 							</Link>
@@ -211,9 +234,26 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 							</Link>
 						</DropdownMenuItem>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem className="cursor-pointer text-destructive">
-							<LogOut className="mr-2 h-4 w-4" />
-							<span>Log out</span>
+						<DropdownMenuItem
+							className="cursor-pointer text-destructive"
+							onSelect={(event) => {
+								event.preventDefault();
+								if (!isSigningOut) {
+									handleSignOut();
+								}
+							}}
+						>
+							{isSigningOut ? (
+								<>
+									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									<span>Signing out…</span>
+								</>
+							) : (
+								<>
+									<LogOut className="mr-2 h-4 w-4" />
+									<span>Log out</span>
+								</>
+							)}
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

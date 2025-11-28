@@ -1,28 +1,28 @@
 "use client";
 
 import { useMemo } from "react";
-import type { MapSite } from "@/lib/types";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { MapSiteFeature } from "@/entities/map/model/types";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Separator } from "@/shared/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import { MapPin, Calendar, Camera, MessageSquare, Users, ExternalLink } from "lucide-react";
 import Link from "next/link";
-import { timeAgo } from "@/lib/utils";
+import { timeAgo } from "@/shared/lib/utils";
 
 interface DrawerSiteContentProps {
-	site: MapSite;
-	allSites?: MapSite[];
+	site: MapSiteFeature;
+	allSites?: MapSiteFeature[];
 	onSelectSite?: (siteId: string) => void;
 }
 
-const statusVariant: Record<MapSite["verificationStatus"], "success" | "warning" | "outline"> = {
+const statusVariant: Record<MapSiteFeature["verificationStatus"], "success" | "warning" | "outline"> = {
 	verified: "success",
 	under_review: "warning",
 	unverified: "outline",
 };
 
-const communityTierLabel: Record<NonNullable<MapSite["trustTier"]>, string> = {
+const communityTierLabel: Record<NonNullable<MapSiteFeature["trustTier"]>, string> = {
 	bronze: "Bronze",
 	silver: "Silver",
 	gold: "Gold",
@@ -61,7 +61,7 @@ export const DrawerSiteContent = ({ site, allSites = [], onSelectSite }: DrawerS
 			.filter((s) => s.id !== site.id)
 			.map((s) => ({
 				...s,
-				distance: calculateDistance(site.latitude, site.longitude, s.latitude, s.longitude),
+				distance: calculateDistance(site.coordinates.lat, site.coordinates.lng, s.coordinates.lat, s.coordinates.lng),
 			}))
 			.sort((a, b) => a.distance - b.distance)
 			.slice(0, 5); // Top 5 nearest
@@ -74,7 +74,7 @@ export const DrawerSiteContent = ({ site, allSites = [], onSelectSite }: DrawerS
 				<div>
 					<h2 className="text-2xl font-bold leading-tight">{site.name}</h2>
 					<p className="text-sm text-muted-foreground mt-1">
-						{site.civilization} • {site.era}
+						{site.tags.cultures.join(", ") || "Unknown"} • {site.tags.eras.join(", ") || "Unknown"}
 					</p>
 				</div>
 
@@ -84,17 +84,7 @@ export const DrawerSiteContent = ({ site, allSites = [], onSelectSite }: DrawerS
 						{site.verificationStatus === "under_review" && "⏳ Under Review"}
 						{site.verificationStatus === "unverified" && "Unverified"}
 					</Badge>
-					<Badge variant={isCommunity ? "outline" : "secondary"}>
-						{isCommunity ? `Community ${tierLabel}` : "Official"}
-					</Badge>
-					{site.importance && (
-						<Badge variant="outline" className="border-primary/40 text-primary">
-							{site.importance === "critical" && "⭐ Critical"}
-							{site.importance === "major" && "★ Major"}
-							{site.importance === "moderate" && "✦ Moderate"}
-							{site.importance === "minor" && "· Minor"}
-						</Badge>
-					)}
+					<Badge variant={isCommunity ? "outline" : "secondary"}>{isCommunity ? `Community ${tierLabel}` : "Official"}</Badge>
 				</div>
 
 				<p className="text-sm text-muted-foreground leading-relaxed">{site.summary}</p>
@@ -126,12 +116,8 @@ export const DrawerSiteContent = ({ site, allSites = [], onSelectSite }: DrawerS
 						<div className="min-w-0">
 							<p className="font-medium">Location</p>
 							<p className="text-xs text-muted-foreground truncate">
-								{site.geography.country}
-								{site.geography.region && ` • ${site.geography.region}`}
+								{site.zoneMemberships.length > 0 ? site.zoneMemberships[0].name : "Unknown Region"}
 							</p>
-							{site.geography.zone && (
-								<p className="text-xs text-primary font-medium mt-0.5">⛰️ {site.geography.zone}</p>
-							)}
 						</div>
 					</div>
 					<div className="flex items-start gap-2">
@@ -152,14 +138,14 @@ export const DrawerSiteContent = ({ site, allSites = [], onSelectSite }: DrawerS
 						<Users className="h-3 w-3" />
 						{site.relatedResearchIds.length} research
 					</span>
-					<span>Updated {timeAgo(site.lastUpdated)}</span>
+					<span>Updated {timeAgo(site.updatedAt)}</span>
 				</div>
 
-				{site.tags.length > 0 && (
+				{(site.tags.cultures.length > 0 || site.tags.eras.length > 0 || site.tags.themes.length > 0) && (
 					<div className="space-y-2">
 						<p className="text-sm font-medium">Tags</p>
 						<div className="flex flex-wrap gap-2">
-							{site.tags.map((tag) => (
+							{[...site.tags.cultures, ...site.tags.eras, ...site.tags.themes].map((tag: string) => (
 								<span key={tag} className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
 									#{tag}
 								</span>
@@ -213,7 +199,7 @@ export const DrawerSiteContent = ({ site, allSites = [], onSelectSite }: DrawerS
 										<div className="flex-1 min-w-0">
 											<p className="text-sm font-medium truncate">{nearby.name}</p>
 											<p className="text-xs text-muted-foreground truncate">
-												{nearby.civilization} • {nearby.siteType}
+												{nearby.tags.cultures[0] || "Unknown"} • {nearby.siteType}
 											</p>
 										</div>
 
@@ -234,23 +220,20 @@ export const DrawerSiteContent = ({ site, allSites = [], onSelectSite }: DrawerS
 						<div>
 							<p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Coordinates</p>
 							<p className="font-mono text-xs">
-								{site.latitude.toFixed(4)}°, {site.longitude.toFixed(4)}°
+								{site.coordinates.lat.toFixed(4)}°, {site.coordinates.lng.toFixed(4)}°
 							</p>
 						</div>
 
 						<div>
 							<p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Last Updated</p>
 							<p className="text-xs">
-								{timeAgo(site.lastUpdated)} by {site.updatedBy}
+								{timeAgo(site.updatedAt)} by {site.updatedBy}
 							</p>
 						</div>
 
 						<div>
-							<p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Full Location</p>
-							<p className="text-xs">
-								{site.geography.continent} → {site.geography.country}
-								{site.geography.region && ` → ${site.geography.region}`}
-							</p>
+							<p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Zones</p>
+							<p className="text-xs">{site.zoneMemberships.length > 0 ? site.zoneMemberships.map((z) => z.name).join(", ") : "No zones"}</p>
 						</div>
 					</div>
 				</TabsContent>
@@ -281,5 +264,3 @@ export const DrawerSiteContent = ({ site, allSites = [], onSelectSite }: DrawerS
 		</div>
 	);
 };
-
-

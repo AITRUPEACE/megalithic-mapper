@@ -1,7 +1,6 @@
-import Link from "next/link";
-import { Button } from "@/shared/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Compass, Network, Map, BookOpen, ShieldCheck, MessageSquare } from "lucide-react";
+import { AuthCtas } from "@/components/landing/AuthCtas";
 
 const featureCards = [
   {
@@ -58,14 +57,7 @@ export default function LandingPage() {
               Megalithic Mapper unites archaeologists, historians, content creators, and enthusiasts in one collaborative space
               built with Next.js, Supabase, Leaflet, and shadcn/ui.
             </p>
-            <div className="flex flex-wrap gap-4">
-              <Button asChild size="lg">
-                <Link href="/map">Launch the collaborative map</Link>
-              </Button>
-              <Button asChild variant="secondary" size="lg">
-                <Link href="/research">Explore research projects</Link>
-              </Button>
-            </div>
+            <AuthCtas />
           </div>
           <div className="glass-panel relative overflow-hidden border-primary/40 p-8">
             <div className="absolute right-12 top-10 h-24 w-24 rounded-full bg-primary/20 blur-3xl" />

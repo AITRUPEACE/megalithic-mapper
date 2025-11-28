@@ -1,3 +1,5 @@
+import { createClient } from "@/lib/supabase/server";
+import { SUPABASE_SCHEMA } from "@/lib/supabase/config";
 import { mapRecords } from "@/shared/mocks/map-records";
 import type {
   BoundingBox,
@@ -155,28 +157,16 @@ export interface MapQueryFilters {
   tags?: string[];
 }
 
-const hasSupabaseConfig = () =>
-  Boolean(
-    typeof window === "undefined" &&
-      process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-  );
-
 async function fetchRecordsFromSupabase(query: MapQueryFilters): Promise<MapRecordSet | null> {
-  if (!hasSupabaseConfig()) return null;
-  const [{ createServerComponentClient }, { cookies }] = await Promise.all([
-    import("@supabase/auth-helpers-nextjs"),
-    import("next/headers"),
-  ]);
+  let supabase;
+  try {
+    supabase = await createClient();
+  } catch (error) {
+    console.warn("Falling back to mocked map records due to Supabase config error", error);
+    return null;
+  }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseKey = (process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)!;
-  const cookieStore = cookies();
-  const supabase = createServerComponentClient(
-    { cookies: () => cookieStore },
-    { supabaseUrl, supabaseKey }
-  );
-  const mapSchema = supabase.schema("megalithic");
+  const mapSchema = supabase.schema(SUPABASE_SCHEMA);
 
   try {
     const sitesQuery = mapSchema

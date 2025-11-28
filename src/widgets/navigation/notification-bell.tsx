@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Bell } from "lucide-react";
-import { createClient } from "@supabase/supabase-js";
 import type { ActivityNotification } from "@/shared/types/content";
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
+import { getBrowserSupabaseClient } from "@/lib/supabase/clients";
 
 interface NotificationBellProps {
   notifications: ActivityNotification[];
@@ -15,16 +15,8 @@ interface NotificationBellProps {
 export const NotificationBell = ({ notifications, onUnreadChange }: NotificationBellProps) => {
   const [unread, setUnread] = useState(() => notifications.filter((item) => item.unread).length);
 
-  const supabaseConfig = useMemo(() => {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    return supabaseUrl && supabaseKey ? { supabaseUrl, supabaseKey } : null;
-  }, []);
-
   useEffect(() => {
-    if (!supabaseConfig) return;
-    const supabase = createClient(supabaseConfig.supabaseUrl, supabaseConfig.supabaseKey);
-
+    const supabase = getBrowserSupabaseClient();
     const channel = supabase
       .channel("notification-stream")
       .on(
@@ -37,7 +29,7 @@ export const NotificationBell = ({ notifications, onUnreadChange }: Notification
     return () => {
       channel.unsubscribe();
     };
-  }, [supabaseConfig]);
+  }, []);
 
   useEffect(() => {
     onUnreadChange?.(unread);

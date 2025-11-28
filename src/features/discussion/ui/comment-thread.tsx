@@ -197,13 +197,7 @@ export const CommentThread = ({ snapshot }: CommentThreadProps) => {
 
             <Separator className="border-border/40" />
 
-            <CommentComposer
-              threadId={snapshot.thread.id}
-              parentId={comment.id}
-              entityRef={entityRef}
-              onSubmit={handleSubmit}
-              optimisticAuthors={optimisticAuthors}
-            />
+            <CommentComposer parentId={comment.id} entityRef={entityRef} onSubmit={handleSubmit} optimisticAuthors={optimisticAuthors} />
 
             {childComments
               .filter((child) => child.parentId === comment.id)
@@ -227,7 +221,7 @@ export const CommentThread = ({ snapshot }: CommentThreadProps) => {
           <CardTitle className="text-base font-semibold">Add a new reply</CardTitle>
         </CardHeader>
         <CardContent>
-          <CommentComposer threadId={snapshot.thread.id} entityRef={entityRef} onSubmit={handleSubmit} />
+          <CommentComposer entityRef={entityRef} onSubmit={handleSubmit} />
         </CardContent>
       </Card>
 

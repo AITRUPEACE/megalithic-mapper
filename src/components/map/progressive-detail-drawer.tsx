@@ -3,12 +3,12 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { motion, useAnimation, PanInfo } from "framer-motion";
 import { X, ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { MapSite } from "@/lib/types";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/shared/lib/utils";
+import type { MapSiteFeature } from "@/entities/map/model/types";
+import { Button } from "@/shared/ui/button";
 
 interface ProgressiveDetailDrawerProps {
-	site: MapSite | null;
+	site: MapSiteFeature | null;
 	open: boolean;
 	onClose: () => void;
 	children?: React.ReactNode;

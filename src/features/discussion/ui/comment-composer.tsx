@@ -11,7 +11,6 @@ import { Badge } from "@/shared/ui/badge";
 import { cn } from "@/shared/lib/utils";
 
 interface CommentComposerProps {
-  threadId: string;
   parentId?: string;
   entityRef: DiscussionEntityRef;
   onSubmit: (payload: {
@@ -33,7 +32,6 @@ const markdownLite = (value: string) => {
 };
 
 export const CommentComposer = ({
-  threadId,
   parentId,
   entityRef,
   onSubmit,

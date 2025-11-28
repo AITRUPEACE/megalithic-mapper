@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { nanoid } from "nanoid";
-import { ContentItem, ContentType, VerificationStatus, Comment, Rating } from "@/lib/types";
-import { sampleContentItems } from "@/data/sample-content";
-import { sampleComments, sampleRatings } from "@/data/sample-interactions";
+import { ContentItem, ContentType, VerificationStatus, Comment, Rating } from "@/shared/types/content";
+import { sampleContentItems } from "@/shared/mocks/sample-content";
+import { sampleComments, sampleRatings } from "@/shared/mocks/sample-interactions";
 
 export interface ContentFilters {
   search: string;

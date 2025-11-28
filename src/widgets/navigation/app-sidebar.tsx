@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState, type FocusEventHandler } from "react";
+import { useEffect, useMemo, useState, type FocusEventHandler } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Map, Compass, MessageSquare, Images, BookOpen, Network, Bell, UserCircle } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Map, Compass, MessageSquare, Images, BookOpen, Network, Bell, UserCircle, LogOut, Loader2 } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { cn } from "@/shared/lib/utils";
+import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
+import { useAuth } from "@/components/providers/AuthProvider";
 
 const navItems = [
 	{ href: "/map", label: "Map", icon: Map },
@@ -20,8 +22,33 @@ const navItems = [
 
 export const AppSidebar = () => {
 	const pathname = usePathname();
+	const router = useRouter();
 	const isMapRoute = pathname.startsWith("/map");
 	const [isExpanded, setIsExpanded] = useState(!isMapRoute);
+	const [isSigningOut, setIsSigningOut] = useState(false);
+	const { profile, user, signOut } = useAuth();
+
+	const profileHref = profile?.username ? `/profile/${profile.username}` : "/profile";
+	const initials = useMemo(() => {
+		const source = profile?.full_name ?? user?.email ?? "MM";
+		return source
+			.split(/\s+/)
+			.map((part) => part[0])
+			.join("")
+			.slice(0, 2)
+			.toUpperCase();
+	}, [profile?.full_name, user?.email]);
+	const displayName = profile?.full_name ?? profile?.username ?? user?.email ?? "Explorer";
+
+	const handleSignOut = async () => {
+		setIsSigningOut(true);
+		try {
+			await signOut();
+			router.replace("/login");
+		} finally {
+			setIsSigningOut(false);
+		}
+	};
 
 	useEffect(() => {
 		setIsExpanded(!isMapRoute);
@@ -54,7 +81,7 @@ export const AppSidebar = () => {
 
 	return (
 		<aside
-			className={cn("relative z-40 h-full overflow-visible hidden md:block", isMapRoute ? "w-10 xl:w-20" : "w-64")}
+			className={cn("relative z-40 h-full overflow-visible", isMapRoute ? "w-16" : "w-64")}
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
 			onFocus={handleFocus}
@@ -84,6 +111,7 @@ export const AppSidebar = () => {
 				<nav className={cn("flex flex-1 flex-col overflow-hidden transition-all duration-200", isExpanded ? "gap-1.5 px-3 py-3" : "gap-1 px-3 py-3")}>
 					{navItems.map((item) => {
 						const Icon = item.icon;
+						const targetHref = item.href === "/profile" ? profileHref : item.href;
 						const isActive = pathname.startsWith(item.href);
 						return (
 							<Button
@@ -99,7 +127,7 @@ export const AppSidebar = () => {
 								)}
 							>
 								<Link
-									href={item.href}
+										href={targetHref}
 									className={cn("flex min-w-0 items-center overflow-hidden", isExpanded ? "w-full gap-2" : "w-full")}
 									aria-label={item.label}
 								>
@@ -116,16 +144,40 @@ export const AppSidebar = () => {
 				</nav>
 				<div
 					className={cn(
-						"px-4 py-4 text-xs text-muted-foreground transition-all duration-200",
+						"flex items-center gap-3 border-t border-border/40 px-4 py-4 text-xs text-muted-foreground transition-all duration-200",
 						isExpanded ? "opacity-100" : "pointer-events-none opacity-0"
 					)}
 				>
-					<p>
-						Connected explorers: <span className="font-semibold text-foreground">128 online</span>
-					</p>
-					<p className="mt-1">
-						Research projects active today: <span className="font-semibold text-foreground">6</span>
-					</p>
+					<Avatar className="h-10 w-10">
+						<AvatarFallback>{initials}</AvatarFallback>
+					</Avatar>
+					<div className="flex flex-1 flex-col">
+						<Link href={profileHref} className="text-sm font-semibold text-foreground">
+							{displayName}
+						</Link>
+						<Button
+							variant="ghost"
+							size="sm"
+							className="h-auto justify-start gap-2 px-0 text-xs text-muted-foreground hover:text-destructive"
+							onClick={() => {
+								if (!isSigningOut) {
+									handleSignOut();
+								}
+							}}
+						>
+							{isSigningOut ? (
+								<>
+									<Loader2 className="h-3 w-3 animate-spin" />
+									Signing out…
+								</>
+							) : (
+								<>
+									<LogOut className="h-3 w-3" />
+									Sign out
+								</>
+							)}
+						</Button>
+					</div>
 				</div>
 			</div>
 		</aside>

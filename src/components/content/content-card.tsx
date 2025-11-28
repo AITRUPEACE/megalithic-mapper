@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ContentItem } from "@/lib/types";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ContentItem } from "@/shared/types/content";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
 import {
 	Heart,
 	MessageCircle,
@@ -23,7 +23,7 @@ import {
 	MapPin,
 	VerifiedIcon,
 } from "lucide-react";
-import { timeAgo } from "@/lib/utils";
+import { timeAgo } from "@/shared/lib/utils";
 
 interface ContentCardProps {
 	content: ContentItem;
@@ -226,7 +226,7 @@ export function ContentCard({
 
 					{/* Tags */}
 					<div className="flex flex-wrap gap-1">
-						{content.tags.slice(0, 3).map((tag) => (
+						{content.tags.slice(0, 3).map((tag: string) => (
 							<span key={tag} className="rounded-full bg-secondary/40 px-2 py-0.5 text-xs">
 								#{tag}
 							</span>
@@ -297,9 +297,14 @@ export function ContentCard({
 							<AvatarFallback>{content.submittedBy.displayName[0]}</AvatarFallback>
 						</Avatar>
 						<div className="flex flex-col">
-							<span className="text-sm font-medium">
+							<span className="text-sm font-medium flex items-center gap-1">
 								{content.submittedBy.displayName}
-								{content.submittedBy.verificationStatus === "verified" && <VerifiedIcon className="ml-1 inline h-3 w-3 text-blue-500" />}
+								{content.submittedBy.isVerified && <VerifiedIcon className="inline h-3 w-3 text-blue-500" />}
+								{content.submittedBy.role === "expert" && (
+									<Badge variant="outline" className="ml-1 text-[10px] h-4 px-1 border-amber-500 text-amber-500">
+										Expert
+									</Badge>
+								)}
 							</span>
 							<span className="text-xs text-muted-foreground">{timeAgo(content.createdAt)}</span>
 						</div>
@@ -318,7 +323,7 @@ export function ContentCard({
 				{/* Tags */}
 				{content.tags.length > 0 && (
 					<div className="flex flex-wrap gap-2">
-						{content.tags.map((tag) => (
+						{content.tags.map((tag: string) => (
 							<Link
 								key={tag}
 								href={`/content?tag=${tag}`}
@@ -338,7 +343,7 @@ export function ContentCard({
 							<span>Linked Sites</span>
 						</div>
 						<div className="flex flex-wrap gap-2">
-							{content.linkedSites.map((siteId) => (
+							{content.linkedSites.map((siteId: string) => (
 								<Link key={siteId} href={`/map?site=${siteId}`} className="text-xs text-primary hover:underline">
 									{siteId}
 								</Link>

@@ -66,23 +66,157 @@ export interface MapSite {
   zoneId?: string; // Reference to MapZone
 }
 
-export type HypothesisStatus = "proposed" | "under_review" | "validated" | "deprecated";
+// ============================================================================
+// Research Feed Types
+// ============================================================================
 
-export interface ResearchHypothesis {
+export type FeedPostType = "official" | "community";
+
+export interface Badge {
   id: string;
-  title: string;
-  statement: string;
-  status: HypothesisStatus;
-  confidence: "speculative" | "plausible" | "supported";
-  evidenceCount: number;
-  lastUpdated: string;
+  slug: string;
+  name: string;
+  description: string;
+  iconUrl?: string;
+  category: "contribution" | "expert" | "community" | "achievement";
+  awardedAt?: string;
 }
 
-export interface LinkedEntity {
+export interface UserProfile {
   id: string;
-  type: "site" | "artifact" | "text" | "figure" | "media";
-  name: string;
-  relation: string;
+  userId?: string; // alias for id compatibility
+  username: string;
+  displayName: string;
+  avatarUrl?: string;
+  avatar?: string; // alias for compatibility
+  bio?: string; // "About" section
+  isVerified: boolean;
+  verificationStatus?: VerificationStatus; // compatibility
+  title?: string; // e.g. "Archaeologist", "Field Researcher"
+  role?: "user" | "contributor" | "researcher" | "expert" | "admin";
+  badges?: Badge[];
+  stats?: {
+    contributions: number;
+    followers: number;
+    following: number;
+  };
+}
+
+export interface FeedPost {
+  id: string;
+  type: FeedPostType;
+  author: UserProfile;
+  title: string;
+  content: string; // Markdown supported
+  timestamp: string;
+  
+  // Media & Links
+  media?: {
+    type: "image" | "video" | "youtube";
+    url: string;
+    thumbnail?: string;
+    caption?: string;
+  }[];
+  externalLink?: {
+    url: string;
+    title: string;
+    domain: string; // e.g. "substack.com", "twitter.com"
+  };
+
+  // Engagement
+  likes: number;
+  commentsCount: number;
+  shares: number;
+  isLiked?: boolean; // for current user context
+  
+  // Context
+  tags: string[];
+  relatedSiteIds?: string[]; // Links to map sites
+  topicId?: string; // Link to a ResearchTopic
+}
+
+export interface ResearchTopic {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  coverImage?: string;
+  stats: {
+    posts: number;
+    followers: number;
+    contributors: number;
+  };
+  topContributors: UserProfile[];
+  relatedTopics?: string[]; // IDs of other topics
+}
+
+export interface FeedComment {
+  id: string;
+  postId?: string; // Made optional, moving to contentId
+  contentId?: string; // Generic content identifier
+  parentCommentId?: string; // For threaded replies
+  author: UserProfile;
+  content: string; // content body
+  body?: string; // alias for compatibility
+  timestamp: string;
+  createdAt?: string; // alias
+  likes: number;
+  replyCount?: number;
+  replies?: FeedComment[]; // Threaded replies
+  isDeleted?: boolean;
+  isHidden?: boolean;
+  isEdited?: boolean;
+  flagCount?: number;
+}
+
+// Alias for backward compatibility
+export type Comment = FeedComment;
+
+export interface Rating {
+  id: string;
+  contentId: string;
+  userId: string;
+  user: UserProfile; // Added back for RatingItem
+  rating: number; // 1-5
+  value?: number; // alias
+  review?: string;
+  comment?: string;
+  timestamp: string;
+  createdAt?: string; // alias
+  updatedAt?: string;
+  helpfulCount: number;
+  notHelpfulCount: number;
+}
+
+export type ContentType = "post" | "site" | "artifact" | "text" | "media" | "image" | "video" | "youtube" | "document" | "link";
+
+export interface ContentItem {
+  id: string;
+  type: ContentType;
+  title: string;
+  description: string;
+  submittedBy: UserProfile; // Renamed from author
+  author?: UserProfile; 
+  createdAt: string;
+  updatedAt: string;
+  tags: string[];
+  content: unknown; // Keep flexible for now
+  verificationStatus: VerificationStatus;
+  trustTier?: CommunityTier;
+  civilization?: string;
+  era?: string;
+  linkedSites: string[];
+  stats: {
+    likes: number;
+    views: number;
+    comments: number;
+    bookmarks: number;
+    shares: number;
+    rating: {
+      average: number;
+      count: number;
+    };
+  };
 }
 
 export interface ResearchProject {
@@ -95,8 +229,8 @@ export interface ResearchProject {
   status: "active" | "draft" | "archived";
   leadInvestigator: string;
   collaboratorCount: number;
-  hypotheses: ResearchHypothesis[];
-  linkedEntities: LinkedEntity[];
+  hypotheses: unknown[]; // Keeping minimal for now as we transition
+  linkedEntities: unknown[];
   activity: {
     id: string;
     description: string;
@@ -105,37 +239,20 @@ export interface ResearchProject {
   }[];
 }
 
-export interface DiscussionThread {
-  id: string;
-  title: string;
-  category: string;
-  excerpt: string;
-  lastUpdated: string;
-  replies: number;
-  tags: string[];
-  isVerifiedOnly?: boolean;
-}
+export type { MediaAsset } from "@/entities/media/model/types";
 
-export interface TextSource {
-  id: string;
-  title: string;
-  author: string;
-  civilization: string;
-  era: string;
-  language: string;
-  summary: string;
-  tags: string[];
-  downloadUrl?: string;
-}
+export type ActivityNotificationType =
+  | "mention"
+  | "comment"
+  | "verification"
+  | "research_update"
+  | "follow"
+  | "system"
+  | "like";
 
 export interface ActivityNotification {
   id: string;
-  type:
-    | "mention"
-    | "verification"
-    | "research_update"
-    | "comment"
-    | "system";
+  type: ActivityNotificationType;
   summary: string;
   timestamp: string;
   unread: boolean;
@@ -144,236 +261,3 @@ export interface ActivityNotification {
     label: string;
   };
 }
-
-<<<<<<< HEAD:src/lib/types.ts
-// ============================================================================
-// Enhanced Content Management System
-// ============================================================================
-
-export type ContentType = 
-  | "site" 
-  | "image" 
-  | "video" 
-  | "youtube" 
-  | "document" 
-  | "text" 
-  | "post" 
-  | "link";
-
-export interface UserProfile {
-  userId: string;
-  username: string;
-  displayName: string;
-  avatar?: string;
-  verificationStatus: VerificationStatus;
-  bio?: string;
-  affiliation?: string;
-}
-
-export interface ContentStats {
-  views: number;
-  likes: number;
-  bookmarks: number;
-  comments: number;
-  shares: number;
-  rating: {
-    average: number; // 0-5 stars
-    count: number;
-  };
-}
-
-// Content-specific data types
-export interface ImageData {
-  url: string;
-  thumbnail: string;
-  width?: number;
-  height?: number;
-  format?: string;
-  source?: string;
-  license?: string;
-}
-
-export interface VideoData {
-  url: string;
-  thumbnail: string;
-  duration?: number;
-  format?: string;
-  source?: string;
-}
-
-export interface YoutubeData {
-  videoId: string;
-  thumbnail: string;
-  duration?: number;
-  channelName?: string;
-  channelId?: string;
-}
-
-export interface DocumentData {
-  url: string;
-  fileType: "pdf" | "doc" | "docx" | "txt" | "other";
-  fileSize?: number;
-  pages?: number;
-  author?: string;
-  language?: string;
-}
-
-export interface TextData {
-  body: string;
-  author?: string;
-  originalLanguage?: string;
-  translatedBy?: string;
-  sourceReference?: string;
-}
-
-export interface PostData {
-  body: string;
-  featuredImage?: string;
-  category?: string;
-}
-
-export interface LinkData {
-  url: string;
-  domain: string;
-  favicon?: string;
-  preview?: {
-    title: string;
-    description: string;
-    image?: string;
-  };
-}
-
-export type ContentData = 
-  | { type: "image"; data: ImageData }
-  | { type: "video"; data: VideoData }
-  | { type: "youtube"; data: YoutubeData }
-  | { type: "document"; data: DocumentData }
-  | { type: "text"; data: TextData }
-  | { type: "post"; data: PostData }
-  | { type: "link"; data: LinkData };
-
-export interface ContentItem {
-  id: string;
-  type: ContentType;
-  title: string;
-  description: string;
-  
-  // Attribution
-  submittedBy: UserProfile;
-  createdAt: string;
-  updatedAt: string;
-  
-  // Verification & Trust
-  verificationStatus: VerificationStatus;
-  trustTier?: CommunityTier;
-  
-  // Content specifics
-  content: ContentData;
-  
-  // Relationships
-  linkedSites: string[]; // Site IDs this is linked to
-  linkedContent: string[]; // Other content items
-  tags: string[];
-  
-  // Metadata
-  civilization?: string;
-  era?: string;
-  geography?: Partial<GeographicHierarchy>;
-  
-  // Engagement
-  stats: ContentStats;
-}
-
-export type RelationshipType =
-  | "attached_to"
-  | "references"
-  | "depicts"
-  | "discusses"
-  | "supplements"
-  | "contradicts"
-  | "supports"
-  | "part_of"
-  | "related";
-
-export interface ContentRelationship {
-  id: string;
-  fromContentId: string;
-  toContentId: string;
-  relationshipType: RelationshipType;
-  description?: string;
-  createdBy: string;
-  createdAt: string;
-}
-
-export interface Comment {
-  id: string;
-  contentId: string;
-  parentCommentId?: string;
-  
-  author: UserProfile;
-  
-  body: string;
-  createdAt: string;
-  updatedAt?: string;
-  
-  // Engagement
-  likes: number;
-  isEdited: boolean;
-  
-  // Moderation
-  isHidden: boolean;
-  isDeleted: boolean;
-  flagCount: number;
-  
-  // Threading
-  replies: Comment[];
-  replyCount: number;
-}
-
-export interface Rating {
-  id: string;
-  contentId: string;
-  user: UserProfile;
-  rating: number; // 1-5 stars
-  review?: string;
-  createdAt: string;
-  updatedAt?: string;
-  
-  // Helpful votes
-  helpfulCount: number;
-  notHelpfulCount: number;
-}
-
-export type UserActionType = "like" | "bookmark" | "flag" | "share" | "view";
-
-export interface UserAction {
-  id: string;
-  userId: string;
-  contentId: string;
-  actionType: UserActionType;
-  createdAt: string;
-  metadata?: Record<string, unknown>;
-}
-
-export interface ContentCollection {
-  id: string;
-  title: string;
-  description: string;
-  
-  creator: UserProfile;
-  
-  contentIds: string[];
-  isPublic: boolean;
-  isCollaborative: boolean;
-  
-  tags: string[];
-  createdAt: string;
-  updatedAt: string;
-  
-  // Stats
-  followerCount: number;
-  itemCount: number;
-}
-=======
-export type { MediaAsset } from "@/entities/media/model/types";
->>>>>>> 520337dfb48b4ef3f55d0edf1ade0738f592525b:src/shared/types/content.ts
