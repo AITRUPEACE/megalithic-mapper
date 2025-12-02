@@ -1,136 +1,333 @@
-import { Card, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
-import { Compass, Network, Map, BookOpen, ShieldCheck, MessageSquare } from "lucide-react";
+"use client";
+
+import { useEffect, useRef } from "react";
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { Compass, Sparkles } from "lucide-react";
 import { AuthCtas } from "@/components/landing/AuthCtas";
 
-const featureCards = [
-  {
-    title: "Global Site Mapping",
-    description:
-      "Interactive Leaflet maps with civilization filters, verification badges, and quick access to related discussions.",
-    icon: Map,
-  },
-  {
-    title: "Collaborative Research Hub",
-    description:
-      "Structure hypotheses, link artifacts, and log decisions with peers inside dedicated project workspaces.",
-    icon: Network,
-  },
-  {
-    title: "Scholarly Knowledge Exchange",
-    description:
-      "Threaded forums, annotated text repositories, and multimedia galleries curated by verified contributors.",
-    icon: MessageSquare,
-  },
-];
+function AnimatedBackground() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-const trustPillars = [
-  {
-    title: "Verification Program",
-    description: "Admins review credentials so explorers can trust contributions and collaboration invites.",
-    icon: ShieldCheck,
-  },
-  {
-    title: "Structured Taxonomies",
-    description: "Supabase-backed data models keep sites, artifacts, texts, and links searchable across civilizations.",
-    icon: BookOpen,
-  },
-  {
-    title: "Map-first Discovery",
-    description: "Leaflet clustering, bounding-box filters, and research overlays reveal regional storylines at a glance.",
-    icon: Compass,
-  },
-];
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animationId: number;
+    let time = 0;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    const drawConstellations = () => {
+      // Ancient star map / constellation effect
+      const points: Array<{ x: number; y: number; size: number; pulse: number }> = [];
+      
+      // Generate constellation points based on time for subtle movement
+      for (let i = 0; i < 40; i++) {
+        const baseX = (Math.sin(i * 0.7) * 0.5 + 0.5) * canvas.width;
+        const baseY = (Math.cos(i * 0.5) * 0.5 + 0.5) * canvas.height;
+        points.push({
+          x: baseX + Math.sin(time * 0.001 + i) * 2,
+          y: baseY + Math.cos(time * 0.001 + i) * 2,
+          size: 1.5 + Math.sin(i) * 0.5,
+          pulse: Math.sin(time * 0.003 + i * 0.5) * 0.5 + 0.5,
+        });
+      }
+
+      // Draw connecting lines (like ancient star charts)
+      ctx.strokeStyle = "rgba(251, 146, 60, 0.06)";
+      ctx.lineWidth = 1;
+      
+      for (let i = 0; i < points.length; i++) {
+        for (let j = i + 1; j < points.length; j++) {
+          const dx = points[i].x - points[j].x;
+          const dy = points[i].y - points[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist < 200) {
+            ctx.beginPath();
+            ctx.moveTo(points[i].x, points[i].y);
+            ctx.lineTo(points[j].x, points[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw points
+      points.forEach((p) => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * (0.8 + p.pulse * 0.4), 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(251, 146, 60, ${0.3 + p.pulse * 0.4})`;
+        ctx.fill();
+      });
+    };
+
+    const animate = () => {
+      time++;
+      ctx.fillStyle = "rgba(2, 6, 23, 0.15)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      drawConstellations();
+      
+      animationId = requestAnimationFrame(animate);
+    };
+
+    resize();
+    // Initial fill
+    ctx.fillStyle = "#020617";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    animate();
+
+    window.addEventListener("resize", resize);
+    return () => {
+      cancelAnimationFrame(animationId);
+      window.removeEventListener("resize", resize);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="pointer-events-none fixed inset-0 z-0"
+    />
+  );
+}
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-6 py-16 text-foreground">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-16">
-        <section className="grid gap-10 lg:grid-cols-2 lg:items-center">
-          <div className="space-y-6">
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
-              Ancient Civilizations Research Network
-            </span>
-            <h1 className="text-4xl font-semibold leading-tight md:text-5xl">
-              Map, analyze, and debate the technologies of the ancient world together.
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              Megalithic Mapper unites archaeologists, historians, content creators, and enthusiasts in one collaborative space
-              built with Next.js, Supabase, Leaflet, and shadcn/ui.
-            </p>
-            <AuthCtas />
-          </div>
-          <div className="glass-panel relative overflow-hidden border-primary/40 p-8">
-            <div className="absolute right-12 top-10 h-24 w-24 rounded-full bg-primary/20 blur-3xl" />
-            <div className="absolute bottom-10 left-16 h-28 w-28 rounded-full bg-accent/20 blur-3xl" />
-            <div className="relative space-y-4">
-              <h2 className="text-xl font-semibold">MVP feature pillars</h2>
-              <ul className="space-y-3 text-sm text-muted-foreground">
-                <li>• Leaflet-powered geospatial explorer with verified contributor overlays</li>
-                <li>• Supabase auth, profiles, and storage-ready media workflows</li>
-                <li>• Research hub for hypotheses, evidence logs, and relationship graphs</li>
-                <li>• Forums, image galleries, and embedded video threads</li>
-              </ul>
-              <p className="text-xs text-muted-foreground">
-                Built for rapid iteration by a solo developer collaborating with an AI coding agent.
-              </p>
-            </div>
-          </div>
-        </section>
+    <>
+      <AnimatedBackground />
 
-        <section className="grid gap-6 md:grid-cols-3">
-          {featureCards.map((card) => {
-            const Icon = card.icon;
-            return (
-              <Card key={card.title} className="glass-panel border-border/40">
-                <CardHeader className="flex flex-row items-center gap-3">
-                  <span className="rounded-full bg-primary/20 p-2 text-primary">
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <div>
-                    <CardTitle className="text-lg font-semibold">{card.title}</CardTitle>
-                    <CardDescription>{card.description}</CardDescription>
-                  </div>
-                </CardHeader>
-              </Card>
-            );
-          })}
-        </section>
+      <main className="relative z-10 min-h-screen text-foreground">
+        {/* Hero */}
+        <section className="relative flex min-h-screen flex-col items-center justify-center px-6 py-20">
+          {/* Soft glow */}
+          <div className="pointer-events-none absolute left-1/2 top-1/3 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-amber-500/5 blur-[120px]" />
 
-        <section className="glass-panel border-border/40 p-8">
-          <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
-            <div className="space-y-4">
-              <h2 className="text-3xl font-semibold">Collaboration crafted for research breakthroughs</h2>
-              <p className="text-muted-foreground">
-                Every project receives dedicated hypothesis threads, evidence logs, and entity linkages so teams can document how
-                theories evolve. Verified creators surface best practices while enthusiasts learn alongside them.
-              </p>
-              <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                <span className="rounded-full bg-secondary/40 px-3 py-1">Supabase auth + storage</span>
-                <span className="rounded-full bg-secondary/40 px-3 py-1">Leaflet map overlays</span>
-                <span className="rounded-full bg-secondary/40 px-3 py-1">shadcn/ui design system</span>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="mx-auto flex max-w-3xl flex-col items-center text-center"
+          >
+            {/* Compass icon as a subtle brand mark */}
+            <motion.div
+              initial={{ opacity: 0, rotate: -20 }}
+              animate={{ opacity: 1, rotate: 0 }}
+              transition={{ delay: 0.2, duration: 0.8 }}
+              className="mb-8"
+            >
+              <div className="relative">
+                <Compass className="h-12 w-12 text-primary/60" strokeWidth={1} />
+                <Sparkles className="absolute -right-1 -top-1 h-4 w-4 text-amber-400" />
               </div>
-            </div>
-            <div className="grid gap-4">
-              {trustPillars.map((pillar) => {
-                const Icon = pillar.icon;
-                return (
-                  <Card key={pillar.title} className="border-border/40 bg-card/80">
-                    <CardHeader className="flex flex-row items-start gap-3">
-                      <span className="rounded-full bg-secondary/50 p-2 text-secondary-foreground">
-                        <Icon className="h-4 w-4" />
-                      </span>
-                      <div className="space-y-1">
-                        <CardTitle className="text-base font-semibold">{pillar.title}</CardTitle>
-                        <CardDescription>{pillar.description}</CardDescription>
-                      </div>
-                    </CardHeader>
-                  </Card>
-                );
-              })}
-            </div>
+            </motion.div>
+
+            {/* Headline - more human, curious */}
+            <motion.h1
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="mb-6 font-serif text-4xl font-medium leading-snug tracking-tight sm:text-5xl md:text-6xl"
+            >
+              What if we mapped{" "}
+              <span className="italic text-primary">every</span> ancient site
+              <br className="hidden sm:block" />
+              on Earth—together?
+            </motion.h1>
+
+            {/* Subtext - conversational, inviting */}
+            <motion.p
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              className="mb-4 max-w-xl text-lg text-muted-foreground sm:text-xl"
+            >
+              An open experiment to piece together the puzzle of lost civilizations. 
+              Drop pins, share photos, debate theories.
+            </motion.p>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7, duration: 0.8 }}
+              className="mb-10 text-sm text-muted-foreground/70"
+            >
+              We're just getting started. Come build with us.
+            </motion.p>
+
+            {/* CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9, duration: 0.8 }}
+            >
+              <AuthCtas />
+            </motion.div>
+          </motion.div>
+
+          {/* Bottom hint */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5, duration: 1 }}
+            className="absolute bottom-12 left-1/2 -translate-x-1/2"
+          >
+            <p className="text-xs tracking-widest text-muted-foreground/50 uppercase">
+              Scroll to peek inside
+            </p>
+          </motion.div>
+        </section>
+
+        {/* What is this? - casual explainer */}
+        <section className="relative px-6 py-24">
+          <div className="mx-auto max-w-2xl">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7 }}
+              className="space-y-6 text-center"
+            >
+              <h2 className="font-serif text-2xl font-medium sm:text-3xl">
+                Okay, but what <span className="italic">is</span> this?
+              </h2>
+              <div className="space-y-4 text-muted-foreground">
+                <p>
+                  You know how every few months someone posts a photo of some 
+                  megalithic wall in Peru or Turkey, and everyone loses their minds 
+                  trying to figure out who built it and when?
+                </p>
+                <p>
+                  This is a place to collect all of that. A collaborative map where 
+                  anyone can pin interesting sites, upload evidence, and connect 
+                  the dots across continents.
+                </p>
+                <p className="text-foreground/90">
+                  Think Wikipedia meets Google Earth, but for ancient mysteries.
+                </p>
+              </div>
+            </motion.div>
           </div>
         </section>
-      </div>
-    </main>
+
+        {/* Visual break - simple quote/vibe */}
+        <section className="relative overflow-hidden px-6 py-20">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
+            className="mx-auto max-w-4xl text-center"
+          >
+            <blockquote className="font-serif text-2xl italic text-primary/80 sm:text-3xl">
+              "The past is never dead. It's not even past."
+            </blockquote>
+            <p className="mt-4 text-sm text-muted-foreground">— Faulkner, probably thinking about Göbekli Tepe</p>
+          </motion.div>
+        </section>
+
+        {/* What you can do - simple list, not feature cards */}
+        <section className="relative px-6 py-24">
+          <div className="mx-auto max-w-2xl">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7 }}
+              className="space-y-8"
+            >
+              <h2 className="text-center font-serif text-2xl font-medium sm:text-3xl">
+                Things you can do here
+              </h2>
+              
+              <ul className="space-y-4 text-muted-foreground">
+                <motion.li 
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 }}
+                  className="flex items-start gap-3"
+                >
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                  <span>Drop a pin on the map for a site you've researched, visited, or just find fascinating</span>
+                </motion.li>
+                <motion.li 
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 }}
+                  className="flex items-start gap-3"
+                >
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                  <span>Upload photos, documents, and videos—especially the weird stuff mainstream archaeology ignores</span>
+                </motion.li>
+                <motion.li 
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                  className="flex items-start gap-3"
+                >
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                  <span>Connect sites across the globe—notice a pattern? Link them and explain why</span>
+                </motion.li>
+                <motion.li 
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4 }}
+                  className="flex items-start gap-3"
+                >
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                  <span>Debate theories with other researchers (respectfully—we're all searching here)</span>
+                </motion.li>
+              </ul>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Final CTA - warm, inviting */}
+        <section className="relative px-6 py-24">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.7 }}
+            className="mx-auto max-w-xl text-center"
+          >
+            <p className="mb-2 text-sm uppercase tracking-widest text-primary/70">
+              Early days
+            </p>
+            <h2 className="mb-4 font-serif text-2xl font-medium sm:text-3xl">
+              This is version 0.1
+            </h2>
+            <p className="mb-8 text-muted-foreground">
+              Rough edges and all. If you're into ancient history, alternative archaeology, 
+              or just love a good mystery—jump in. The best ideas come from unexpected places.
+            </p>
+            <AuthCtas variant="compact" />
+          </motion.div>
+        </section>
+
+        {/* Footer - minimal */}
+        <footer className="border-t border-border/20 px-6 py-8">
+          <div className="mx-auto flex max-w-4xl flex-col items-center justify-between gap-4 text-sm text-muted-foreground/60 sm:flex-row">
+            <p>Built by curious humans, 2024</p>
+            <div className="flex gap-6">
+              <Link href="/map" className="transition-colors hover:text-foreground">
+                Explore the Map
+              </Link>
+            </div>
+          </div>
+        </footer>
+      </main>
+    </>
   );
 }

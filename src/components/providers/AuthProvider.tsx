@@ -17,6 +17,21 @@ import { isAuthenticatedClient } from "@/lib/supabase/auth-helpers";
 import type { ProfileRecord } from "@/lib/supabase/profile";
 import { DEFAULT_VIEWPORT } from "@/lib/supabase/profile";
 import { useUserStore } from "@/entities/user/model/user-store";
+import { DEV_USERS, type DevUserKey } from "@/components/dev/dev-auth-panel";
+
+const SESSION_CHECK_TIMEOUT_MS = 5000;
+
+/** Wraps a promise with a timeout - resolves to null on timeout instead of rejecting */
+function withTimeout<T>(
+	promise: Promise<T>,
+	ms: number,
+	fallback: T
+): Promise<T> {
+	return Promise.race([
+		promise,
+		new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms)),
+	]);
+}
 
 type AuthContextValue = {
 	user: User | null;
@@ -79,20 +94,83 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const loadUser = useCallback(async () => {
 		setLoading(true);
 		try {
-			const {
-				data: { user: nextUser },
-			} = await supabase.auth.getUser();
+			// Check for dev auth bypass first (development only)
+			if (process.env.NODE_ENV === "development" && typeof window !== "undefined") {
+				const devUserKey = document.cookie
+					.split("; ")
+					.find((row) => row.startsWith("dev-user-key="))
+					?.split("=")[1] as DevUserKey | undefined;
 
+				if (devUserKey && devUserKey in DEV_USERS) {
+					const devUser = DEV_USERS[devUserKey];
+					// Create a mock user object
+					const mockUser = {
+						id: devUser.id,
+						email: devUser.email,
+						app_metadata: {},
+						user_metadata: { full_name: devUser.full_name },
+						aud: "authenticated",
+						created_at: new Date().toISOString(),
+					} as User;
+					
+					// Create a mock profile
+					const mockProfile: ProfileRecord = {
+						id: devUser.id,
+						username: devUser.username || null,
+						full_name: devUser.full_name || null,
+						headline: devUser.headline || null,
+						bio: null,
+						avatar_url: devUser.avatar_url || null,
+						location: null,
+						website_url: null,
+						role: devUser.role,
+						is_verified: devUser.is_verified,
+						expertise_tags: devUser.expertise_tags || [],
+						contribution_intent: null,
+						collaboration_focus: null,
+						notify_research_activity: true,
+						notify_product_updates: false,
+						onboarding_completed: devUserKey !== "newuser",
+						default_viewport: DEFAULT_VIEWPORT,
+					};
+
+					console.log("🔧 Dev auth active:", devUserKey, devUser.full_name);
+					setUser(mockUser);
+					setProfile(mockProfile);
+					hydrateProfile(mockProfile);
+					setLoading(false);
+					return;
+				}
+			}
+
+			// Wrap getUser with timeout to prevent infinite loading
+			const userResponse = await withTimeout(
+				supabase.auth.getUser(),
+				SESSION_CHECK_TIMEOUT_MS,
+				{ data: { user: null }, error: null }
+			);
+
+			const nextUser = userResponse.data.user;
 			setUser(nextUser ?? null);
 
 			if (nextUser?.id) {
-				const nextProfile = await fetchProfile(nextUser.id);
+				// Also wrap profile fetch with timeout
+				const nextProfile = await withTimeout(
+					fetchProfile(nextUser.id),
+					SESSION_CHECK_TIMEOUT_MS,
+					null
+				);
 				setProfile(nextProfile);
 				hydrateProfile(nextProfile);
 			} else {
 				setProfile(null);
 				hydrateProfile(null);
 			}
+		} catch (error) {
+			console.warn("Session check failed, continuing as guest:", error);
+			setUser(null);
+			setProfile(null);
+			hydrateProfile(null);
 		} finally {
 			setLoading(false);
 		}

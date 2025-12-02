@@ -31,6 +31,7 @@ interface SiteMapProps {
 	className?: string;
 	onBoundsChange?: (bounds: L.LatLngBounds) => void;
 	onMapClick?: (lat: number, lng: number) => void;
+	onMapReady?: (map: L.Map) => void;
 }
 
 const MapClickHandler = ({ onClick }: { onClick?: (lat: number, lng: number) => void }) => {
@@ -126,6 +127,16 @@ const BoundsWatcher = ({ onChange }: { onChange?: (bounds: L.LatLngBounds) => vo
 	return null;
 };
 
+const MapReadyHandler = ({ onReady }: { onReady?: (map: L.Map) => void }) => {
+	const map = useMap();
+	
+	useEffect(() => {
+		onReady?.(map);
+	}, [map, onReady]);
+	
+	return null;
+};
+
 const toLeafletBounds = (bounds: BoundingBox): L.LatLngBoundsExpression => [
 	[bounds.minLat, bounds.minLng],
 	[bounds.maxLat, bounds.maxLng],
@@ -151,11 +162,11 @@ const SiteMarker = ({ site, isSelected, onSelect }: { site: MapSiteFeature; isSe
 	);
 };
 
-export const SiteMap = ({ sites, zones, selectedSiteId, onSelect, className, onBoundsChange, onMapClick }: SiteMapProps) => {
+export const SiteMap = ({ sites, zones, selectedSiteId, onSelect, className, onBoundsChange, onMapClick, onMapReady }: SiteMapProps) => {
 	const selectedSite = useMemo(() => sites.find((site) => site.id === selectedSiteId) ?? null, [sites, selectedSiteId]);
 
 	return (
-		<div className={cn("glass-panel overflow-hidden border-border/40", className)}>
+		<div className={cn("overflow-hidden", className)}>
 			<style jsx global>{`
 				.custom-marker-wrapper {
 					background: transparent;
@@ -214,6 +225,7 @@ export const SiteMap = ({ sites, zones, selectedSiteId, onSelect, className, onB
 				<TileLayer url={TILE_LAYERS.dark.url} attribution={TILE_LAYERS.dark.attribution} />
 				<BoundsWatcher onChange={onBoundsChange} />
 				<MapClickHandler onClick={onMapClick} />
+				<MapReadyHandler onReady={onMapReady} />
 				<SelectedSiteFocus site={selectedSite} />
 				{zones.map((zone) => (
 					<Rectangle key={zone.id} bounds={toLeafletBounds(zone.bounds)} pathOptions={{ color: zone.color, weight: 1.5, fillOpacity: 0.08 }}>

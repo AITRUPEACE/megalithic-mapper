@@ -42,6 +42,13 @@ export async function middleware(request: NextRequest) {
 		return NextResponse.next();
 	}
 
+	// Check for dev auth bypass (development only)
+	const devAuthBypass = request.cookies.get("dev-auth-bypass")?.value;
+	if (process.env.NODE_ENV === "development" && devAuthBypass === "true") {
+		console.log("🔧 Dev auth bypass active for:", pathname);
+		return NextResponse.next();
+	}
+
 	const response = NextResponse.next({
 		request: {
 			headers: request.headers,
