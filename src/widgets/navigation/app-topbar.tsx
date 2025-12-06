@@ -33,6 +33,7 @@ import {
 } from "@/shared/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/shared/ui/sheet";
 import { cn } from "@/shared/lib/utils";
+import { zClass } from "@/shared/lib/z-index";
 import { useAuth } from "@/components/providers/AuthProvider";
 
 interface AppTopbarProps {
@@ -81,12 +82,17 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 	};
 
 	return (
-		<header className="relative z-[450] flex h-16 items-center justify-between border-b border-border/60 bg-background/50 px-4 backdrop-blur md:px-6">
-			<div className="flex flex-1 items-center gap-3">
+		<header
+			className={cn(
+				"relative flex h-14 shrink-0 items-center justify-between border-b border-border/60 bg-background/50 px-3 backdrop-blur sm:h-16 sm:px-4 md:px-6",
+				zClass.topbar
+			)}
+		>
+			<div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
 				{/* Mobile menu button */}
 				<Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
 					<SheetTrigger asChild>
-						<Button variant="ghost" size="icon" className="md:hidden">
+						<Button variant="ghost" size="icon" className="shrink-0 md:hidden">
 							<Menu className="h-5 w-5" />
 							<span className="sr-only">Toggle menu</span>
 						</Button>
@@ -148,7 +154,7 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 				</Button>
 			</div>
 
-			<div className="flex items-center gap-2 md:gap-3">
+			<div className="flex shrink-0 items-center gap-1.5 sm:gap-2 md:gap-3">
 				{/* New Contribution button */}
 				<Button asChild size="sm" variant="secondary" className="hidden md:flex">
 					<Link href="/map#new-site">
@@ -158,7 +164,7 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 				</Button>
 
 				{/* Mobile compact version */}
-				<Button asChild size="icon" variant="secondary" className="md:hidden">
+				<Button asChild size="icon" variant="secondary" className="h-8 w-8 md:hidden">
 					<Link href="/map#new-site">
 						<Plus className="h-4 w-4" />
 					</Link>
@@ -202,9 +208,7 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 					<DropdownMenuContent className="w-56" align="end" forceMount>
 						<DropdownMenuLabel className="font-normal">
 							<div className="flex flex-col space-y-1">
-								<p className="text-sm font-medium leading-none">
-									{authLoading ? "Loading profile…" : displayName}
-								</p>
+								<p className="text-sm font-medium leading-none">{authLoading ? "Loading profile…" : displayName}</p>
 								<p className="text-xs leading-none text-muted-foreground">{email}</p>
 							</div>
 						</DropdownMenuLabel>

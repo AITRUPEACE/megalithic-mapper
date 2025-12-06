@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Map, Compass, MessageSquare, Images, BookOpen, Network, Bell, UserCircle, LogOut, Loader2 } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { cn } from "@/shared/lib/utils";
+import { zClass } from "@/shared/lib/z-index";
 import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
 import { useAuth } from "@/components/providers/AuthProvider";
 
@@ -81,7 +82,12 @@ export const AppSidebar = () => {
 
 	return (
 		<aside
-			className={cn("relative z-40 h-full overflow-visible", isMapRoute ? "w-16" : "w-64")}
+			className={cn(
+				"relative h-full overflow-visible",
+				zClass.sidebar,
+				"hidden md:block", // Hide on mobile
+				isMapRoute ? "w-16" : "w-64"
+			)}
 			onMouseEnter={handleMouseEnter}
 			onMouseLeave={handleMouseLeave}
 			onFocus={handleFocus}
@@ -127,7 +133,7 @@ export const AppSidebar = () => {
 								)}
 							>
 								<Link
-										href={targetHref}
+									href={targetHref}
 									className={cn("flex min-w-0 items-center overflow-hidden", isExpanded ? "w-full gap-2" : "w-full")}
 									aria-label={item.label}
 								>

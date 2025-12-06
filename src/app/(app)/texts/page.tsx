@@ -49,14 +49,16 @@ export default function TextLibraryPage() {
 	};
 
 	return (
-		<div className="space-y-8">
+		<div className="space-y-6 sm:space-y-8">
 			{/* Header */}
-			<div className="flex flex-wrap items-center justify-between gap-4">
-				<div>
-					<h1 className="text-3xl font-semibold">Text Library</h1>
-					<p className="text-sm text-muted-foreground">Annotated manuscripts, translations, and field notes powering collaborative hypotheses.</p>
+			<div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4">
+				<div className="min-w-0 flex-1">
+					<h1 className="text-2xl font-semibold sm:text-3xl">Text Library</h1>
+					<p className="text-xs text-muted-foreground sm:text-sm">
+						Annotated manuscripts, translations, and field notes powering collaborative hypotheses.
+					</p>
 				</div>
-				<Button asChild>
+				<Button asChild size="sm" className="w-full sm:w-auto">
 					<Link href="/content/upload?type=text">
 						<FileText className="mr-2 h-4 w-4" />
 						Add Text
@@ -65,56 +67,58 @@ export default function TextLibraryPage() {
 			</div>
 
 			{/* Filters and Controls */}
-			<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-				{/* Search */}
-				<div className="relative flex-1 max-w-md">
-					<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-					<Input
-						placeholder="Search texts, documents, posts..."
-						value={searchTerm}
-						onChange={(e) => setSearchTerm(e.target.value)}
-						className="pl-9"
-					/>
-				</div>
+			<div className="flex flex-col gap-3 sm:gap-4">
+				<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+					{/* Search */}
+					<div className="relative flex-1 sm:max-w-md">
+						<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+						<Input
+							placeholder="Search texts, documents, posts..."
+							value={searchTerm}
+							onChange={(e) => setSearchTerm(e.target.value)}
+							className="pl-9"
+						/>
+					</div>
 
-				{/* View controls */}
-				<div className="flex items-center gap-2">
-					<Button variant={viewMode === "grid" ? "default" : "outline"} size="sm" onClick={() => setViewMode("grid")}>
-						<Grid3x3 className="h-4 w-4" />
-					</Button>
-					<Button variant={viewMode === "list" ? "default" : "outline"} size="sm" onClick={() => setViewMode("list")}>
-						<List className="h-4 w-4" />
-					</Button>
-					<Button variant="outline" size="sm" asChild>
-						<Link href="/browse?type=text">
-							<SlidersHorizontal className="mr-2 h-4 w-4" />
-							Advanced Filters
-						</Link>
-					</Button>
+					{/* View controls */}
+					<div className="flex items-center gap-2">
+						<Button variant={viewMode === "grid" ? "default" : "outline"} size="sm" onClick={() => setViewMode("grid")}>
+							<Grid3x3 className="h-4 w-4" />
+						</Button>
+						<Button variant={viewMode === "list" ? "default" : "outline"} size="sm" onClick={() => setViewMode("list")}>
+							<List className="h-4 w-4" />
+						</Button>
+						<Button variant="outline" size="sm" asChild>
+							<Link href="/browse?type=text">
+								<SlidersHorizontal className="h-4 w-4 sm:mr-2" />
+								<span className="hidden sm:inline">Advanced Filters</span>
+							</Link>
+						</Button>
+					</div>
 				</div>
 			</div>
 
 			{/* Quick Filters */}
-			<div className="space-y-2">
-				<div className="flex flex-wrap gap-2">
-					<span className="text-sm font-medium text-muted-foreground">Verification:</span>
+			<div className="space-y-3 overflow-x-auto">
+				<div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+					<span className="shrink-0 text-xs font-medium text-muted-foreground sm:text-sm">Verification:</span>
 					<Badge
 						variant={filters.verification === "all" ? "secondary" : "default"}
-						className="cursor-pointer"
+						className="cursor-pointer text-xs"
 						onClick={() => setFilters({ verification: "all" })}
 					>
 						All
 					</Badge>
 					<Badge
 						variant={filters.verification === "verified" ? "default" : "secondary"}
-						className="cursor-pointer"
+						className="cursor-pointer text-xs"
 						onClick={() => setFilters({ verification: "verified" })}
 					>
 						Verified
 					</Badge>
 					<Badge
 						variant={filters.verification === "under_review" ? "default" : "secondary"}
-						className="cursor-pointer"
+						className="cursor-pointer text-xs"
 						onClick={() => setFilters({ verification: "under_review" })}
 					>
 						Under Review
@@ -122,13 +126,13 @@ export default function TextLibraryPage() {
 				</div>
 
 				{civilizations.length > 0 && (
-					<div className="flex flex-wrap gap-2">
-						<span className="text-sm font-medium text-muted-foreground">Civilization:</span>
+					<div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+						<span className="shrink-0 text-xs font-medium text-muted-foreground sm:text-sm">Civilization:</span>
 						{civilizations.map((civ) => (
 							<Badge
 								key={civ}
 								variant={filters.civilizations.includes(civ as string) ? "default" : "outline"}
-								className="cursor-pointer"
+								className="cursor-pointer text-xs"
 								onClick={() => {
 									const newCivs = filters.civilizations.includes(civ as string)
 										? filters.civilizations.filter((c) => c !== civ)
@@ -143,13 +147,13 @@ export default function TextLibraryPage() {
 				)}
 
 				{eras.length > 0 && (
-					<div className="flex flex-wrap gap-2">
-						<span className="text-sm font-medium text-muted-foreground">Era:</span>
+					<div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+						<span className="shrink-0 text-xs font-medium text-muted-foreground sm:text-sm">Era:</span>
 						{eras.slice(0, 6).map((era) => (
 							<Badge
 								key={era}
 								variant={filters.eras.includes(era as string) ? "default" : "outline"}
-								className="cursor-pointer"
+								className="cursor-pointer text-xs"
 								onClick={() => {
 									const newEras = filters.eras.includes(era as string) ? filters.eras.filter((e) => e !== era) : [...filters.eras, era as string];
 									setFilters({ eras: newEras });

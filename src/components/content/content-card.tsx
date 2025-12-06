@@ -89,45 +89,47 @@ export function ContentCard({
 
 	if (variant === "list") {
 		return (
-			<div className="flex gap-4 rounded-lg border border-border/40 bg-card/70 p-4 hover:bg-card/90 transition-colors">
+			<div className="flex flex-col gap-3 rounded-lg border border-border/40 bg-card/70 p-3 hover:bg-card/90 transition-colors sm:flex-row sm:gap-4 sm:p-4">
 				{/* Thumbnail */}
 				{thumbnail && (
-					<div className="relative h-24 w-32 flex-shrink-0 overflow-hidden rounded-md">
-						<Image src={thumbnail} alt={content.title} fill className="object-cover" sizes="128px" />
+					<div className="relative h-40 w-full overflow-hidden rounded-md sm:h-24 sm:w-32 sm:flex-shrink-0">
+						<Image src={thumbnail} alt={content.title} fill className="object-cover" sizes="(max-width: 640px) 100vw, 128px" />
 						<Badge className="absolute left-2 top-2 bg-black/60 text-xs">{content.type}</Badge>
 					</div>
 				)}
 
 				{/* Content */}
-				<div className="flex-1 space-y-2">
-					<div className="flex items-start justify-between gap-3">
-						<div className="flex-1">
+				<div className="min-w-0 flex-1 space-y-2">
+					<div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+						<div className="min-w-0 flex-1">
 							<Link href={`/content/${content.id}`} className="hover:underline">
-								<h3 className="font-semibold text-foreground line-clamp-1">{content.title}</h3>
+								<h3 className="font-semibold text-foreground line-clamp-2 text-sm sm:text-base sm:line-clamp-1">{content.title}</h3>
 							</Link>
-							<p className="text-sm text-muted-foreground line-clamp-2">{content.description}</p>
+							<p className="text-xs text-muted-foreground line-clamp-2 sm:text-sm">{content.description}</p>
 						</div>
 
-						<Badge variant={content.verificationStatus === "verified" ? "default" : "secondary"}>{content.verificationStatus}</Badge>
+						<Badge variant={content.verificationStatus === "verified" ? "default" : "secondary"} className="self-start shrink-0 text-xs">
+							{content.verificationStatus}
+						</Badge>
 					</div>
 
 					{/* Metadata */}
-					<div className="flex items-center gap-4 text-xs text-muted-foreground">
+					<div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground sm:gap-4">
 						<Link href={`/profile/${content.submittedBy.username}`} className="flex items-center gap-1 hover:text-foreground">
 							<Avatar className="h-4 w-4">
 								<AvatarImage src={content.submittedBy.avatar} />
 								<AvatarFallback>{content.submittedBy.displayName[0]}</AvatarFallback>
 							</Avatar>
-							<span>{content.submittedBy.displayName}</span>
+							<span className="truncate max-w-[100px] sm:max-w-none">{content.submittedBy.displayName}</span>
 							{content.submittedBy.verificationStatus === "verified" && <VerifiedIcon className="h-3 w-3 text-blue-500" />}
 						</Link>
 
-						<span>•</span>
+						<span className="hidden sm:inline">•</span>
 						<span>{timeAgo(content.createdAt)}</span>
 
 						{content.linkedSites.length > 0 && (
 							<>
-								<span>•</span>
+								<span className="hidden sm:inline">•</span>
 								<span className="flex items-center gap-1">
 									<MapPin className="h-3 w-3" />
 									{content.linkedSites.length} {content.linkedSites.length === 1 ? "site" : "sites"}
@@ -138,7 +140,7 @@ export function ContentCard({
 
 					{/* Stats */}
 					{showStats && (
-						<div className="flex items-center gap-4 text-xs text-muted-foreground">
+						<div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground sm:gap-4">
 							<span className="flex items-center gap-1">
 								<Heart className="h-3 w-3" />
 								{content.stats.likes}
