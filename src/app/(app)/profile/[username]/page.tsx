@@ -28,8 +28,9 @@ function BadgeCard({ badge }: { badge: PublicBadge }) {
 	);
 }
 
-export default async function ProfilePage({ params }: { params: { username: string } }) {
-	const profile = await getProfileByUsername(params.username);
+export default async function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
+	const { username } = await params;
+	const profile = await getProfileByUsername(username);
 
 	if (!profile) {
 		notFound();

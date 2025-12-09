@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import dynamic from "next/dynamic";
-import { PanelLeftClose, PanelLeft, Plus, Search, X } from "lucide-react";
+import { Maximize2, Minimize2, Plus, Search, X, Map as MapIcon, List } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Badge } from "@/shared/ui/badge";
@@ -11,7 +11,7 @@ import { cn } from "@/shared/lib/utils";
 import { zClass } from "@/shared/lib/z-index";
 import type { BoundingBox, MapSiteFeature, MapZoneFeature } from "@/entities/map/model/types";
 import { useMapStore, applySiteFilters } from "@/features/map-explorer/model/map-store";
-import { ActivityFeed } from "./activity-feed";
+import { HomeFeed } from "./home-feed";
 import { SiteSlideOver } from "./site-slide-over";
 import { SiteEditor } from "./site-editor";
 import { ZoneEditor } from "./zone-editor";
@@ -43,6 +43,8 @@ const QUICK_FILTERS = [
 	{ id: "americas", label: "Americas" },
 ];
 
+type ViewMode = "split" | "map" | "feed";
+
 export const SiteExplorer = ({ initialSites, initialZones, initialBounds }: SiteExplorerProps) => {
 	const { sites, zones, filters, selectedSiteId, selectSite, initialize, replaceData, setBounds } = useMapStore();
 
@@ -54,8 +56,8 @@ export const SiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 	const lastBoundsRef = useRef<BoundingBox | null>(null);
 	const mapRef = useRef<L.Map | null>(null);
 
-	// UI state
-	const [isPanelCollapsed, setIsPanelCollapsed] = useState(false);
+	// UI state - default to split view showing both feed and map
+	const [viewMode, setViewMode] = useState<ViewMode>("split");
 	const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
 	const [activeQuickFilters, setActiveQuickFilters] = useState<string[]>([]);
 	const [searchQuery, setSearchQuery] = useState("");
@@ -161,8 +163,12 @@ export const SiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 				mapRef.current.flyTo([site.coordinates.lat, site.coordinates.lng], 8, { duration: 0.8 });
 			}
 			selectSite(siteId);
+			// If in feed-only mode, switch to split to show the map
+			if (viewMode === "feed") {
+				setViewMode("split");
+			}
 		},
-		[sites, selectSite]
+		[sites, selectSite, viewMode]
 	);
 
 	const handleCloseSlideOver = useCallback(() => {
@@ -174,136 +180,202 @@ export const SiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 		setActiveQuickFilters((prev) => (prev.includes(filterId) ? prev.filter((f) => f !== filterId) : [...prev, filterId]));
 	};
 
+	// Calculate layout based on view mode
+	const showFeed = viewMode === "split" || viewMode === "feed";
+	const showMap = viewMode === "split" || viewMode === "map";
+	const isMapExpanded = viewMode === "map";
+
 	return (
-		// Height: subtract topbar + padding + bottom nav on mobile, just topbar + padding on desktop
 		<div className="relative flex h-[calc(100dvh-10rem)] sm:h-[calc(100dvh-9rem)] md:h-[calc(100dvh-7rem)] w-full overflow-hidden rounded-xl border border-border/40 bg-card/30">
-			{/* Activity Feed Panel - Desktop only */}
-			<aside
-				className={cn(
-					"hidden lg:flex flex-col shrink-0 border-r border-border/30 bg-card/60 transition-all duration-300 overflow-hidden",
-					isPanelCollapsed ? "w-0" : "w-72"
-				)}
-			>
-				<ActivityFeed
-					sites={filteredSites}
-					selectedSiteId={selectedSiteId}
-					onSelectSite={handleSelectSite}
-					onFocusSite={handleFocusSite}
-					className="h-full"
-				/>
-			</aside>
-
-			{/* Main Map Area */}
-			<div className="relative flex-1 flex flex-col min-w-0">
-				{/* Floating controls */}
-				<div className={cn("absolute top-3 left-3 right-3 flex items-center gap-2", zClass.mapControls)}>
-					{/* Panel toggle - Desktop */}
-					<Button
-						size="icon"
-						variant="secondary"
-						className="hidden lg:flex h-9 w-9 shrink-0 bg-card/95 backdrop-blur shadow-md"
-						onClick={() => setIsPanelCollapsed(!isPanelCollapsed)}
-					>
-						{isPanelCollapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
-					</Button>
-
-					{/* Search bar - visible on all screen sizes */}
-					<div className="flex-1 max-w-sm">
-						<div className="relative">
-							<Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-							<Input
-								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
-								placeholder="Search sites..."
-								className="h-9 pl-9 pr-8 bg-card/95 backdrop-blur shadow-md text-sm"
-							/>
-							{searchQuery && (
-								<Button
-									size="icon"
-									variant="ghost"
-									className="absolute right-0.5 top-1/2 -translate-y-1/2 h-8 w-8"
-									onClick={() => setSearchQuery("")}
+			{/* Activity Feed Panel */}
+			{showFeed && (
+				<aside
+					className={cn(
+						"flex flex-col shrink-0 border-r border-border/30 bg-[#0e1217] transition-all duration-300 overflow-hidden",
+						viewMode === "feed" ? "flex-1" : "w-full md:w-[420px] lg:w-[480px]"
+					)}
+				>
+					{/* Feed header with view controls */}
+					<div className="flex items-center justify-between px-3 py-2 border-b border-border/30 bg-[#0e1217]">
+						<div className="flex items-center gap-2">
+							<span className="text-sm font-medium text-muted-foreground">View:</span>
+							<div className="flex items-center gap-0.5 p-0.5 bg-secondary/30 rounded-lg">
+								<button
+									onClick={() => setViewMode("feed")}
+									className={cn(
+										"flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium transition-colors",
+										viewMode === "feed"
+											? "bg-white text-slate-900 shadow-sm"
+											: "text-muted-foreground hover:text-foreground"
+									)}
 								>
-									<X className="h-3.5 w-3.5" />
-								</Button>
+									<List className="h-3.5 w-3.5" />
+									Feed
+								</button>
+								<button
+									onClick={() => setViewMode("split")}
+									className={cn(
+										"flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium transition-colors",
+										viewMode === "split"
+											? "bg-white text-slate-900 shadow-sm"
+											: "text-muted-foreground hover:text-foreground"
+									)}
+								>
+									Split
+								</button>
+								<button
+									onClick={() => setViewMode("map")}
+									className={cn(
+										"flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium transition-colors",
+										viewMode === "map"
+											? "bg-white text-slate-900 shadow-sm"
+											: "text-muted-foreground hover:text-foreground"
+									)}
+								>
+									<MapIcon className="h-3.5 w-3.5" />
+									Map
+								</button>
+							</div>
+						</div>
+						{viewMode !== "map" && (
+							<Button
+								size="sm"
+								variant="ghost"
+								className="h-7 gap-1.5 text-xs"
+								onClick={() => setViewMode("map")}
+							>
+								<Maximize2 className="h-3.5 w-3.5" />
+								Expand Map
+							</Button>
+						)}
+					</div>
+
+					<HomeFeed
+						sites={filteredSites}
+						onFocusSite={handleFocusSite}
+						className="flex-1"
+					/>
+				</aside>
+			)}
+
+			{/* Map Area */}
+			{showMap && (
+				<div className={cn(
+					"relative flex flex-col min-w-0 transition-all duration-300",
+					viewMode === "map" ? "flex-1" : "flex-1 hidden md:flex"
+				)}>
+					{/* Map controls overlay */}
+					<div className={cn("absolute top-3 left-3 right-3 flex items-center gap-2", zClass.mapControls)}>
+						{/* Collapse map button (when expanded) */}
+						{viewMode === "map" && (
+							<Button
+								size="icon"
+								variant="secondary"
+								className="h-9 w-9 shrink-0 bg-card/95 backdrop-blur shadow-md"
+								onClick={() => setViewMode("split")}
+							>
+								<Minimize2 className="h-4 w-4" />
+							</Button>
+						)}
+
+						{/* Search bar */}
+						<div className="flex-1 max-w-sm">
+							<div className="relative">
+								<Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+								<Input
+									value={searchQuery}
+									onChange={(e) => setSearchQuery(e.target.value)}
+									placeholder="Search sites..."
+									className="h-9 pl-9 pr-8 bg-card/95 backdrop-blur shadow-md text-sm"
+								/>
+								{searchQuery && (
+									<Button
+										size="icon"
+										variant="ghost"
+										className="absolute right-0.5 top-1/2 -translate-y-1/2 h-8 w-8"
+										onClick={() => setSearchQuery("")}
+									>
+										<X className="h-3.5 w-3.5" />
+									</Button>
+								)}
+							</div>
+						</div>
+
+						{/* Actions */}
+						<div className="flex items-center gap-2">
+							{isPending && (
+								<Badge variant="outline" className="hidden sm:flex bg-card/95 text-xs">
+									Loading...
+								</Badge>
 							)}
+							<Button
+								size="sm"
+								className="h-9 bg-card/95 backdrop-blur shadow-md"
+								variant="secondary"
+								onClick={() => setActiveEditor((prev) => (prev === "site" ? null : "site"))}
+							>
+								<Plus className="h-4 w-4 sm:mr-1.5" />
+								<span className="hidden sm:inline">Add Site</span>
+							</Button>
 						</div>
 					</div>
 
-					{/* Actions */}
-					<div className="flex items-center gap-2">
-						{isPending && (
-							<Badge variant="outline" className="hidden sm:flex bg-card/95 text-xs">
-								Loading...
-							</Badge>
-						)}
-						<Button
-							size="sm"
-							className="h-9 bg-card/95 backdrop-blur shadow-md"
-							variant="secondary"
-							onClick={() => setActiveEditor((prev) => (prev === "site" ? null : "site"))}
-						>
-							<Plus className="h-4 w-4 sm:mr-1.5" />
-							<span className="hidden sm:inline">Add Site</span>
-						</Button>
+					{/* Quick filter chips */}
+					<div className={cn("absolute top-14 left-3 flex gap-1.5 overflow-x-auto max-w-[calc(100%-1.5rem)] pb-1", zClass.mapFilters)}>
+						{QUICK_FILTERS.map((filter) => (
+							<button
+								key={filter.id}
+								onClick={() => toggleQuickFilter(filter.id)}
+								className={cn(
+									"shrink-0 rounded-full px-2.5 py-1 text-xs font-medium transition-all shadow-md",
+									activeQuickFilters.includes(filter.id)
+										? "bg-primary text-primary-foreground"
+										: "bg-card/95 backdrop-blur text-foreground hover:bg-card"
+								)}
+							>
+								{filter.label}
+							</button>
+						))}
 					</div>
+
+					{/* Floating editors */}
+					{activeEditor === "site" && (
+						<div className={cn("absolute top-24 left-3 right-3 max-w-md", zClass.mapEditors)}>
+							<SiteEditor
+								className="border border-primary/40 bg-card shadow-xl rounded-xl"
+								zones={zones}
+								site={selectedSite}
+								onClose={() => setActiveEditor(null)}
+								pendingCoordinates={pendingCoordinates}
+							/>
+						</div>
+					)}
+
+					{activeEditor === "zone" && (
+						<div className={cn("absolute top-24 left-3 right-3 max-w-md", zClass.mapEditors)}>
+							<ZoneEditor className="border border-secondary/40 bg-card shadow-xl rounded-xl" onClose={() => setActiveEditor(null)} />
+						</div>
+					)}
+
+					{/* Map */}
+					<SiteMap
+						sites={filteredSites}
+						zones={zones}
+						selectedSiteId={selectedSiteId}
+						onSelect={handleSelectSite}
+						className="h-full w-full"
+						onBoundsChange={handleBoundsChange}
+						onMapClick={(lat, lng) => {
+							if (activeEditor === "site") {
+								setPendingCoordinates({ lat, lng });
+							}
+						}}
+						onMapReady={(map) => {
+							mapRef.current = map;
+						}}
+					/>
 				</div>
-
-				{/* Quick filter chips */}
-				<div className={cn("absolute top-14 left-3 flex gap-1.5 overflow-x-auto max-w-[calc(100%-1.5rem)] pb-1", zClass.mapFilters)}>
-					{QUICK_FILTERS.map((filter) => (
-						<button
-							key={filter.id}
-							onClick={() => toggleQuickFilter(filter.id)}
-							className={cn(
-								"shrink-0 rounded-full px-2.5 py-1 text-xs font-medium transition-all shadow-md",
-								activeQuickFilters.includes(filter.id)
-									? "bg-primary text-primary-foreground"
-									: "bg-card/95 backdrop-blur text-foreground hover:bg-card"
-							)}
-						>
-							{filter.label}
-						</button>
-					))}
-				</div>
-
-				{/* Floating editors */}
-				{activeEditor === "site" && (
-					<div className={cn("absolute top-24 left-3 right-3 max-w-md", zClass.mapEditors)}>
-						<SiteEditor
-							className="border border-primary/40 bg-card shadow-xl rounded-xl"
-							zones={zones}
-							site={selectedSite}
-							onClose={() => setActiveEditor(null)}
-							pendingCoordinates={pendingCoordinates}
-						/>
-					</div>
-				)}
-
-				{activeEditor === "zone" && (
-					<div className={cn("absolute top-24 left-3 right-3 max-w-md", zClass.mapEditors)}>
-						<ZoneEditor className="border border-secondary/40 bg-card shadow-xl rounded-xl" onClose={() => setActiveEditor(null)} />
-					</div>
-				)}
-
-				{/* Map */}
-				<SiteMap
-					sites={filteredSites}
-					zones={zones}
-					selectedSiteId={selectedSiteId}
-					onSelect={handleSelectSite}
-					className="h-full w-full"
-					onBoundsChange={handleBoundsChange}
-					onMapClick={(lat, lng) => {
-						if (activeEditor === "site") {
-							setPendingCoordinates({ lat, lng });
-						}
-					}}
-					onMapReady={(map) => {
-						mapRef.current = map;
-					}}
-				/>
-			</div>
+			)}
 
 			{/* Site Detail Slide-over */}
 			<SiteSlideOver site={selectedSite} isOpen={isSlideOverOpen} onClose={handleCloseSlideOver} />

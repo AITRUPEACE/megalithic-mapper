@@ -8,24 +8,25 @@
 
 @layer base {
   :root {
-    --background: 210 40% 6%;
-    --foreground: 213 31% 91%;
-    --card: 222 47% 11%;
-    --card-foreground: 213 31% 91%;
-    --popover: 222 47% 11%;
-    --popover-foreground: 213 31% 91%;
+    /* daily.dev inspired dark theme */
+    --background: 220 20% 4%;
+    --foreground: 210 20% 93%;
+    --card: 220 18% 9%;
+    --card-foreground: 210 20% 93%;
+    --popover: 220 18% 9%;
+    --popover-foreground: 210 20% 93%;
     --primary: 23 94% 58%;
     --primary-foreground: 26 100% 96%;
-    --secondary: 200 35% 20%;
-    --secondary-foreground: 213 31% 91%;
-    --muted: 215 35% 18%;
-    --muted-foreground: 217 20% 65%;
-    --accent: 45 100% 71%;
-    --accent-foreground: 222 47% 11%;
+    --secondary: 220 15% 15%;
+    --secondary-foreground: 210 20% 93%;
+    --muted: 220 15% 15%;
+    --muted-foreground: 215 15% 55%;
+    --accent: 45 100% 65%;
+    --accent-foreground: 220 20% 4%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217 28% 25%;
-    --input: 217 28% 25%;
+    --border: 220 15% 18%;
+    --input: 220 15% 18%;
     --ring: 23 94% 58%;
     --radius: 0.75rem;
   }
@@ -367,6 +368,29 @@
 /* Prevent pull-to-refresh on iOS when drawer is open */
 .no-pull-refresh {
   overscroll-behavior-y: contain;
+}
+
+/* Custom scrollbar for sidebar/nav */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted)) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted));
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
 }
 
 /* Minimum touch target sizes (iOS HIG + Material Design) */

@@ -139,48 +139,96 @@ export const SiteEditor = ({ zones, site, onClose, className, pendingCoordinates
 		}));
 	};
 
-	const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+	const [isSaving, setIsSaving] = useState(false);
+
+	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		if (!form.name.trim() || !form.siteType.trim() || !form.summary.trim()) {
 			setMessage("Provide a name, summary, and site type before saving.");
 			return;
 		}
 
+		if (form.coordinates.lat === 0 && form.coordinates.lng === 0) {
+			setMessage("Please set coordinates by clicking on the map.");
+			return;
+		}
+
+		setIsSaving(true);
+		setMessage(null);
+
 		const links = form.mediaResources
-			.filter((m) => m.type === "link" || m.type === "video") // Treat videos as links for now
+			.filter((m) => m.type === "link" || m.type === "video")
 			.map((m) => m.url);
 
-		optimisticUpsertSite({
-			id: site?.id,
-			name: form.name.trim(),
-			slug: slugify(form.name),
-			summary: form.summary.trim(),
-			siteType: form.siteType.trim(),
-			category: form.category,
-			coordinates: form.coordinates,
-			verificationStatus: form.verificationStatus,
-			layer: form.layer,
-			trustTier: form.trustTier,
-			tags: {
-				cultures: cultureTags,
-				eras: eraTags,
-				themes: themeTags,
-			},
-			zoneIds: form.zoneIds,
-			updatedBy: form.updatedBy.trim() || "field.builder",
-			mediaCount: form.mediaResources.filter((m) => m.type !== "link").length,
-			relatedResearchIds: [],
-			evidenceLinks: links,
-		});
+		try {
+			// Save to Supabase via API
+			const response = await fetch("/api/sites", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					name: form.name.trim(),
+					slug: slugify(form.name),
+					summary: form.summary.trim(),
+					siteType: form.siteType.trim(),
+					category: form.category,
+					coordinates: form.coordinates,
+					tags: {
+						cultures: cultureTags,
+						eras: eraTags,
+						themes: themeTags,
+					},
+					zoneIds: form.zoneIds,
+				}),
+			});
 
-		setForm(DEFAULT_SITE);
-		setCultureTags([]);
-		setEraTags([]);
-		setThemeTags([]);
-		setNewMediaUrl("");
-		setNewMediaTitle("");
-		setMessage(site ? "Site updated locally. Supabase mutation pending integration." : "Site saved locally. Supabase mutation pending integration.");
-		onClose?.();
+			const result = await response.json();
+
+			if (!response.ok) {
+				throw new Error(result.error || "Failed to save site");
+			}
+
+			// Also update local state for immediate UI feedback
+			optimisticUpsertSite({
+				id: result.site?.id || site?.id,
+				name: form.name.trim(),
+				slug: slugify(form.name),
+				summary: form.summary.trim(),
+				siteType: form.siteType.trim(),
+				category: form.category,
+				coordinates: form.coordinates,
+				verificationStatus: "under_review",
+				layer: "community",
+				trustTier: "bronze",
+				tags: {
+					cultures: cultureTags,
+					eras: eraTags,
+					themes: themeTags,
+				},
+				zoneIds: form.zoneIds,
+				updatedBy: form.updatedBy.trim() || "field.builder",
+				mediaCount: form.mediaResources.filter((m) => m.type !== "link").length,
+				relatedResearchIds: [],
+				evidenceLinks: links,
+			});
+
+			setForm(DEFAULT_SITE);
+			setCultureTags([]);
+			setEraTags([]);
+			setThemeTags([]);
+			setNewMediaUrl("");
+			setNewMediaTitle("");
+			setMessage("✓ Site submitted for community review!");
+			
+			// Close after brief delay to show success message
+			setTimeout(() => {
+				onClose?.();
+			}, 1500);
+		} catch (error) {
+			console.error("Error saving site:", error);
+			setMessage(`Error: ${error instanceof Error ? error.message : "Failed to save site"}`);
+		} finally {
+			setIsSaving(false);
+		}
 	};
 
 	const addMedia = () => {
@@ -232,8 +280,8 @@ export const SiteEditor = ({ zones, site, onClose, className, pendingCoordinates
 							New site
 						</Button>
 					)}
-					<Button type="submit" size="sm">
-						{site ? "Save changes" : "Save site"}
+					<Button type="submit" size="sm" disabled={isSaving}>
+						{isSaving ? "Saving..." : site ? "Save changes" : "Submit Site"}
 					</Button>
 				</div>
 			</div>

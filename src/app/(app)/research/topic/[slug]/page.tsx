@@ -10,8 +10,8 @@ import { BookOpen, Users, MessageSquare, Plus, ArrowLeft, Share2, ThumbsUp, Exte
 import Link from "next/link";
 import { FeedPost } from "@/shared/types/content";
 
-export default async function TopicDetailPage({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export default async function TopicDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const topic = sampleTopics.find((t) => t.slug === slug);
 
   if (!topic) {

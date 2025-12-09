@@ -5,24 +5,30 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
 	Search,
-	Plus,
-	ShieldCheck,
 	Menu,
-	UserCircle,
 	Bell,
 	Settings,
 	LogOut,
-	Network,
 	Map,
-	Compass,
+	Activity,
 	MessageSquare,
-	Images,
 	BookOpen,
+	Link2,
 	Loader2,
+	Command,
+	Upload,
+	UserCircle,
+	Compass,
+	Microscope,
+	Calendar,
+	Library,
+	Eye,
+	CheckCircle2,
 } from "lucide-react";
 import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
 import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
+import { Badge } from "@/shared/ui/badge";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -35,20 +41,22 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/sh
 import { cn } from "@/shared/lib/utils";
 import { zClass } from "@/shared/lib/z-index";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { Separator } from "@/shared/ui/separator";
 
 interface AppTopbarProps {
 	onGlobalSearch?: (query: string) => void;
 }
 
-const navItems = [
-	{ href: "/map", label: "Map", icon: Map },
-	{ href: "/discover", label: "Discover", icon: Compass },
-	{ href: "/forum", label: "Forum", icon: MessageSquare },
-	{ href: "/media", label: "Media", icon: Images },
+// Mobile navigation items
+const mobileNavItems = [
+	{ href: "/map", label: "Explore Map", icon: Map, primary: true },
+	{ href: "/activity", label: "Recent Activity", icon: Activity },
+	{ href: "/research", label: "Research Projects", icon: Microscope },
 	{ href: "/texts", label: "Text Library", icon: BookOpen },
-	{ href: "/research", label: "Research Hub", icon: Network },
+	{ href: "/connections", label: "Connections", icon: Link2 },
+	{ href: "/forum", label: "Forum", icon: MessageSquare },
+	{ href: "/events", label: "Events & Tours", icon: Calendar },
 	{ href: "/notifications", label: "Notifications", icon: Bell },
-	{ href: "/profile", label: "Profile", icon: UserCircle },
 ];
 
 export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
@@ -69,7 +77,11 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 			.toUpperCase();
 	}, [profile?.full_name, user?.email]);
 	const displayName = profile?.full_name ?? profile?.username ?? user?.email ?? "Explorer";
-	const email = user?.email ?? profile?.username ?? "authenticated";
+
+	// Mock data
+	const unreadNotifications = 3;
+	const contributionCount = 142;
+	const isVerified = true;
 
 	const handleSignOut = async () => {
 		setIsSigningOut(true);
@@ -84,11 +96,12 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 	return (
 		<header
 			className={cn(
-				"relative flex h-14 shrink-0 items-center justify-between border-b border-border/60 bg-background/50 px-3 backdrop-blur sm:h-16 sm:px-4 md:px-6",
+				"relative flex h-14 shrink-0 items-center gap-3 border-b border-border/40 bg-[#0e1217] px-3 sm:px-4 md:px-5",
 				zClass.topbar
 			)}
 		>
-			<div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+			{/* Left Section: Mobile Menu + Search */}
+			<div className="flex flex-1 items-center gap-3">
 				{/* Mobile menu button */}
 				<Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
 					<SheetTrigger asChild>
@@ -97,138 +110,187 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 							<span className="sr-only">Toggle menu</span>
 						</Button>
 					</SheetTrigger>
-					<SheetContent side="left" className="w-[280px]">
+					<SheetContent side="left" className="w-[280px] bg-[#0e1217] border-border/40">
 						<SheetHeader>
 							<SheetTitle className="flex items-center gap-2">
-								<Map className="h-5 w-5 text-primary" />
-								<span className="text-sm uppercase tracking-wide text-primary">Megalithic Mapper</span>
+								<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-600 to-orange-700">
+									<Map className="h-4 w-4 text-white" />
+								</div>
+								<span className="text-sm font-bold">
+									Megalithic<span className="text-primary">Mapper</span>
+								</span>
 							</SheetTitle>
 						</SheetHeader>
-						<nav className="mt-6 flex flex-col gap-2">
-							{navItems.map((item) => {
+						<div className="mt-4">
+							<Button asChild className="w-full gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
+								<Link href="/contribute" onClick={() => setIsSheetOpen(false)}>
+									<Upload className="h-4 w-4" />
+									Add Contribution
+								</Link>
+							</Button>
+						</div>
+						<nav className="mt-6 flex flex-col gap-1">
+							{mobileNavItems.map((item) => {
 								const Icon = item.icon;
-								const targetHref = item.href === "/profile" ? profileHref : item.href;
 								const isActive = pathname.startsWith(item.href);
 								return (
 									<Link
 										key={item.href}
-										href={targetHref}
+										href={item.href}
 										onClick={() => setIsSheetOpen(false)}
 										className={cn(
-											"flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-											isActive ? "bg-secondary text-foreground" : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+											"flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+											item.primary
+												? isActive
+													? "bg-primary text-primary-foreground"
+													: "bg-primary/10 text-primary"
+												: isActive
+													? "bg-secondary text-foreground"
+													: "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
 										)}
 									>
-										<Icon className="h-4 w-4" />
+										<Icon className="h-[18px] w-[18px]" />
 										{item.label}
 									</Link>
 								);
 							})}
 						</nav>
-						<div className="absolute bottom-4 left-4 right-4 space-y-1 border-t border-border pt-4 text-xs text-muted-foreground">
+						<Separator className="my-4 bg-border/30" />
+						<div className="space-y-2 text-xs text-muted-foreground">
 							<p>
-								Connected explorers: <span className="font-semibold text-foreground">128 online</span>
+								Sites documented: <span className="font-semibold text-foreground">2,847</span>
 							</p>
 							<p>
-								Research projects active today: <span className="font-semibold text-foreground">6</span>
+								Active researchers: <span className="font-semibold text-foreground">128 online</span>
 							</p>
 						</div>
 					</SheetContent>
 				</Sheet>
 
-				{/* Desktop Research Hub link */}
-				<Link
-					href="/research"
-					className={cn(
-						"hidden items-center gap-1 rounded-md border border-primary/30 px-3 py-1 text-xs font-medium uppercase tracking-wide text-primary md:inline-flex",
-						pathname.startsWith("/research") && "bg-primary/10"
-					)}
-				>
-					Research Hub
-				</Link>
-
-				{/* Mobile search button */}
-				<Button variant="ghost" size="icon" className="md:hidden">
-					<Search className="h-5 w-5" />
-					<span className="sr-only">Search</span>
-				</Button>
-			</div>
-
-			<div className="flex shrink-0 items-center gap-1.5 sm:gap-2 md:gap-3">
-				{/* New Contribution button */}
-				<Button asChild size="sm" variant="secondary" className="hidden md:flex">
-					<Link href="/map#new-site">
-						<Plus className="mr-1 h-4 w-4" />
-						New Contribution
-					</Link>
-				</Button>
-
-				{/* Mobile compact version */}
-				<Button asChild size="icon" variant="secondary" className="h-8 w-8 md:hidden">
-					<Link href="/map#new-site">
-						<Plus className="h-4 w-4" />
-					</Link>
-				</Button>
-
-				{/* Desktop search */}
-				<div className="relative hidden w-[200px] lg:block">
+				{/* Search Bar */}
+				<div className="relative w-full max-w-md">
 					<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 					<Input
-						placeholder="Search the platform..."
-						className="h-8 w-full rounded-full border-border/40 bg-background/70 pl-9 text-xs"
+						placeholder="Search sites, media, researchers..."
+						className="h-9 w-full rounded-xl border-border/40 bg-secondary/30 pl-9 pr-12 text-sm placeholder:text-muted-foreground/60 focus:bg-secondary/50 focus:ring-1 focus:ring-primary/30"
 						onChange={(event) => onGlobalSearch?.(event.target.value)}
 					/>
+					<kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-0.5 rounded bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
+						<Command className="h-2.5 w-2.5" />
+						<span>K</span>
+					</kbd>
 				</div>
+			</div>
 
-				{/* Desktop verification button */}
-				<Button asChild size="sm" variant="ghost" className="hidden lg:flex">
-					<Link href={profileHref}>
-						<ShieldCheck className="mr-1 h-4 w-4" />
-						Request Verification
-					</Link>
-				</Button>
+			{/* Right Section: Actions */}
+			<div className="flex items-center gap-2">
+				{/* Contribution Count - Desktop only */}
+				<Link
+					href="/library/contributions"
+					className="hidden sm:flex items-center gap-1.5 rounded-lg bg-secondary/30 px-2.5 py-1.5 hover:bg-secondary/50 transition-colors"
+				>
+					<Upload className="h-4 w-4 text-primary" />
+					<span className="text-sm font-semibold text-foreground">{contributionCount}</span>
+				</Link>
 
-				{/* Notifications button - mobile and desktop */}
-				<Button asChild variant="ghost" size="icon" className="hidden md:flex">
+				{/* Notifications */}
+				<Button
+					variant="ghost"
+					size="icon"
+					className="relative h-9 w-9 rounded-lg text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+					asChild
+				>
 					<Link href="/notifications">
 						<Bell className="h-4 w-4" />
-						<span className="sr-only">Notifications</span>
+						{unreadNotifications > 0 && (
+							<span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+								{unreadNotifications}
+							</span>
+						)}
 					</Link>
 				</Button>
 
 				{/* Profile dropdown */}
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" className="relative h-8 w-8 rounded-full">
-							<Avatar className="h-8 w-8">
-								<AvatarFallback>{initials}</AvatarFallback>
+						<Button variant="ghost" className="relative h-9 w-9 rounded-full p-0 hover:ring-2 hover:ring-primary/30">
+							<Avatar className="h-8 w-8 border border-border/40">
+								<AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-xs font-semibold">
+									{initials}
+								</AvatarFallback>
 							</Avatar>
+							{isVerified && (
+								<CheckCircle2 className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 text-blue-400 fill-blue-400 bg-[#0e1217] rounded-full" />
+							)}
 						</Button>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent className="w-56" align="end" forceMount>
+					<DropdownMenuContent className="w-60 bg-[#1a1f26] border-border/40" align="end" forceMount>
 						<DropdownMenuLabel className="font-normal">
-							<div className="flex flex-col space-y-1">
-								<p className="text-sm font-medium leading-none">{authLoading ? "Loading profile…" : displayName}</p>
-								<p className="text-xs leading-none text-muted-foreground">{email}</p>
+							<div className="flex items-center gap-3">
+								<Avatar className="h-10 w-10 border border-border/40">
+									<AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20">
+										{initials}
+									</AvatarFallback>
+								</Avatar>
+								<div className="flex flex-col space-y-0.5">
+									<div className="flex items-center gap-1.5">
+										<p className="text-sm font-semibold leading-none">
+											{authLoading ? "Loading..." : displayName}
+										</p>
+										{isVerified && (
+											<CheckCircle2 className="h-3.5 w-3.5 text-blue-400 fill-blue-400" />
+										)}
+									</div>
+									<p className="text-xs leading-none text-muted-foreground">
+										@{profile?.username ?? "explorer"}
+									</p>
+								</div>
 							</div>
 						</DropdownMenuLabel>
-						<DropdownMenuSeparator />
+
+						{/* Contribution Stats */}
+						<div className="flex items-center justify-around px-2 py-3 border-y border-border/30 my-2">
+							<div className="flex flex-col items-center">
+								<span className="text-sm font-bold">{contributionCount}</span>
+								<span className="text-[10px] text-muted-foreground">Contributions</span>
+							</div>
+							<div className="flex flex-col items-center">
+								<span className="text-sm font-bold">24</span>
+								<span className="text-[10px] text-muted-foreground">Sites</span>
+							</div>
+							<div className="flex flex-col items-center">
+								<span className="text-sm font-bold">8</span>
+								<span className="text-[10px] text-muted-foreground">Following</span>
+							</div>
+						</div>
+
 						<DropdownMenuItem asChild>
 							<Link href={profileHref} className="cursor-pointer">
 								<UserCircle className="mr-2 h-4 w-4" />
 								<span>Profile</span>
 							</Link>
 						</DropdownMenuItem>
+						<DropdownMenuItem asChild>
+							<Link href="/library/contributions" className="cursor-pointer">
+								<Upload className="mr-2 h-4 w-4" />
+								<span>My Contributions</span>
+							</Link>
+						</DropdownMenuItem>
+						<DropdownMenuItem asChild>
+							<Link href="/library/saved" className="cursor-pointer">
+								<Library className="mr-2 h-4 w-4" />
+								<span>Saved Sites</span>
+							</Link>
+						</DropdownMenuItem>
 						<DropdownMenuItem asChild className="md:hidden">
 							<Link href="/notifications" className="cursor-pointer">
 								<Bell className="mr-2 h-4 w-4" />
 								<span>Notifications</span>
-							</Link>
-						</DropdownMenuItem>
-						<DropdownMenuItem asChild className="lg:hidden">
-							<Link href={profileHref} className="cursor-pointer">
-								<ShieldCheck className="mr-2 h-4 w-4" />
-								<span>Request Verification</span>
+								{unreadNotifications > 0 && (
+									<Badge variant="destructive" className="ml-auto h-5 px-1.5 text-[10px]">
+										{unreadNotifications}
+									</Badge>
+								)}
 							</Link>
 						</DropdownMenuItem>
 						<DropdownMenuItem asChild>
@@ -237,9 +299,9 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 								<span>Settings</span>
 							</Link>
 						</DropdownMenuItem>
-						<DropdownMenuSeparator />
+						<DropdownMenuSeparator className="bg-border/30" />
 						<DropdownMenuItem
-							className="cursor-pointer text-destructive"
+							className="cursor-pointer text-destructive focus:text-destructive"
 							onSelect={(event) => {
 								event.preventDefault();
 								if (!isSigningOut) {
