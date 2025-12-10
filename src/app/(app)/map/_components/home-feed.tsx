@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
 	Sparkles,
@@ -31,52 +31,76 @@ import { Button } from "@/shared/ui/button";
 import { ScrollArea } from "@/shared/ui/scroll-area";
 import { cn, timeAgo } from "@/shared/lib/utils";
 import type { MapSiteFeature } from "@/entities/map/model/types";
+import { ActivityDetailDrawer, type FeedItem as BaseFeedItem } from "./activity-detail-drawer";
+
+// Extended FeedItem with enhanced activity tracking fields
+interface FeedItem extends BaseFeedItem {
+	sourceType?: "official" | "community" | "system";
+	changeType?: ChangeType;
+	changeMagnitude?: number;
+	mediaCount?: number;
+}
 
 // Feed sorting options
-type SortMode = "hot" | "new" | "top";
+type SortMode = "smart" | "hot" | "new" | "top";
+
+// Source filter types
+type SourceFilter = "all" | "official" | "community";
 
 // Activity/contribution types
-type ContributionType =
-	| "new_photos"
-	| "new_video"
-	| "research_update"
-	| "site_update"
-	| "expert_post"
-	| "connection_found"
-	| "event_announcement";
+type ContributionType = "new_photos" | "new_video" | "research_update" | "site_update" | "expert_post" | "connection_found" | "event_announcement";
 
-interface FeedItem {
-	id: string;
-	type: ContributionType;
-	siteId?: string;
-	siteName?: string;
-	siteLocation?: string;
-	title: string;
-	description: string;
-	author: {
-		name: string;
-		username: string;
-		avatar?: string;
-		isVerified?: boolean;
-		badge?: string; // "YouTuber", "Researcher", "Expert"
-	};
-	timestamp: Date;
-	engagement: {
-		upvotes: number;
-		comments: number;
-		views: number;
-	};
-	media?: {
-		type: "image" | "video" | "youtube";
-		thumbnail?: string;
-		count?: number;
-	};
-	tags: string[];
-	externalLink?: {
-		url: string;
-		domain: string;
-	};
+// Change types for more specific labels
+type ChangeType =
+	| "new_site"
+	| "site_verified"
+	| "video_added"
+	| "photos_added"
+	| "document_added"
+	| "description_updated"
+	| "coordinates_updated"
+	| "metadata_updated"
+	| "trending"
+	| "milestone"
+	| "post_created"
+	| "research_published"
+	| "event_announced"
+	| "connection_proposed";
+
+// Human-readable labels for change types
+const CHANGE_LABELS: Record<ChangeType, string> = {
+	new_site: "New site",
+	site_verified: "Verified",
+	video_added: "Video added",
+	document_added: "Document added",
+	photos_added: "Photos added",
+	description_updated: "Description updated",
+	coordinates_updated: "Location corrected",
+	metadata_updated: "Details updated",
+	trending: "Trending",
+	milestone: "Milestone",
+	post_created: "New discussion",
+	research_published: "Research published",
+	event_announced: "Event announced",
+	connection_proposed: "Connection discovered",
+};
+
+// Get descriptive label for activity, using changeType when available
+function getActivityLabel(item: FeedItem): string {
+	if (item.changeType) {
+		const changeType = item.changeType as ChangeType;
+		const label = CHANGE_LABELS[changeType];
+		// Add count for photos
+		if (changeType === "photos_added" && item.mediaCount && item.mediaCount > 1) {
+			return `${item.mediaCount} photos added`;
+		}
+		return label || item.type.replace(/_/g, " ");
+	}
+	// Fall back to config label for contribution type
+	return contributionConfig[item.type]?.label || item.type.replace(/_/g, " ");
 }
+
+// FeedItem type is imported from activity-detail-drawer
 
 interface HomeFeedProps {
 	sites: MapSiteFeature[];
@@ -142,7 +166,7 @@ function generateFeedItems(sites: MapSiteFeature[]): FeedItem[] {
 	const items: FeedItem[] = [];
 	const now = new Date();
 
-	// Expert video post
+	// Expert video post (Official - high magnitude)
 	items.push({
 		id: "feed-1",
 		type: "new_video",
@@ -163,9 +187,13 @@ function generateFeedItems(sites: MapSiteFeature[]): FeedItem[] {
 		media: { type: "youtube", thumbnail: "/api/placeholder/640/360" },
 		tags: ["polygonal-masonry", "sacsayhuaman", "precision"],
 		externalLink: { url: "https://youtube.com", domain: "youtube.com" },
+		// Enhanced activity fields
+		sourceType: "official",
+		changeType: "video_added",
+		changeMagnitude: 85,
 	});
 
-	// New photos contribution
+	// New photos contribution (Community - medium-high magnitude)
 	items.push({
 		id: "feed-2",
 		type: "new_photos",
@@ -184,9 +212,14 @@ function generateFeedItems(sites: MapSiteFeature[]): FeedItem[] {
 		engagement: { upvotes: 892, comments: 156, views: 8900 },
 		media: { type: "image", count: 12 },
 		tags: ["gobekli-tepe", "pillar-43", "photography"],
+		// Enhanced activity fields
+		sourceType: "community",
+		changeType: "photos_added",
+		changeMagnitude: 70,
+		mediaCount: 12,
 	});
 
-	// Research update
+	// Research update (Official - high magnitude)
 	items.push({
 		id: "feed-3",
 		type: "research_update",
@@ -204,9 +237,13 @@ function generateFeedItems(sites: MapSiteFeature[]): FeedItem[] {
 		timestamp: new Date(now.getTime() - 8 * 60 * 60 * 1000),
 		engagement: { upvotes: 1456, comments: 234, views: 12400 },
 		tags: ["acoustics", "giza", "resonance"],
+		// Enhanced activity fields
+		sourceType: "official",
+		changeType: "research_published",
+		changeMagnitude: 75,
 	});
 
-	// Connection found
+	// Connection found (Community - medium-high magnitude)
 	items.push({
 		id: "feed-4",
 		type: "connection_found",
@@ -221,24 +258,30 @@ function generateFeedItems(sites: MapSiteFeature[]): FeedItem[] {
 		timestamp: new Date(now.getTime() - 12 * 60 * 60 * 1000),
 		engagement: { upvotes: 567, comments: 89, views: 4200 },
 		tags: ["astronomy", "alignments", "archaeoastronomy"],
+		// Enhanced activity fields
+		sourceType: "community",
+		changeType: "connection_proposed",
+		changeMagnitude: 70,
 	});
 
-	// Site update
+	// Site updates (Community - varying magnitudes)
+	// These demonstrate the priority system: low-magnitude updates without engagement get deprioritized
+	const siteUpdateTypes: { changeType: ChangeType; magnitude: number; desc: string }[] = [
+		{ changeType: "coordinates_updated", magnitude: 45, desc: "47 coordinate points, updated measurements" },
+		{ changeType: "photos_added", magnitude: 70, desc: "12 new photographs added" },
+		{ changeType: "description_updated", magnitude: 50, desc: "Description and summary updated" },
+	];
+
 	sites.slice(0, 3).forEach((site, i) => {
+		const update = siteUpdateTypes[i];
 		items.push({
 			id: `site-update-${site.id}`,
 			type: "site_update",
 			siteId: site.id,
 			siteName: site.name,
 			siteLocation: site.tags.cultures[0] || "Unknown",
-			title: `Site Profile Updated: ${site.name}`,
-			description: `New data added: ${
-				i === 0
-					? "47 coordinate points, updated measurements"
-					: i === 1
-						? "12 new photographs, updated description"
-						: "3D model reference, material analysis"
-			}`,
+			title: `${site.name}: ${CHANGE_LABELS[update.changeType]}`,
+			description: update.desc,
 			author: {
 				name: "Community Contributor",
 				username: "contributor_" + (i + 1),
@@ -250,10 +293,15 @@ function generateFeedItems(sites: MapSiteFeature[]): FeedItem[] {
 				views: Math.floor(Math.random() * 2000 + 500),
 			},
 			tags: site.tags.themes.slice(0, 2),
+			// Enhanced activity fields - community updates with lower magnitude
+			sourceType: "community",
+			changeType: update.changeType,
+			changeMagnitude: update.magnitude,
+			mediaCount: i === 1 ? 12 : undefined,
 		});
 	});
 
-	// Event
+	// Event (Official - medium-high magnitude)
 	items.push({
 		id: "feed-event-1",
 		type: "event_announcement",
@@ -268,6 +316,10 @@ function generateFeedItems(sites: MapSiteFeature[]): FeedItem[] {
 		timestamp: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000),
 		engagement: { upvotes: 1234, comments: 67, views: 15600 },
 		tags: ["event", "egypt", "tour"],
+		// Enhanced activity fields
+		sourceType: "official",
+		changeType: "event_announced",
+		changeMagnitude: 65,
 	});
 
 	return items;
@@ -275,22 +327,40 @@ function generateFeedItems(sites: MapSiteFeature[]): FeedItem[] {
 
 // Calculate "hotness" score
 function calculateHotScore(item: FeedItem): number {
-	const hoursSincePost =
-		(Date.now() - item.timestamp.getTime()) / (1000 * 60 * 60);
-	const engagementScore =
-		item.engagement.upvotes * 1 +
-		item.engagement.comments * 2 +
-		item.engagement.views * 0.01;
+	const hoursSincePost = (Date.now() - item.timestamp.getTime()) / (1000 * 60 * 60);
+	const engagementScore = item.engagement.upvotes * 1 + item.engagement.comments * 2 + item.engagement.views * 0.01;
 	// Decay factor - newer posts get boosted
 	const decay = Math.pow(0.95, hoursSincePost);
 	return engagementScore * decay;
 }
 
 export function HomeFeed({ sites, onFocusSite, className }: HomeFeedProps) {
-	const [sortMode, setSortMode] = useState<SortMode>("hot");
+	const [sortMode, setSortMode] = useState<SortMode>("smart");
+	const [sourceFilter, setSourceFilter] = useState<SourceFilter>("all");
 	const [apiFeedItems, setApiFeedItems] = useState<FeedItem[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
+	const [selectedItem, setSelectedItem] = useState<FeedItem | null>(null);
+	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+	const handleOpenDetail = useCallback((item: FeedItem) => {
+		setSelectedItem(item);
+		setIsDrawerOpen(true);
+	}, []);
+
+	const handleCloseDrawer = useCallback(() => {
+		setIsDrawerOpen(false);
+		// Delay clearing selected item for exit animation
+		setTimeout(() => setSelectedItem(null), 300);
+	}, []);
+
+	const handleFocusSiteFromDrawer = useCallback(
+		(siteId: string) => {
+			handleCloseDrawer();
+			onFocusSite(siteId);
+		},
+		[handleCloseDrawer, onFocusSite]
+	);
 
 	// Fetch feed from API
 	useEffect(() => {
@@ -298,11 +368,11 @@ export function HomeFeed({ sites, onFocusSite, className }: HomeFeedProps) {
 			setIsLoading(true);
 			setError(null);
 			try {
-				const response = await fetch(`/api/feed?sort=${sortMode}&limit=30`);
+				const response = await fetch(`/api/feed?sort=${sortMode}&source=${sourceFilter}&limit=30`);
 				if (!response.ok) throw new Error("Failed to fetch feed");
-				
+
 				const data = await response.json();
-				
+
 				// Transform API response to FeedItem format
 				const items: FeedItem[] = (data.feed || []).map((item: any) => ({
 					id: item.id,
@@ -325,15 +395,25 @@ export function HomeFeed({ sites, onFocusSite, className }: HomeFeedProps) {
 						comments: 0,
 						views: 0,
 					},
-					media: item.thumbnail_url ? { type: "image", thumbnail: item.thumbnail_url } : 
-					       item.metadata?.external_links?.[0]?.type === "youtube" ? { type: "youtube", thumbnail: item.metadata.external_links[0].thumbnail } : undefined,
+					media: item.thumbnail_url
+						? { type: "image", thumbnail: item.thumbnail_url }
+						: item.metadata?.external_links?.[0]?.type === "youtube"
+						? { type: "youtube", thumbnail: item.metadata.external_links[0].thumbnail }
+						: undefined,
 					tags: [],
-					externalLink: item.metadata?.external_links?.[0] ? {
-						url: item.metadata.external_links[0].url,
-						domain: new URL(item.metadata.external_links[0].url).hostname.replace("www.", ""),
-					} : undefined,
+					externalLink: item.metadata?.external_links?.[0]
+						? {
+								url: item.metadata.external_links[0].url,
+								domain: new URL(item.metadata.external_links[0].url).hostname.replace("www.", ""),
+						  }
+						: undefined,
+					// New fields for enhanced activity tracking
+					sourceType: item.source_type || "community",
+					changeType: item.change_type,
+					changeMagnitude: item.change_magnitude || 50,
+					mediaCount: item.media_count || 0,
 				}));
-				
+
 				setApiFeedItems(items);
 			} catch (err) {
 				console.error("Error fetching feed:", err);
@@ -342,9 +422,9 @@ export function HomeFeed({ sites, onFocusSite, className }: HomeFeedProps) {
 				setIsLoading(false);
 			}
 		}
-		
+
 		fetchFeed();
-	}, [sortMode]);
+	}, [sortMode, sourceFilter]);
 
 	// Fallback to generated items if API returns nothing
 	const generatedItems = useMemo(() => generateFeedItems(sites), [sites]);
@@ -354,17 +434,11 @@ export function HomeFeed({ sites, onFocusSite, className }: HomeFeedProps) {
 		const sorted = [...feedItems];
 		switch (sortMode) {
 			case "hot":
-				return sorted.sort(
-					(a, b) => calculateHotScore(b) - calculateHotScore(a)
-				);
+				return sorted.sort((a, b) => calculateHotScore(b) - calculateHotScore(a));
 			case "new":
-				return sorted.sort(
-					(a, b) => b.timestamp.getTime() - a.timestamp.getTime()
-				);
+				return sorted.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 			case "top":
-				return sorted.sort(
-					(a, b) => b.engagement.upvotes - a.engagement.upvotes
-				);
+				return sorted.sort((a, b) => b.engagement.upvotes - a.engagement.upvotes);
 			default:
 				return sorted;
 		}
@@ -384,39 +458,71 @@ export function HomeFeed({ sites, onFocusSite, className }: HomeFeedProps) {
 	}
 
 	const sortOptions: { key: SortMode; label: string; icon: typeof Flame }[] = [
+		{ key: "smart", label: "Smart", icon: Sparkles },
 		{ key: "hot", label: "Hot", icon: Flame },
 		{ key: "new", label: "New", icon: Clock },
 		{ key: "top", label: "Top", icon: TrendingUp },
 	];
 
+	const sourceOptions: { key: SourceFilter; label: string }[] = [
+		{ key: "all", label: "All" },
+		{ key: "official", label: "Official" },
+		{ key: "community", label: "Community" },
+	];
+
 	return (
 		<div className={cn("flex flex-col h-full", className)}>
 			{/* Header */}
-			<div className="flex items-center justify-between px-4 py-3 border-b border-border/30">
-				<div className="flex items-center gap-2">
-					<Sparkles className="h-5 w-5 text-primary" />
-					<h2 className="font-semibold">Activity Feed</h2>
+			<div className="flex flex-col gap-2 px-4 py-3 border-b border-border/30">
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-2">
+						<Sparkles className="h-5 w-5 text-primary" />
+						<h2 className="font-semibold">Activity Feed</h2>
+					</div>
+					{/* Sort toggle */}
+					<div className="flex items-center gap-1 p-0.5 bg-secondary/50 rounded-lg">
+						{sortOptions.map((opt) => {
+							const Icon = opt.icon;
+							return (
+								<button
+									key={opt.key}
+									onClick={() => setSortMode(opt.key)}
+									className={cn(
+										"flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors",
+										sortMode === opt.key ? "bg-white text-slate-900 shadow-sm" : "text-muted-foreground hover:text-foreground"
+									)}
+								>
+									<Icon className="h-3.5 w-3.5" />
+									{opt.label}
+								</button>
+							);
+						})}
+					</div>
 				</div>
-				{/* Sort toggle */}
-				<div className="flex items-center gap-1 p-0.5 bg-secondary/50 rounded-lg">
-					{sortOptions.map((opt) => {
-						const Icon = opt.icon;
-						return (
+
+				{/* Source filter toggle (Official / Community) */}
+				<div className="flex items-center justify-between">
+					<span className="text-xs text-muted-foreground">Show activity from:</span>
+					<div className="flex items-center gap-1 p-0.5 bg-secondary/30 rounded-lg">
+						{sourceOptions.map((opt) => (
 							<button
 								key={opt.key}
-								onClick={() => setSortMode(opt.key)}
+								onClick={() => setSourceFilter(opt.key)}
 								className={cn(
-									"flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors",
-									sortMode === opt.key
-										? "bg-white text-slate-900 shadow-sm"
+									"px-2.5 py-1 rounded-md text-xs font-medium transition-colors",
+									sourceFilter === opt.key
+										? opt.key === "official"
+											? "bg-blue-500/20 text-blue-400 shadow-sm"
+											: opt.key === "community"
+											? "bg-emerald-500/20 text-emerald-400 shadow-sm"
+											: "bg-white text-slate-900 shadow-sm"
 										: "text-muted-foreground hover:text-foreground"
 								)}
 							>
-								<Icon className="h-3.5 w-3.5" />
 								{opt.label}
 							</button>
-						);
-					})}
+						))}
+					</div>
 				</div>
 			</div>
 
@@ -445,11 +551,7 @@ export function HomeFeed({ sites, onFocusSite, className }: HomeFeedProps) {
 					) : (
 						<>
 							{sortedItems.map((item) => (
-								<FeedCard
-									key={item.id}
-									item={item}
-									onFocusSite={onFocusSite}
-								/>
+								<FeedCard key={item.id} item={item} onFocusSite={onFocusSite} onOpenDetail={handleOpenDetail} />
 							))}
 
 							{/* Load more */}
@@ -463,6 +565,9 @@ export function HomeFeed({ sites, onFocusSite, className }: HomeFeedProps) {
 					)}
 				</div>
 			</ScrollArea>
+
+			{/* Activity Detail Drawer */}
+			<ActivityDetailDrawer item={selectedItem} isOpen={isDrawerOpen} onClose={handleCloseDrawer} onFocusSite={handleFocusSiteFromDrawer} />
 		</div>
 	);
 }
@@ -471,16 +576,21 @@ export function HomeFeed({ sites, onFocusSite, className }: HomeFeedProps) {
 function FeedCard({
 	item,
 	onFocusSite,
+	onOpenDetail,
 }: {
 	item: FeedItem;
 	onFocusSite: (siteId: string) => void;
+	onOpenDetail: (item: FeedItem) => void;
 }) {
 	const [isUpvoted, setIsUpvoted] = useState(false);
 	const config = contributionConfig[item.type];
 	const Icon = config.icon;
 
 	return (
-		<Card className="overflow-hidden border-border/40 bg-[#1a1f26] hover:bg-[#1e232b] transition-colors">
+		<Card
+			className="overflow-hidden border-border/40 bg-[#1a1f26] hover:bg-[#1e232b] transition-colors cursor-pointer group"
+			onClick={() => onOpenDetail(item)}
+		>
 			<CardHeader className="p-3 pb-2">
 				<div className="flex items-start gap-3">
 					{/* Author avatar */}
@@ -497,37 +607,32 @@ function FeedCard({
 
 					<div className="flex-1 min-w-0">
 						<div className="flex items-center gap-2 flex-wrap">
-							<span className="font-medium text-sm">
-								{item.author.name}
-							</span>
+							<span className="font-medium text-sm">{item.author.name}</span>
 							{item.author.isVerified && (
-								<Badge
-									variant="secondary"
-									className="h-4 px-1 text-[9px] bg-blue-500/20 text-blue-400"
-								>
+								<Badge variant="secondary" className="h-4 px-1 text-[9px] bg-blue-500/20 text-blue-400">
 									✓
 								</Badge>
 							)}
 							{item.author.badge && (
-								<Badge
-									variant="outline"
-									className="h-4 px-1.5 text-[9px] border-primary/40 text-primary"
-								>
+								<Badge variant="outline" className="h-4 px-1.5 text-[9px] border-primary/40 text-primary">
 									{item.author.badge}
 								</Badge>
 							)}
-							<span className="text-xs text-muted-foreground">
-								• {item.type.replace(/_/g, " ")}
-							</span>
+							{/* Show source badge for official content */}
+							{item.sourceType === "official" && (
+								<Badge variant="secondary" className="h-4 px-1.5 text-[9px] bg-blue-500/10 text-blue-400 border-blue-500/30">
+									Official
+								</Badge>
+							)}
+							{/* Descriptive activity label instead of generic type */}
+							<span className="text-xs text-muted-foreground">• {getActivityLabel(item)}</span>
 						</div>
 						<div className="flex items-center gap-1.5 mt-0.5 text-xs text-muted-foreground">
 							{item.siteName && (
 								<>
 									<MapPin className="h-3 w-3" />
 									<span>{item.siteName}</span>
-									{item.siteLocation && (
-										<span>• {item.siteLocation}</span>
-									)}
+									{item.siteLocation && <span>• {item.siteLocation}</span>}
 								</>
 							)}
 						</div>
@@ -542,14 +647,10 @@ function FeedCard({
 
 			<CardContent className="px-3 py-2">
 				{/* Title */}
-				<h3 className="font-semibold text-sm leading-tight mb-1.5">
-					{item.title}
-				</h3>
+				<h3 className="font-semibold text-sm leading-tight mb-1.5">{item.title}</h3>
 
 				{/* Description */}
-				<p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-2">
-					{item.description}
-				</p>
+				<p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-2">{item.description}</p>
 
 				{/* Media preview */}
 				{item.media && (
@@ -564,9 +665,7 @@ function FeedCard({
 							<div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-pink-900/30 to-pink-950/50">
 								<div className="text-center">
 									<ImageIcon className="h-8 w-8 text-pink-400 mx-auto mb-1" />
-									<span className="text-sm font-medium text-pink-300">
-										{item.media.count} photos
-									</span>
+									<span className="text-sm font-medium text-pink-300">{item.media.count} photos</span>
 								</div>
 							</div>
 						) : null}
@@ -579,22 +678,18 @@ function FeedCard({
 						href={item.externalLink.url}
 						target="_blank"
 						rel="noopener noreferrer"
+						onClick={(e) => e.stopPropagation()}
 						className="flex items-center gap-2 p-2 rounded-lg bg-secondary/30 hover:bg-secondary/50 transition-colors text-xs mb-2"
 					>
 						<ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
-						<span className="text-muted-foreground">
-							{item.externalLink.domain}
-						</span>
+						<span className="text-muted-foreground">{item.externalLink.domain}</span>
 					</a>
 				)}
 
 				{/* Tags */}
 				<div className="flex flex-wrap gap-1.5">
 					{item.tags.slice(0, 3).map((tag) => (
-						<span
-							key={tag}
-							className="text-[10px] text-primary hover:underline cursor-pointer"
-						>
+						<span key={tag} className="text-[10px] text-primary hover:underline cursor-pointer">
 							#{tag}
 						</span>
 					))}
@@ -605,22 +700,21 @@ function FeedCard({
 				<div className="flex items-center gap-3">
 					{/* Upvote */}
 					<button
-						onClick={() => setIsUpvoted(!isUpvoted)}
+						onClick={(e) => {
+							e.stopPropagation();
+							setIsUpvoted(!isUpvoted);
+						}}
 						className={cn(
 							"flex items-center gap-1.5 text-xs transition-colors",
-							isUpvoted
-								? "text-primary"
-								: "text-muted-foreground hover:text-foreground"
+							isUpvoted ? "text-primary" : "text-muted-foreground hover:text-foreground"
 						)}
 					>
-						<ThumbsUp
-							className={cn("h-3.5 w-3.5", isUpvoted && "fill-current")}
-						/>
+						<ThumbsUp className={cn("h-3.5 w-3.5", isUpvoted && "fill-current")} />
 						{item.engagement.upvotes + (isUpvoted ? 1 : 0)}
 					</button>
 
 					{/* Comments */}
-					<button className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+					<button onClick={(e) => e.stopPropagation()} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
 						<MessageSquare className="h-3.5 w-3.5" />
 						{item.engagement.comments}
 					</button>
@@ -628,17 +722,13 @@ function FeedCard({
 					{/* Views */}
 					<span className="flex items-center gap-1.5 text-xs text-muted-foreground">
 						<Eye className="h-3.5 w-3.5" />
-						{item.engagement.views > 1000
-							? `${(item.engagement.views / 1000).toFixed(1)}K`
-							: item.engagement.views}
+						{item.engagement.views > 1000 ? `${(item.engagement.views / 1000).toFixed(1)}K` : item.engagement.views}
 					</span>
 				</div>
 
 				<div className="flex items-center gap-2">
 					{/* Timestamp */}
-					<span className="text-[10px] text-muted-foreground">
-						{timeAgo(item.timestamp)}
-					</span>
+					<span className="text-[10px] text-muted-foreground">{timeAgo(item.timestamp.toISOString())}</span>
 
 					{/* Focus on map */}
 					{item.siteId && (
@@ -646,7 +736,10 @@ function FeedCard({
 							variant="ghost"
 							size="icon"
 							className="h-7 w-7"
-							onClick={() => onFocusSite(item.siteId!)}
+							onClick={(e) => {
+								e.stopPropagation();
+								onFocusSite(item.siteId!);
+							}}
 						>
 							<MapPin className="h-3.5 w-3.5" />
 						</Button>
@@ -656,4 +749,3 @@ function FeedCard({
 		</Card>
 	);
 }
-

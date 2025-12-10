@@ -9,9 +9,10 @@ export async function GET(request: NextRequest) {
     const mapSchema = supabase.schema(SUPABASE_SCHEMA);
     
     const { searchParams } = new URL(request.url);
-    const sortBy = searchParams.get("sort") || "new"; // hot, new, top
+    const sortBy = searchParams.get("sort") || "smart"; // smart, hot, new, top
     const siteId = searchParams.get("siteId"); // Filter by site
     const activityType = searchParams.get("type"); // Filter by type
+    const sourceFilter = searchParams.get("source") || "all"; // all, official, community
     const limit = parseInt(searchParams.get("limit") || "30");
     const offset = parseInt(searchParams.get("offset") || "0");
 
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
       .select(`
         id, activity_type, actor_id, target_type, target_id, site_id,
         title, description, thumbnail_url, metadata, engagement_score,
-        created_at
+        created_at, source_type, change_type, change_magnitude, media_count, change_details
       `)
       .range(offset, offset + limit - 1);
 
@@ -43,8 +44,28 @@ export async function GET(request: NextRequest) {
       query = query.eq("activity_type", activityType);
     }
 
+    // Apply source filter (official/community)
+    if (sourceFilter && sourceFilter !== "all") {
+      query = query.eq("source_type", sourceFilter);
+    }
+
+    // For community-only view, filter out low-impact updates without engagement
+    if (sourceFilter === "community") {
+      // Only show community updates with magnitude >= 40 OR engagement >= 5
+      query = query.or("change_magnitude.gte.40,engagement_score.gte.5");
+    }
+
     // Apply sorting
     switch (sortBy) {
+      case "smart":
+        // Smart sort: prioritize by magnitude + official status + recency
+        // Official sources first, then by magnitude, then engagement, then time
+        query = query
+          .order("source_type", { ascending: true }) // 'community' < 'official' alphabetically, we want official first
+          .order("change_magnitude", { ascending: false, nullsFirst: false })
+          .order("engagement_score", { ascending: false })
+          .order("created_at", { ascending: false });
+        break;
       case "hot":
         query = query.order("engagement_score", { ascending: false })
                      .order("created_at", { ascending: false });
@@ -53,8 +74,14 @@ export async function GET(request: NextRequest) {
         query = query.order("engagement_score", { ascending: false });
         break;
       case "new":
-      default:
         query = query.order("created_at", { ascending: false });
+        break;
+      default:
+        // Default to smart sort
+        query = query
+          .order("change_magnitude", { ascending: false, nullsFirst: false })
+          .order("engagement_score", { ascending: false })
+          .order("created_at", { ascending: false });
         break;
     }
 
@@ -85,12 +112,18 @@ export async function GET(request: NextRequest) {
     const feedWithActors = feedItems?.map(item => ({
       ...item,
       actor: item.actor_id ? actors[item.actor_id] : null,
+      // Provide default values for new columns if they don't exist yet
+      source_type: item.source_type || "community",
+      change_type: item.change_type || mapActivityToChangeType(item.activity_type),
+      change_magnitude: item.change_magnitude || getDefaultMagnitude(item.activity_type),
+      media_count: item.media_count || 0,
     }));
 
     return NextResponse.json({ 
       feed: feedWithActors,
       meta: {
         sortBy,
+        sourceFilter,
         limit,
         offset,
         count: feedItems?.length || 0,
@@ -212,6 +245,7 @@ async function getFallbackFeed(
     feed: feedWithActors,
     meta: {
       sortBy,
+      sourceFilter: "all",
       limit,
       offset,
       count: paginatedFeed.length,
@@ -220,5 +254,36 @@ async function getFallbackFeed(
   });
 }
 
+// Helper: Map activity type to change type
+function mapActivityToChangeType(activityType: string): string {
+  const mapping: Record<string, string> = {
+    site_added: "new_site",
+    site_verified: "site_verified",
+    site_updated: "metadata_updated",
+    media_added: "photos_added",
+    post_created: "post_created",
+    comment_added: "post_created",
+    user_joined: "metadata_updated",
+    badge_earned: "milestone",
+    connection_proposed: "connection_proposed",
+  };
+  return mapping[activityType] || "metadata_updated";
+}
+
+// Helper: Get default magnitude for activity type
+function getDefaultMagnitude(activityType: string): number {
+  const magnitudes: Record<string, number> = {
+    site_added: 100,
+    site_verified: 90,
+    media_added: 70,
+    post_created: 60,
+    comment_added: 40,
+    site_updated: 30,
+    user_joined: 20,
+    badge_earned: 50,
+    connection_proposed: 70,
+  };
+  return magnitudes[activityType] || 50;
+}
 
 

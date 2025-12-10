@@ -4,6 +4,9 @@ export type CommunityTier = "bronze" | "silver" | "gold" | "promoted";
 export type SiteCategory = "site" | "artifact" | "text";
 export type ZoneVerificationState = "draft" | "published";
 
+// Heat tier for site popularity indicators
+export type HeatTier = "hot" | "rising" | "active" | "normal" | "low";
+
 export interface CoordinatePair {
   lat: number;
   lng: number;
@@ -116,9 +119,14 @@ export interface MapSiteFeature {
   mediaCount: number;
   relatedResearchIds: string[];
   evidenceLinks?: string[];
+  thumbnailUrl?: string; // Cover image URL for map preview
   updatedAt: string;
   updatedBy: string;
   searchText: string;
+  // Heat/popularity indicators
+  heatTier?: HeatTier;
+  heatScore?: number; // 0-100
+  trendReason?: string; // Why it's trending, e.g., "12 new photos"
 }
 
 export interface MapDataResult {

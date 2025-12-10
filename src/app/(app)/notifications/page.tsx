@@ -14,7 +14,7 @@ const notificationLabels: Record<(typeof sampleNotifications)[number]["type"], s
 
 export default function NotificationsPage() {
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-4xl space-y-6 p-4 pb-20 sm:p-6 md:p-8 md:pb-8">
       <div>
         <h1 className="text-3xl font-semibold">Notifications</h1>
         <p className="text-sm text-muted-foreground">

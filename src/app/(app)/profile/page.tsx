@@ -167,7 +167,7 @@ export default function ProfilePage() {
     .toUpperCase();
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6 p-3 pb-20 sm:p-4 md:p-6 md:pb-6">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>

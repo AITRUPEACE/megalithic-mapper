@@ -51,7 +51,6 @@ const mapZoneRow = (zone: ZoneRow): MapZoneFeature => ({
   eraFocus: zone.era_focus,
   verificationState: zone.verification_state,
   updatedAt: zone.updated_at,
-  updatedBy: zone.updated_by,
 });
 
 const toZoneSummary = (zone: MapZoneFeature) => ({
@@ -202,7 +201,7 @@ async function fetchRecordsFromSupabase(query: MapQueryFilters): Promise<MapReco
     const { data: zoneRows, error: zoneError } = await mapSchema
       .from("zones")
       .select(
-        "id, slug, name, description, color, bounds, centroid, culture_focus, era_focus, verification_state, updated_at, updated_by"
+        "id, slug, name, description, color, bounds, centroid, culture_focus, era_focus, verification_state, updated_at"
       )
       .gte("bounds_max_lat", query.bounds.minLat)
       .lte("bounds_min_lat", query.bounds.maxLat)

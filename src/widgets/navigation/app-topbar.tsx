@@ -24,6 +24,11 @@ import {
 	Library,
 	Eye,
 	CheckCircle2,
+	AtSign,
+	ShieldCheck,
+	FlaskConical,
+	MessageCircle,
+	ExternalLink,
 } from "lucide-react";
 import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
@@ -38,10 +43,21 @@ import {
 	DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/shared/ui/sheet";
-import { cn } from "@/shared/lib/utils";
+import { cn, timeAgo } from "@/shared/lib/utils";
 import { zClass } from "@/shared/lib/z-index";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Separator } from "@/shared/ui/separator";
+import { ThemeToggle } from "@/shared/ui/theme-toggle";
+import { sampleNotifications } from "@/shared/mocks/sample-notifications";
+
+// Notification type icons
+const notificationTypeIcons: Record<string, React.ElementType> = {
+	mention: AtSign,
+	verification: ShieldCheck,
+	research_update: FlaskConical,
+	comment: MessageCircle,
+	system: Bell,
+};
 
 interface AppTopbarProps {
 	onGlobalSearch?: (query: string) => void;
@@ -94,12 +110,7 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 	};
 
 	return (
-		<header
-			className={cn(
-				"relative flex h-14 shrink-0 items-center gap-3 border-b border-border/40 bg-[#0e1217] px-3 sm:px-4 md:px-5",
-				zClass.topbar
-			)}
-		>
+		<header className={cn("relative flex h-14 shrink-0 items-center gap-3 border-b border-border/40 bg-card px-3 sm:px-4 md:px-5", zClass.topbar)}>
 			{/* Left Section: Mobile Menu + Search */}
 			<div className="flex flex-1 items-center gap-3">
 				{/* Mobile menu button */}
@@ -145,8 +156,8 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 													? "bg-primary text-primary-foreground"
 													: "bg-primary/10 text-primary"
 												: isActive
-													? "bg-secondary text-foreground"
-													: "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+												? "bg-secondary text-foreground"
+												: "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
 										)}
 									>
 										<Icon className="h-[18px] w-[18px]" />
@@ -193,31 +204,87 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 					<span className="text-sm font-semibold text-foreground">{contributionCount}</span>
 				</Link>
 
-				{/* Notifications */}
-				<Button
-					variant="ghost"
-					size="icon"
-					className="relative h-9 w-9 rounded-lg text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
-					asChild
-				>
-					<Link href="/notifications">
-						<Bell className="h-4 w-4" />
-						{unreadNotifications > 0 && (
-							<span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
-								{unreadNotifications}
-							</span>
-						)}
-					</Link>
-				</Button>
+				{/* Theme Toggle - Desktop only */}
+				<div className="hidden sm:block">
+					<ThemeToggle />
+				</div>
+
+				{/* Notifications Dropdown */}
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button
+							variant="ghost"
+							size="icon"
+							className="relative h-9 w-9 rounded-lg text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+						>
+							<Bell className="h-4 w-4" />
+							{unreadNotifications > 0 && (
+								<span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+									{unreadNotifications}
+								</span>
+							)}
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent className="w-80 bg-[#1a1f26] border-border/40" align="end" forceMount>
+						<DropdownMenuLabel className="flex items-center justify-between">
+							<span className="font-semibold">Notifications</span>
+							{unreadNotifications > 0 && (
+								<Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
+									{unreadNotifications} new
+								</Badge>
+							)}
+						</DropdownMenuLabel>
+						<DropdownMenuSeparator className="bg-border/30" />
+						<div className="max-h-[320px] overflow-y-auto">
+							{sampleNotifications.slice(0, 5).map((notification) => {
+								const TypeIcon = notificationTypeIcons[notification.type] || Bell;
+								return (
+									<DropdownMenuItem
+										key={notification.id}
+										className={cn("flex flex-col items-start gap-1 p-3 cursor-pointer", notification.unread && "bg-primary/5")}
+										asChild
+									>
+										<Link href={notification.link?.href ?? "/notifications"}>
+											<div className="flex items-start gap-2.5 w-full">
+												<div
+													className={cn(
+														"flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
+														notification.unread ? "bg-primary/20 text-primary" : "bg-secondary text-muted-foreground"
+													)}
+												>
+													<TypeIcon className="h-4 w-4" />
+												</div>
+												<div className="flex-1 min-w-0">
+													<p className={cn("text-sm leading-snug", notification.unread ? "text-foreground" : "text-muted-foreground")}>
+														{notification.summary}
+													</p>
+													<div className="flex items-center gap-2 mt-1">
+														<span className="text-[10px] text-muted-foreground">{timeAgo(notification.timestamp)}</span>
+														{notification.unread && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
+													</div>
+												</div>
+											</div>
+										</Link>
+									</DropdownMenuItem>
+								);
+							})}
+						</div>
+						<DropdownMenuSeparator className="bg-border/30" />
+						<DropdownMenuItem asChild className="justify-center">
+							<Link href="/notifications" className="w-full text-center cursor-pointer py-2">
+								<span className="text-sm text-primary font-medium">See all notifications</span>
+								<ExternalLink className="ml-1.5 h-3 w-3 text-primary" />
+							</Link>
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
 
 				{/* Profile dropdown */}
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="ghost" className="relative h-9 w-9 rounded-full p-0 hover:ring-2 hover:ring-primary/30">
 							<Avatar className="h-8 w-8 border border-border/40">
-								<AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-xs font-semibold">
-									{initials}
-								</AvatarFallback>
+								<AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-xs font-semibold">{initials}</AvatarFallback>
 							</Avatar>
 							{isVerified && (
 								<CheckCircle2 className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 text-blue-400 fill-blue-400 bg-[#0e1217] rounded-full" />
@@ -228,22 +295,14 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 						<DropdownMenuLabel className="font-normal">
 							<div className="flex items-center gap-3">
 								<Avatar className="h-10 w-10 border border-border/40">
-									<AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20">
-										{initials}
-									</AvatarFallback>
+									<AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20">{initials}</AvatarFallback>
 								</Avatar>
 								<div className="flex flex-col space-y-0.5">
 									<div className="flex items-center gap-1.5">
-										<p className="text-sm font-semibold leading-none">
-											{authLoading ? "Loading..." : displayName}
-										</p>
-										{isVerified && (
-											<CheckCircle2 className="h-3.5 w-3.5 text-blue-400 fill-blue-400" />
-										)}
+										<p className="text-sm font-semibold leading-none">{authLoading ? "Loading..." : displayName}</p>
+										{isVerified && <CheckCircle2 className="h-3.5 w-3.5 text-blue-400 fill-blue-400" />}
 									</div>
-									<p className="text-xs leading-none text-muted-foreground">
-										@{profile?.username ?? "explorer"}
-									</p>
+									<p className="text-xs leading-none text-muted-foreground">@{profile?.username ?? "explorer"}</p>
 								</div>
 							</div>
 						</DropdownMenuLabel>

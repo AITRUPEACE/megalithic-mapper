@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Map, Activity, Plus, MessageSquare, UserCircle } from "lucide-react";
+import { Map, Activity, Plus, MessageSquare } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 import { zClass } from "@/shared/lib/z-index";
 import { useAuth } from "@/components/providers/AuthProvider";
@@ -31,10 +31,14 @@ export const MobileNavbar = () => {
 			.toUpperCase();
 	}, [profile?.full_name, user?.email]);
 
+	// Hide mobile nav on map page - map has its own specialized navigation
+	const isMapPage = pathname === "/map" || pathname.startsWith("/map/");
+	if (isMapPage) return null;
+
 	return (
 		<nav
 			className={cn(
-				"fixed bottom-0 left-0 right-0 border-t border-border/40 bg-[#0e1217]/95 pb-safe backdrop-blur-lg md:hidden",
+				"fixed bottom-0 left-0 right-0 border-t border-border/40 bg-card/95 pb-safe backdrop-blur-lg md:hidden",
 				zClass.mobileNav
 			)}
 		>

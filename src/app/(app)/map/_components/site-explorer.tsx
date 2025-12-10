@@ -15,8 +15,13 @@ import { HomeFeed } from "./home-feed";
 import { SiteSlideOver } from "./site-slide-over";
 import { SiteEditor } from "./site-editor";
 import { ZoneEditor } from "./zone-editor";
+import { WhatsHotPanel, getSimulatedHeatData } from "./whats-hot-panel";
 import { loadMapData } from "../actions";
+import { useIsMobile } from "@/shared/hooks/use-media-query";
 import type L from "leaflet";
+
+// Dynamically import mobile explorer
+const MobileSiteExplorer = dynamic(() => import("./mobile-site-explorer").then((mod) => mod.MobileSiteExplorer), { ssr: false });
 
 const SiteMap = dynamic(() => import("./site-map").then((module) => module.SiteMap), {
 	ssr: false,
@@ -46,6 +51,18 @@ const QUICK_FILTERS = [
 type ViewMode = "split" | "map" | "feed";
 
 export const SiteExplorer = ({ initialSites, initialZones, initialBounds }: SiteExplorerProps) => {
+	const isMobile = useIsMobile();
+
+	// Render mobile version on small screens
+	if (isMobile) {
+		return <MobileSiteExplorer initialSites={initialSites} initialZones={initialZones} initialBounds={initialBounds} />;
+	}
+
+	return <DesktopSiteExplorer initialSites={initialSites} initialZones={initialZones} initialBounds={initialBounds} />;
+};
+
+// Desktop version of the explorer
+const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: SiteExplorerProps) => {
 	const { sites, zones, filters, selectedSiteId, selectSite, initialize, replaceData, setBounds } = useMapStore();
 
 	const searchParams = useSearchParams();
@@ -75,6 +92,9 @@ export const SiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 	}, [initialize, initialSites, initialZones, initialBounds]);
 
 	const filteredSites = useMemo(() => applySiteFilters(sites, filters), [sites, filters]);
+	
+	// Add heat tier data to filtered sites for map display
+	const sitesWithHeat = useMemo(() => getSimulatedHeatData(filteredSites), [filteredSites]);
 	const selectedSite = useMemo(() => sites.find((site) => site.id === selectedSiteId) ?? null, [sites, selectedSiteId]);
 
 	// Open slide-over when site is selected
@@ -171,6 +191,17 @@ export const SiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 		[sites, selectSite, viewMode]
 	);
 
+	// Invalidate map size when view mode changes to ensure tiles fill properly
+	useEffect(() => {
+		if (mapRef.current && (viewMode === "map" || viewMode === "split")) {
+			// Small delay to allow CSS transitions to complete
+			const timeout = setTimeout(() => {
+				mapRef.current?.invalidateSize();
+			}, 350);
+			return () => clearTimeout(timeout);
+		}
+	}, [viewMode]);
+
 	const handleCloseSlideOver = useCallback(() => {
 		setIsSlideOverOpen(false);
 		selectSite(null);
@@ -181,32 +212,33 @@ export const SiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 	};
 
 	// Calculate layout based on view mode
+	// On mobile: show either feed or map (not split)
+	// On desktop: can show split view
 	const showFeed = viewMode === "split" || viewMode === "feed";
 	const showMap = viewMode === "split" || viewMode === "map";
-	const isMapExpanded = viewMode === "map";
 
 	return (
-		<div className="relative flex h-[calc(100dvh-10rem)] sm:h-[calc(100dvh-9rem)] md:h-[calc(100dvh-7rem)] w-full overflow-hidden rounded-xl border border-border/40 bg-card/30">
+		<div className="relative flex h-[calc(100dvh-10rem)] sm:h-[calc(100dvh-9rem)] md:h-[calc(100dvh-7rem)] w-full overflow-hidden rounded-xl border border-border/40 bg-background">
 			{/* Activity Feed Panel */}
 			{showFeed && (
 				<aside
 					className={cn(
-						"flex flex-col shrink-0 border-r border-border/30 bg-[#0e1217] transition-all duration-300 overflow-hidden",
+						"flex flex-col shrink-0 border-r border-border/30 bg-card transition-all duration-300 overflow-hidden",
+						// On mobile: feed takes full width in split/feed mode
+						// On desktop: feed has fixed width in split, full in feed mode
 						viewMode === "feed" ? "flex-1" : "w-full md:w-[420px] lg:w-[480px]"
 					)}
 				>
 					{/* Feed header with view controls */}
-					<div className="flex items-center justify-between px-3 py-2 border-b border-border/30 bg-[#0e1217]">
+					<div className="flex items-center justify-between px-3 py-2 border-b border-border/30 bg-card">
 						<div className="flex items-center gap-2">
-							<span className="text-sm font-medium text-muted-foreground">View:</span>
+							<span className="text-sm font-medium text-muted-foreground hidden sm:inline">View:</span>
 							<div className="flex items-center gap-0.5 p-0.5 bg-secondary/30 rounded-lg">
 								<button
 									onClick={() => setViewMode("feed")}
 									className={cn(
 										"flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium transition-colors",
-										viewMode === "feed"
-											? "bg-white text-slate-900 shadow-sm"
-											: "text-muted-foreground hover:text-foreground"
+										viewMode === "feed" ? "bg-white text-slate-900 shadow-sm" : "text-muted-foreground hover:text-foreground"
 									)}
 								>
 									<List className="h-3.5 w-3.5" />
@@ -215,10 +247,8 @@ export const SiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 								<button
 									onClick={() => setViewMode("split")}
 									className={cn(
-										"flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium transition-colors",
-										viewMode === "split"
-											? "bg-white text-slate-900 shadow-sm"
-											: "text-muted-foreground hover:text-foreground"
+										"flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium transition-colors hidden md:flex",
+										viewMode === "split" ? "bg-white text-slate-900 shadow-sm" : "text-muted-foreground hover:text-foreground"
 									)}
 								>
 									Split
@@ -227,9 +257,7 @@ export const SiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 									onClick={() => setViewMode("map")}
 									className={cn(
 										"flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium transition-colors",
-										viewMode === "map"
-											? "bg-white text-slate-900 shadow-sm"
-											: "text-muted-foreground hover:text-foreground"
+										viewMode === "map" ? "bg-white text-slate-900 shadow-sm" : "text-muted-foreground hover:text-foreground"
 									)}
 								>
 									<MapIcon className="h-3.5 w-3.5" />
@@ -238,41 +266,48 @@ export const SiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 							</div>
 						</div>
 						{viewMode !== "map" && (
-							<Button
-								size="sm"
-								variant="ghost"
-								className="h-7 gap-1.5 text-xs"
-								onClick={() => setViewMode("map")}
-							>
+							<Button size="sm" variant="ghost" className="h-7 gap-1.5 text-xs md:flex hidden" onClick={() => setViewMode("map")}>
 								<Maximize2 className="h-3.5 w-3.5" />
 								Expand Map
 							</Button>
 						)}
 					</div>
 
-					<HomeFeed
-						sites={filteredSites}
-						onFocusSite={handleFocusSite}
-						className="flex-1"
-					/>
+					<HomeFeed sites={filteredSites} onFocusSite={handleFocusSite} className="flex-1" />
 				</aside>
 			)}
 
-			{/* Map Area */}
+			{/* Map Area - fills remaining space */}
 			{showMap && (
-				<div className={cn(
-					"relative flex flex-col min-w-0 transition-all duration-300",
-					viewMode === "map" ? "flex-1" : "flex-1 hidden md:flex"
-				)}>
+				<div
+					className={cn(
+						"relative min-w-0 h-full",
+						// Width: flex-1 on desktop split, full width on map mode
+						viewMode === "map" ? "flex-1" : "flex-1 hidden md:block"
+					)}
+				>
 					{/* Map controls overlay */}
 					<div className={cn("absolute top-3 left-3 right-3 flex items-center gap-2", zClass.mapControls)}>
-						{/* Collapse map button (when expanded) */}
+						{/* Back to feed button (mobile only, when in map mode) */}
 						{viewMode === "map" && (
 							<Button
 								size="icon"
 								variant="secondary"
-								className="h-9 w-9 shrink-0 bg-card/95 backdrop-blur shadow-md"
+								className="h-9 w-9 shrink-0 bg-card/95 backdrop-blur shadow-md md:hidden"
+								onClick={() => setViewMode("feed")}
+								title="Show Feed"
+							>
+								<List className="h-4 w-4" />
+							</Button>
+						)}
+						{/* Collapse map button (desktop only, when expanded) */}
+						{viewMode === "map" && (
+							<Button
+								size="icon"
+								variant="secondary"
+								className="h-9 w-9 shrink-0 bg-card/95 backdrop-blur shadow-md hidden md:flex"
 								onClick={() => setViewMode("split")}
+								title="Split View"
 							>
 								<Minimize2 className="h-4 w-4" />
 							</Button>
@@ -302,12 +337,14 @@ export const SiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 						</div>
 
 						{/* Actions */}
-						<div className="flex items-center gap-2">
+						<div className="flex items-center gap-2 relative">
 							{isPending && (
 								<Badge variant="outline" className="hidden sm:flex bg-card/95 text-xs">
 									Loading...
 								</Badge>
 							)}
+							{/* What's Hot Panel */}
+							<WhatsHotPanel sites={filteredSites} onFocusSite={handleFocusSite} />
 							<Button
 								size="sm"
 								className="h-9 bg-card/95 backdrop-blur shadow-md"
@@ -357,13 +394,13 @@ export const SiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 						</div>
 					)}
 
-					{/* Map */}
+					{/* Map fills the container */}
 					<SiteMap
-						sites={filteredSites}
+						sites={sitesWithHeat}
 						zones={zones}
 						selectedSiteId={selectedSiteId}
 						onSelect={handleSelectSite}
-						className="h-full w-full"
+						className="absolute inset-0"
 						onBoundsChange={handleBoundsChange}
 						onMapClick={(lat, lng) => {
 							if (activeEditor === "site") {

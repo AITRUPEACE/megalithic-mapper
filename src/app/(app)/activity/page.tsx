@@ -87,7 +87,7 @@ export default function ActivityPage() {
 	const sitesUpdated = new Set(mockFeedItems.filter((i) => i.siteId).map((i) => i.siteId)).size;
 
 	return (
-		<div className="space-y-6">
+		<div className="mx-auto max-w-[1400px] space-y-6 p-3 pb-20 sm:p-4 md:p-6 md:pb-6">
 			{/* Header */}
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 				<div>

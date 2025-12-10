@@ -2,6 +2,13 @@
  * Feed Algorithm - Scoring and ranking functions for feed items
  * 
  * Inspired by Reddit's hot ranking, Hacker News, and daily.dev algorithms
+ * 
+ * PRIORITIZATION RULES:
+ * 1. Official sources > Community (but community can rise with engagement)
+ * 2. New sites have highest priority
+ * 3. Videos > Photos > Description updates
+ * 4. High engagement can boost any content
+ * 5. Community updates don't "bump" sites to top without engagement
  */
 
 import type {
@@ -10,7 +17,10 @@ import type {
 	FeedSortOption,
 	UserFeedPreferences,
 	ActivityType,
+	ActivitySourceType,
+	ChangeType,
 } from "./feed-types";
+import { CHANGE_MAGNITUDE } from "./feed-types";
 
 // ============================================
 // SCORING CONSTANTS
@@ -43,6 +53,14 @@ const SCORE_WEIGHTS = {
 	followedUser: 1.8,
 	followedTag: 1.3,
 	bookmarkedSite: 1.5,
+	
+	// Source type multipliers (new)
+	officialSource: 1.5,  // Official updates get visibility boost
+	communitySource: 1.0, // Community needs engagement to rise
+	
+	// Magnitude threshold for community content visibility
+	communityMinMagnitude: 40, // Below this, community content needs engagement
+	communityEngagementThreshold: 5, // Engagement needed for low-magnitude community content
 };
 
 // Activity type priority for "What's New" style feeds
@@ -152,6 +170,58 @@ export function calculateContentTypeBoost(content: FeedableContent): number {
 }
 
 /**
+ * Calculate source type multiplier
+ * Official sources get a boost, community needs engagement
+ */
+export function calculateSourceMultiplier(content: FeedableContent): number {
+	if (content.sourceType === "official") {
+		return SCORE_WEIGHTS.officialSource;
+	}
+	
+	// Community content with low magnitude needs engagement to be visible
+	if (content.sourceType === "community") {
+		const magnitude = content.changeMagnitude || 50;
+		const engagement = calculateEngagementScore(content);
+		
+		// Low magnitude community content gets penalized unless it has engagement
+		if (magnitude < SCORE_WEIGHTS.communityMinMagnitude) {
+			if (engagement < SCORE_WEIGHTS.communityEngagementThreshold) {
+				return 0.3; // Significantly reduce visibility
+			}
+		}
+		return SCORE_WEIGHTS.communitySource;
+	}
+	
+	return 1;
+}
+
+/**
+ * Calculate change magnitude boost
+ * Higher magnitude changes (new site, video) get priority over lower (description update)
+ */
+export function calculateMagnitudeBoost(content: FeedableContent): number {
+	// Use explicit changeMagnitude if available
+	if (content.changeMagnitude !== undefined) {
+		return content.changeMagnitude / 50; // Normalize to roughly 0-2 range
+	}
+	
+	// Fall back to changeType lookup
+	if (content.changeType && CHANGE_MAGNITUDE[content.changeType]) {
+		return CHANGE_MAGNITUDE[content.changeType] / 50;
+	}
+	
+	// Default based on activity type
+	switch (content.type) {
+		case "new_media":
+			return 1.4;
+		case "site_update":
+			return 1.0;
+		default:
+			return 1.0;
+	}
+}
+
+/**
  * Personalization score based on user preferences
  */
 export function calculatePersonalizationScore(
@@ -196,6 +266,10 @@ export function calculatePersonalizationScore(
 /**
  * HOT Score - Trending content with time decay
  * Best for: Explore feed default, discovering what's popular now
+ * 
+ * Updated to factor in:
+ * - Source type (official vs community)
+ * - Change magnitude (new site > video > photo > description)
  */
 export function calculateHotScore(
 	content: FeedableContent,
@@ -206,8 +280,15 @@ export function calculateHotScore(
 	const timeDecay = calculateTimeDecay(content);
 	const authorMultiplier = calculateAuthorMultiplier(content);
 	const contentBoost = calculateContentTypeBoost(content);
+	const sourceMultiplier = calculateSourceMultiplier(content);
+	const magnitudeBoost = calculateMagnitudeBoost(content);
 	
-	let score = (engagement * 0.3 + velocity * 0.7) * timeDecay * authorMultiplier * contentBoost;
+	let score = (engagement * 0.3 + velocity * 0.7) 
+		* timeDecay 
+		* authorMultiplier 
+		* contentBoost
+		* sourceMultiplier
+		* magnitudeBoost;
 	
 	// Apply personalization if preferences provided
 	if (preferences) {
@@ -270,6 +351,55 @@ export function calculateTopScore(content: FeedableContent): number {
 	return calculateEngagementScore(content) * calculateAuthorMultiplier(content);
 }
 
+/**
+ * SMART Score - Prioritizes by magnitude, official status, and engagement
+ * Best for: Default feed that surfaces important changes first
+ * 
+ * Priority order:
+ * 1. Official sources with high magnitude (new verified sites, official updates)
+ * 2. High-magnitude community content (new sites, videos)
+ * 3. Lower-magnitude content with high engagement
+ * 4. Recent content
+ * 
+ * Community updates to sites don't bump them to top without engagement
+ */
+export function calculateSmartScore(
+	content: FeedableContent,
+	preferences?: UserFeedPreferences
+): number {
+	const magnitude = content.changeMagnitude || 50;
+	const engagement = calculateEngagementScore(content);
+	const freshness = calculateTimeDecay(content);
+	
+	// Base score from magnitude (0-100)
+	let score = magnitude;
+	
+	// Official sources get a significant boost
+	if (content.sourceType === "official") {
+		score += 30;
+	}
+	
+	// Engagement adds to score (capped to avoid gaming)
+	const engagementBoost = Math.min(engagement * 0.5, 40);
+	score += engagementBoost;
+	
+	// Freshness multiplier (newer content gets boost)
+	score *= (0.5 + freshness * 0.5); // Range: 0.5-1.0
+	
+	// Community low-magnitude updates (like description changes) get penalized
+	// unless they have significant engagement
+	if (content.sourceType === "community" && magnitude < 50 && engagement < 10) {
+		score *= 0.3; // Significant penalty
+	}
+	
+	// Personalization boost
+	if (preferences) {
+		score *= calculatePersonalizationScore(content, preferences);
+	}
+	
+	return score;
+}
+
 // ============================================
 // FEED GENERATION FUNCTIONS
 // ============================================
@@ -312,6 +442,32 @@ export function filterFeedItems(
 		// Filter by activity type
 		if (filters.activityTypes?.length && !filters.activityTypes.includes(item.type)) {
 			return false;
+		}
+		
+		// Filter by source type (official/community)
+		if (filters.sourceType && filters.sourceType !== "all") {
+			if (item.sourceType !== filters.sourceType) {
+				return false;
+			}
+		}
+		
+		// Filter by change types
+		if (filters.changeTypes?.length && item.changeType) {
+			if (!filters.changeTypes.includes(item.changeType)) {
+				return false;
+			}
+		}
+		
+		// Filter by minimum magnitude
+		if (filters.minMagnitude !== undefined) {
+			const magnitude = item.changeMagnitude || 50;
+			if (magnitude < filters.minMagnitude) {
+				// Allow low-magnitude items if they have significant engagement
+				const engagement = calculateEngagementScore(item);
+				if (engagement < SCORE_WEIGHTS.communityEngagementThreshold) {
+					return false;
+				}
+			}
 		}
 		
 		// Filter by region
@@ -373,6 +529,10 @@ export function sortFeedItems(
 		let scoreA: number, scoreB: number;
 		
 		switch (sortOption) {
+			case "smart":
+				scoreA = calculateSmartScore(a, preferences);
+				scoreB = calculateSmartScore(b, preferences);
+				break;
 			case "trending":
 			case "hot":
 				scoreA = calculateHotScore(a, preferences);
@@ -395,8 +555,9 @@ export function sortFeedItems(
 				scoreB = b.engagement.comments;
 				break;
 			default:
-				scoreA = calculateHotScore(a, preferences);
-				scoreB = calculateHotScore(b, preferences);
+				// Default to smart sort
+				scoreA = calculateSmartScore(a, preferences);
+				scoreB = calculateSmartScore(b, preferences);
 		}
 		
 		return scoreB - scoreA;
@@ -455,8 +616,46 @@ function getMaxAgeForTimeRange(range: FeedFilters["timeRange"]): number {
 
 /**
  * Generate activity description for feed item
+ * Uses changeType for more specific labels when available
  */
 export function getActivityDescription(item: FeedableContent): string {
+	// Use changeType if available for more specific descriptions
+	if (item.changeType) {
+		switch (item.changeType) {
+			case "new_site":
+				return "added a new site";
+			case "site_verified":
+				return item.sourceType === "official" ? "officially verified" : "community verified";
+			case "video_added":
+				return "added a video";
+		case "photos_added":
+			return item.mediaCount && item.mediaCount > 1 
+				? `added ${item.mediaCount} photos` 
+				: "added photos";
+		case "document_added":
+			return "added a document";
+			case "description_updated":
+				return "updated description";
+			case "coordinates_updated":
+				return "corrected location";
+			case "metadata_updated":
+				return "updated details";
+			case "trending":
+				return "is trending";
+			case "milestone":
+				return "reached a milestone";
+			case "post_created":
+				return "started a discussion";
+			case "research_published":
+				return "published research";
+			case "event_announced":
+				return "announced an event";
+			case "connection_proposed":
+				return "discovered a connection";
+		}
+	}
+	
+	// Fall back to activity type
 	switch (item.type) {
 		case "new_media":
 			return "added new media";
@@ -482,4 +681,7 @@ export function getActivityDescription(item: FeedableContent): string {
 			return "shared content";
 	}
 }
+
+// Export score weights for use in filter function
+export { SCORE_WEIGHTS };
 

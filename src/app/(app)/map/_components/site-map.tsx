@@ -1,10 +1,12 @@
 "use client";
 
 import { MapContainer, TileLayer, Marker, Tooltip, useMap, useMapEvents, Rectangle } from "react-leaflet";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useTheme } from "next-themes";
 import L from "leaflet";
 import type { BoundingBox, MapSiteFeature, MapZoneFeature } from "@/entities/map/model/types";
 import { cn } from "@/shared/lib/utils";
+import { getSiteTypeIconSvg } from "@/components/map/site-type-icons";
 
 const MAP_CENTER: [number, number] = [20, 10];
 const DEFAULT_ZOOM = 3;
@@ -43,59 +45,102 @@ const MapClickHandler = ({ onClick }: { onClick?: (lat: number, lng: number) => 
 	return null;
 };
 
-const verificationColors: Record<MapSiteFeature["verificationStatus"], string> = {
-	verified: "#34d399",
-	under_review: "#f59e0b",
-	unverified: "#f87171",
+// Standardized site types with colors (matches database site_types table)
+export const SITE_TYPES = {
+	pyramid: { name: "Pyramid", color: "#f59e0b", icon: "pyramid" },
+	temple: { name: "Temple", color: "#8b5cf6", icon: "temple" },
+	megalith: { name: "Megalith", color: "#6366f1", icon: "megalith" },
+	stone_circle: { name: "Stone Circle", color: "#06b6d4", icon: "stone-circle" },
+	mound: { name: "Mound", color: "#84cc16", icon: "mound" },
+	tomb: { name: "Tomb", color: "#10b981", icon: "tomb" },
+	fortress: { name: "Fortress", color: "#78716c", icon: "wall" },
+	city: { name: "Ancient City", color: "#14b8a6", icon: "city" },
+	cave: { name: "Cave", color: "#92400e", icon: "cave" },
+	underwater: { name: "Underwater", color: "#0891b2", icon: "underwater" },
+	geoglyph: { name: "Geoglyph", color: "#f97316", icon: "geoglyph" },
+	observatory: { name: "Observatory", color: "#3b82f6", icon: "observatory" },
+	statue: { name: "Statue", color: "#ec4899", icon: "statue" },
+	ruins: { name: "Ruins", color: "#a1a1aa", icon: "ruins" },
+	unknown: { name: "Unknown", color: "#64748b", icon: "unknown" },
+} as const;
+
+export type SiteTypeId = keyof typeof SITE_TYPES;
+
+// Normalize legacy site_type text to standardized type ID
+const normalizeSiteType = (legacyType: string): SiteTypeId => {
+	const normalized = legacyType.toLowerCase().trim();
+
+	if (normalized.includes("pyramid")) return "pyramid";
+	if (normalized.includes("temple") || normalized.includes("shrine") || normalized.includes("sanctuary")) return "temple";
+	if (normalized.includes("circle") || normalized.includes("henge") || normalized.includes("ring")) return "stone_circle";
+	if (normalized.includes("megalith") || normalized.includes("dolmen") || normalized.includes("menhir") || normalized.includes("standing"))
+		return "megalith";
+	if (normalized.includes("mound") || normalized.includes("tumulus") || normalized.includes("barrow") || normalized.includes("cairn")) return "mound";
+	if (normalized.includes("tomb") || normalized.includes("burial") || normalized.includes("passage") || normalized.includes("crypt")) return "tomb";
+	if (normalized.includes("wall") || normalized.includes("fort") || normalized.includes("citadel") || normalized.includes("hillfort"))
+		return "fortress";
+	if (normalized.includes("city") || normalized.includes("settlement") || normalized.includes("complex")) return "city";
+	if (normalized.includes("cave") || normalized.includes("grotto") || normalized.includes("shelter")) return "cave";
+	if (normalized.includes("underwater") || normalized.includes("submerged") || normalized.includes("sunken")) return "underwater";
+	if (normalized.includes("geoglyph") || normalized.includes("nazca") || normalized.includes("lines") || normalized.includes("effigy"))
+		return "geoglyph";
+	if (normalized.includes("observ") || normalized.includes("astronomical") || normalized.includes("align")) return "observatory";
+	if (normalized.includes("statue") || normalized.includes("moai") || normalized.includes("sculpture") || normalized.includes("coloss"))
+		return "statue";
+	if (normalized.includes("ruin")) return "ruins";
+
+	return "unknown";
 };
 
-const communityTierColors: Record<NonNullable<MapSiteFeature["trustTier"]>, string> = {
-	bronze: "#fb923c",
-	silver: "#94a3b8",
-	gold: "#facc15",
-	promoted: "#34d399",
+// Get color for site type
+const getSiteTypeColor = (siteType: string): string => {
+	const typeId = normalizeSiteType(siteType);
+	return SITE_TYPES[typeId].color;
 };
 
-// Helper function to create custom pin icon with verification badge
+// Heat tier size multipliers
+const heatSizeMultipliers: Record<MapSiteFeature["heatTier"] & string, number> = {
+	hot: 1.2,
+	rising: 1.1,
+	active: 1.0,
+	normal: 1.0,
+	low: 0.9,
+};
+
+// Helper function to create clean icon-only marker
 const createCustomPinIcon = (site: MapSiteFeature, isSelected: boolean): L.DivIcon => {
-	const baseSize = isSelected ? 16 : 12;
-	const markerColor = site.layer === "official" ? verificationColors[site.verificationStatus] : communityTierColors[site.trustTier ?? "bronze"];
+	const heatTier = site.heatTier ?? "normal";
+	const sizeMultiplier = heatSizeMultipliers[heatTier];
 
-	// Determine badge based on verification or tier
-	const getBadge = () => {
-		if (site.layer === "official") {
-			if (site.verificationStatus === "verified") {
-				return `<svg class="badge-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-			}
-			if (site.verificationStatus === "under_review") {
-				return `<svg class="badge-icon" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`;
-			}
-		} else {
-			// Community badges
-			if (site.trustTier === "bronze") return `<span class="badge-text">B</span>`;
-			if (site.trustTier === "silver") return `<span class="badge-text">S</span>`;
-			if (site.trustTier === "gold") return `<span class="badge-text">G</span>`;
-			if (site.trustTier === "promoted") return `<span class="badge-text">★</span>`;
-		}
-		return "";
-	};
+	// Icon sizing - slightly larger for visibility
+	const iconSize = isSelected ? 32 : Math.round(24 * sizeMultiplier);
+	const svgSize = isSelected ? 24 : Math.round(18 * sizeMultiplier);
+
+	// Color by site type
+	const iconColor = getSiteTypeColor(site.siteType);
+
+	// Get site type icon SVG with the site type color
+	const siteTypeIcon = getSiteTypeIconSvg(site.siteType, iconColor, svgSize);
+
+	// Heat indicator (only for hot sites)
+	const heatBadge = heatTier === "hot" ? `<div class="marker-fire">🔥</div>` : "";
 
 	const html = `
-		<div class="custom-marker ${isSelected ? "selected" : ""}" style="
-			--marker-color: ${markerColor};
-			--marker-size: ${baseSize * 2}px;
+		<div class="site-marker ${isSelected ? "selected" : ""} heat-${heatTier}" style="
+			--bg-color: ${iconColor};
+			--size: ${iconSize}px;
 		">
-			<div class="marker-pin"></div>
-			${getBadge() ? `<div class="marker-badge">${getBadge()}</div>` : ""}
+			${siteTypeIcon}
+			${heatBadge}
 		</div>
 	`;
 
 	return L.divIcon({
 		html,
-		className: "custom-marker-wrapper",
-		iconSize: [baseSize * 2, baseSize * 2],
-		iconAnchor: [baseSize, baseSize * 2],
-		popupAnchor: [0, -baseSize * 2],
+		className: "site-marker-wrapper",
+		iconSize: [iconSize, iconSize],
+		iconAnchor: [iconSize / 2, iconSize / 2],
+		popupAnchor: [0, -iconSize / 2],
 	});
 };
 
@@ -129,11 +174,11 @@ const BoundsWatcher = ({ onChange }: { onChange?: (bounds: L.LatLngBounds) => vo
 
 const MapReadyHandler = ({ onReady }: { onReady?: (map: L.Map) => void }) => {
 	const map = useMap();
-	
+
 	useEffect(() => {
 		onReady?.(map);
 	}, [map, onReady]);
-	
+
 	return null;
 };
 
@@ -142,20 +187,71 @@ const toLeafletBounds = (bounds: BoundingBox): L.LatLngBoundsExpression => [
 	[bounds.maxLat, bounds.maxLng],
 ];
 
-// Custom marker component
+// Sample thumbnails for demo (in production, this would come from site.thumbnailUrl)
+const sampleThumbnails: Record<string, string> = {
+	avebury: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Avebury_henge_and_village_UK.jpg/320px-Avebury_henge_and_village_UK.jpg",
+	stonehenge: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Stonehenge2007_07_30.jpg/320px-Stonehenge2007_07_30.jpg",
+	giza: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/320px-Kheops-Pyramid.jpg",
+	pyramid: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/320px-Kheops-Pyramid.jpg",
+	machu: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Machu_Picchu%2C_Peru.jpg/320px-Machu_Picchu%2C_Peru.jpg",
+	nazca: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Nazca_Lines_-_Hands.jpg/320px-Nazca_Lines_-_Hands.jpg",
+	petra: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/The_Treasury_in_Petra.jpg/240px-The_Treasury_in_Petra.jpg",
+	angkor: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Angkor_Wat.jpg/320px-Angkor_Wat.jpg",
+	easter: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Moai_Rano_raraku.jpg/320px-Moai_Rano_raraku.jpg",
+	göbekli: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/G%C3%B6bekli_Tepe%2C_Urfa.jpg/320px-G%C3%B6bekli_Tepe%2C_Urfa.jpg",
+	gobekli: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/G%C3%B6bekli_Tepe%2C_Urfa.jpg/320px-G%C3%B6bekli_Tepe%2C_Urfa.jpg",
+};
+
+// Get thumbnail URL for a site (demo implementation)
+const getThumbnailUrl = (site: MapSiteFeature): string | null => {
+	// In production, use site.thumbnailUrl directly
+	// For demo, check if site name matches known sites
+	const nameLower = site.name.toLowerCase();
+	for (const [key, url] of Object.entries(sampleThumbnails)) {
+		if (nameLower.includes(key)) {
+			return url;
+		}
+	}
+	// Only show thumbnails for verified official sites (they'd have images in production)
+	return null;
+};
+
+// Custom marker component with enhanced tooltip
 const SiteMarker = ({ site, isSelected, onSelect }: { site: MapSiteFeature; isSelected: boolean; onSelect: (id: string) => void }) => {
 	const icon = useMemo(() => createCustomPinIcon(site, isSelected), [site, isSelected]);
+	const thumbnailUrl = useMemo(() => getThumbnailUrl(site), [site]);
+	const isVerified = site.layer === "official" && site.verificationStatus === "verified";
 
 	return (
 		<Marker position={[site.coordinates.lat, site.coordinates.lng]} icon={icon} eventHandlers={{ click: () => onSelect(site.id) }}>
-			<Tooltip direction="top" offset={[0, -20]} opacity={1} className="text-xs">
-				<div className="space-y-1">
-					<p className="font-semibold text-foreground">{site.name}</p>
-					<p className="text-muted-foreground">{site.tags.cultures.join(", ") || "Unknown culture"}</p>
-					<p className="text-muted-foreground">{site.siteType}</p>
-					<p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-						{site.layer === "official" ? "Official dataset" : `Community ${site.trustTier ?? "bronze"} tier`}
-					</p>
+			<Tooltip direction="top" offset={[0, -16]} opacity={1} className="site-tooltip">
+				<div className="site-tooltip-content">
+					{/* Thumbnail for verified sites */}
+					{thumbnailUrl && isVerified && (
+						<div className="site-tooltip-thumbnail">
+							<img src={thumbnailUrl} alt={site.name} loading="lazy" />
+						</div>
+					)}
+					<div className="site-tooltip-info">
+						<div className="site-tooltip-header">
+							<p className="site-tooltip-name">{site.name}</p>
+							{isVerified && (
+								<span className="site-tooltip-verified" title="Verified Site">
+									✓
+								</span>
+							)}
+						</div>
+						<p className="site-tooltip-type">{site.siteType}</p>
+						{site.tags.cultures.length > 0 && <p className="site-tooltip-culture">{site.tags.cultures.slice(0, 2).join(", ")}</p>}
+						<div className="site-tooltip-meta">
+							{site.layer === "official" ? (
+								<span className="site-tooltip-badge official">Official</span>
+							) : (
+								<span className={`site-tooltip-badge ${site.trustTier ?? "bronze"}`}>{site.trustTier ?? "bronze"}</span>
+							)}
+							{site.mediaCount > 0 && <span className="site-tooltip-media">📷 {site.mediaCount}</span>}
+						</div>
+					</div>
 				</div>
 			</Tooltip>
 		</Marker>
@@ -163,10 +259,14 @@ const SiteMarker = ({ site, isSelected, onSelect }: { site: MapSiteFeature; isSe
 };
 
 export const SiteMap = ({ sites, zones, selectedSiteId, onSelect, className, onBoundsChange, onMapClick, onMapReady }: SiteMapProps) => {
+	const { resolvedTheme } = useTheme();
 	const selectedSite = useMemo(() => sites.find((site) => site.id === selectedSiteId) ?? null, [sites, selectedSiteId]);
 
+	// Use appropriate tile layer based on theme
+	const tileLayer = resolvedTheme === "light" ? TILE_LAYERS.light : TILE_LAYERS.dark;
+
 	return (
-		<div className={cn("overflow-hidden", className)}>
+		<div className={cn("overflow-hidden h-full w-full", className)}>
 			<style jsx global>{`
 				.custom-marker-wrapper {
 					background: transparent;
@@ -176,44 +276,246 @@ export const SiteMap = ({ sites, zones, selectedSiteId, onSelect, className, onB
 					position: relative;
 					width: var(--marker-size);
 					height: var(--marker-size);
-					transition: all 0.2s ease;
+					transition: all 0.15s ease;
+					cursor: pointer;
+				}
+				.custom-marker:hover {
+					transform: scale(1.15);
 				}
 				.custom-marker.selected {
-					transform: scale(1.2);
-					filter: drop-shadow(0 0 8px var(--marker-color));
+					transform: scale(1.25);
+					filter: drop-shadow(0 0 12px var(--marker-color));
+					z-index: 1000 !important;
 				}
-				.marker-pin {
+				.marker-icon-container {
 					position: absolute;
 					width: 100%;
 					height: 100%;
 					background: var(--marker-color);
-					border: 2px solid rgba(255, 255, 255, 0.9);
-					border-radius: 50% 50% 50% 0;
-					transform: rotate(-45deg);
+					border: 2px solid rgba(255, 255, 255, 0.95);
+					border-radius: 50%;
 					box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-				}
-				.custom-marker.selected .marker-pin {
-					border-width: 3px;
-					box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-				}
-				.marker-badge {
-					position: absolute;
-					top: 50%;
-					left: 50%;
-					transform: translate(-50%, -60%);
-					z-index: 10;
 					display: flex;
 					align-items: center;
 					justify-content: center;
+					overflow: hidden;
 				}
-				.badge-icon {
-					filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
+				.custom-marker.official .marker-icon-container {
+					border-color: rgba(255, 255, 255, 1);
+					box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 				}
-				.badge-text {
-					color: white;
+				.custom-marker.selected .marker-icon-container {
+					border-width: 3px;
+					box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+				}
+				.marker-icon-container svg {
+					width: 60%;
+					height: 60%;
+					filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+				}
+				.marker-verified-badge {
+					position: absolute;
+					bottom: -2px;
+					right: -2px;
+					width: 14px;
+					height: 14px;
+					background: #22c55e;
+					border: 2px solid white;
+					border-radius: 50%;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+				}
+				.marker-verified-badge svg {
+					width: 8px !important;
+					height: 8px !important;
+				}
+
+				/* Heat tier indicators */
+				.marker-heat-badge {
+					position: absolute;
+					top: -6px;
+					left: -6px;
 					font-size: 10px;
-					font-weight: bold;
-					text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+					line-height: 1;
+					z-index: 10;
+				}
+				.marker-heat-badge.hot {
+					animation: heat-badge-pulse 1s ease-in-out infinite;
+				}
+				.marker-heat-badge.rising {
+					animation: heat-badge-pulse 2s ease-in-out infinite;
+				}
+				@keyframes heat-badge-pulse {
+					0%,
+					100% {
+						transform: scale(1);
+					}
+					50% {
+						transform: scale(1.2);
+					}
+				}
+
+				/* Hot tier - pulsing glow */
+				.custom-marker.heat-hot .marker-icon-container {
+					animation: hot-glow 1.5s ease-in-out infinite;
+				}
+				@keyframes hot-glow {
+					0%,
+					100% {
+						box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 12px rgba(255, 107, 53, 0.6);
+					}
+					50% {
+						box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 24px rgba(255, 107, 53, 0.9), 0 0 36px rgba(255, 107, 53, 0.4);
+					}
+				}
+
+				/* Rising tier - subtle pulse */
+				.custom-marker.heat-rising .marker-icon-container {
+					animation: rising-pulse 2s ease-in-out infinite;
+				}
+				@keyframes rising-pulse {
+					0%,
+					100% {
+						box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 8px rgba(255, 165, 0, 0.3);
+					}
+					50% {
+						box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 16px rgba(255, 165, 0, 0.6);
+					}
+				}
+
+				/* Active tier - slight glow */
+				.custom-marker.heat-active .marker-icon-container {
+					box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5), 0 0 6px rgba(100, 200, 255, 0.3);
+				}
+
+				/* Low tier - muted */
+				.custom-marker.heat-low {
+					opacity: 0.65;
+				}
+				.custom-marker.heat-low .marker-icon-container {
+					filter: saturate(0.7);
+				}
+
+				/* Enhanced Tooltip Styles */
+				.leaflet-tooltip-pane {
+					z-index: 650 !important; /* Below navigation dropdowns (1300) */
+				}
+				.site-tooltip {
+					padding: 0 !important;
+					border: none !important;
+					background: transparent !important;
+					box-shadow: none !important;
+				}
+				.site-tooltip .leaflet-tooltip-content {
+					margin: 0;
+				}
+				.site-tooltip-content {
+					background: #1a1f26;
+					border: 1px solid rgba(255, 255, 255, 0.1);
+					border-radius: 10px;
+					overflow: hidden;
+					box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+					min-width: 180px;
+					max-width: 240px;
+				}
+				.site-tooltip-thumbnail {
+					width: 100%;
+					height: 100px;
+					overflow: hidden;
+					background: #0a0c10;
+				}
+				.site-tooltip-thumbnail img {
+					width: 100%;
+					height: 100%;
+					object-fit: cover;
+					transition: transform 0.3s ease;
+				}
+				.site-tooltip-content:hover .site-tooltip-thumbnail img {
+					transform: scale(1.05);
+				}
+				.site-tooltip-info {
+					padding: 10px 12px;
+				}
+				.site-tooltip-header {
+					display: flex;
+					align-items: center;
+					gap: 6px;
+					margin-bottom: 4px;
+				}
+				.site-tooltip-name {
+					font-weight: 600;
+					font-size: 13px;
+					color: #fff;
+					margin: 0;
+					line-height: 1.2;
+					flex: 1;
+				}
+				.site-tooltip-verified {
+					background: #22c55e;
+					color: white;
+					font-size: 9px;
+					width: 14px;
+					height: 14px;
+					border-radius: 50%;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					flex-shrink: 0;
+				}
+				.site-tooltip-type {
+					font-size: 11px;
+					color: #94a3b8;
+					margin: 0 0 2px 0;
+					text-transform: capitalize;
+				}
+				.site-tooltip-culture {
+					font-size: 10px;
+					color: #64748b;
+					margin: 0 0 8px 0;
+				}
+				.site-tooltip-meta {
+					display: flex;
+					align-items: center;
+					gap: 8px;
+				}
+				.site-tooltip-badge {
+					font-size: 9px;
+					font-weight: 600;
+					text-transform: uppercase;
+					padding: 2px 6px;
+					border-radius: 4px;
+					letter-spacing: 0.5px;
+				}
+				.site-tooltip-badge.official {
+					background: rgba(34, 197, 94, 0.2);
+					color: #22c55e;
+				}
+				.site-tooltip-badge.bronze {
+					background: rgba(251, 146, 60, 0.2);
+					color: #fb923c;
+				}
+				.site-tooltip-badge.silver {
+					background: rgba(148, 163, 184, 0.2);
+					color: #94a3b8;
+				}
+				.site-tooltip-badge.gold {
+					background: rgba(250, 204, 21, 0.2);
+					color: #facc15;
+				}
+				.site-tooltip-badge.promoted {
+					background: rgba(34, 197, 94, 0.2);
+					color: #34d399;
+				}
+				.site-tooltip-media {
+					font-size: 10px;
+					color: #64748b;
+				}
+
+				/* Leaflet tooltip arrow override */
+				.site-tooltip::before {
+					border-top-color: #1a1f26 !important;
 				}
 			`}</style>
 			<MapContainer
@@ -222,7 +524,7 @@ export const SiteMap = ({ sites, zones, selectedSiteId, onSelect, className, onB
 				scrollWheelZoom
 				className="h-full w-full"
 			>
-				<TileLayer url={TILE_LAYERS.dark.url} attribution={TILE_LAYERS.dark.attribution} />
+				<TileLayer url={tileLayer.url} attribution={tileLayer.attribution} />
 				<BoundsWatcher onChange={onBoundsChange} />
 				<MapClickHandler onClick={onMapClick} />
 				<MapReadyHandler onReady={onMapReady} />
