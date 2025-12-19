@@ -3,13 +3,30 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { Drawer, DrawerContent } from "@/shared/ui/drawer";
-import { Plus, Search, X, Layers, MapPin, Sparkles, Navigation, Map as MapIcon, List, Activity, Image as ImageIcon, ChevronLeft } from "lucide-react";
+import { MobileDrawer, DRAWER_SNAP_POINTS, type DrawerSnapPoint } from "@/shared/ui/mobile-drawer";
+import {
+	Plus,
+	Search,
+	X,
+	Layers,
+	MapPin,
+	Sparkles,
+	Navigation,
+	Map as MapIcon,
+	List,
+	Image as ImageIcon,
+	ChevronDown,
+	Info,
+	MessageSquare,
+	Grid3X3,
+	Star,
+	Clock,
+	SortAsc,
+} from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Badge } from "@/shared/ui/badge";
 import { ScrollArea } from "@/shared/ui/scroll-area";
-import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/shared/lib/utils";
 import { zClass } from "@/shared/lib/z-index";
@@ -18,10 +35,12 @@ import { useMapStore, applySiteFilters } from "@/features/map-explorer/model/map
 import { HomeFeed } from "./home-feed";
 import { SiteEditor } from "./site-editor";
 import { loadMapData } from "../actions";
-import { WhatsHotPanel, getSimulatedHeatData } from "./whats-hot-panel";
-import { useAuth } from "@/components/providers/AuthProvider";
+import { getSimulatedHeatData } from "./whats-hot-panel";
 import { getSiteTypeIcon } from "@/components/map/site-type-icons";
-import type L from "leaflet";
+import { DrawerComments } from "@/components/discussion/drawer-comments";
+import { SiteFocusTooltip, FocusPointIndicator } from "./site-focus-tooltip";
+import { useFocusPoint, getPixelDistance, FOCUS_THRESHOLD_PX } from "../_hooks/use-focus-point";
+import L from "leaflet";
 
 const SiteMap = dynamic(() => import("./site-map").then((module) => module.SiteMap), {
 	ssr: false,
@@ -42,14 +61,14 @@ const toBoundingBox = (bounds: L.LatLngBounds): BoundingBox => ({
 
 type ViewMode = "map" | "list";
 type DrawerContentType = "sites" | "activity";
+type SiteListViewMode = "card" | "list";
+type SiteSortOption = "importance" | "name" | "recent" | "mediaCount";
 
-// Snap points for vaul drawer (as percentages from bottom)
-// Peek shows header + thumbnails preview (~28%), half screen, almost full
-const SNAP_POINTS: (string | number)[] = [0.28, 0.55, 0.92];
+// Drawer snap point shortcuts
+const { PEEK: SNAP_PEEK, HALF: SNAP_HALF, FULL: SNAP_FULL } = DRAWER_SNAP_POINTS;
 
 export const MobileSiteExplorer = ({ initialSites, initialZones, initialBounds }: MobileSiteExplorerProps) => {
 	const { sites, zones, filters, selectedSiteId, selectSite, initialize, replaceData, setBounds } = useMapStore();
-	const { profile, user } = useAuth();
 
 	const searchParams = useSearchParams();
 	const [activeEditor, setActiveEditor] = useState<"site" | null>(null);
@@ -64,18 +83,20 @@ export const MobileSiteExplorer = ({ initialSites, initialZones, initialBounds }
 	const [drawerContent, setDrawerContent] = useState<DrawerContentType>("sites");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [showSearchDropdown, setShowSearchDropdown] = useState(false);
-	const [drawerSnap, setDrawerSnap] = useState<number | string | null>(SNAP_POINTS[0]);
+	const [drawerSnap, setDrawerSnap] = useState<DrawerSnapPoint>(SNAP_PEEK);
 	const searchInputRef = useRef<HTMLInputElement>(null);
 
-	const initials = useMemo(() => {
-		const source = profile?.full_name ?? user?.email ?? "MM";
-		return source
-			.split(/\s+/)
-			.map((part) => part[0])
-			.join("")
-			.slice(0, 2)
-			.toUpperCase();
-	}, [profile?.full_name, user?.email]);
+	// Site list controls state
+	const [drawerSearchQuery, setDrawerSearchQuery] = useState("");
+	const [showDrawerSearch, setShowDrawerSearch] = useState(false);
+	const [siteListViewMode, setSiteListViewMode] = useState<SiteListViewMode>("card");
+	const [siteSortOption, setSiteSortOption] = useState<SiteSortOption>("importance");
+	const drawerSearchInputRef = useRef<HTMLInputElement>(null);
+
+	// Focus-based site detection state
+	const [focusSite, setFocusSite] = useState<MapSiteFeature | null>(null);
+	const [focusSitePosition, setFocusSitePosition] = useState<{ x: number; y: number } | null>(null);
+	const focusPoint = useFocusPoint(drawerSnap);
 
 	useEffect(() => {
 		if (activeEditor !== "site") {
@@ -92,6 +113,41 @@ export const MobileSiteExplorer = ({ initialSites, initialZones, initialBounds }
 	const filteredSites = useMemo(() => applySiteFilters(sites, filters), [sites, filters]);
 	const sitesWithHeat = useMemo(() => getSimulatedHeatData(filteredSites), [filteredSites]);
 	const selectedSite = useMemo(() => sites.find((site) => site.id === selectedSiteId) ?? null, [sites, selectedSiteId]);
+
+	// Sort and filter sites for the drawer list
+	const sortedSitesForDrawer = useMemo(() => {
+		// First, filter by drawer search query
+		let result = sitesWithHeat;
+		if (drawerSearchQuery.trim()) {
+			const query = drawerSearchQuery.toLowerCase();
+			result = result.filter(
+				(site) =>
+					site.name.toLowerCase().includes(query) ||
+					site.siteType.toLowerCase().includes(query) ||
+					site.tags?.cultures?.some((c) => c.toLowerCase().includes(query)) ||
+					site.tags?.themes?.some((t) => t.toLowerCase().includes(query))
+			);
+		}
+
+		// Then sort based on selected option
+		return [...result].sort((a, b) => {
+			switch (siteSortOption) {
+				case "importance":
+					// Sort by effective score (importance + activity), highest first
+					const scoreA = a.effectiveScore ?? a.importanceScore ?? 50;
+					const scoreB = b.effectiveScore ?? b.importanceScore ?? 50;
+					return scoreB - scoreA;
+				case "name":
+					return a.name.localeCompare(b.name);
+				case "recent":
+					return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+				case "mediaCount":
+					return b.mediaCount - a.mediaCount;
+				default:
+					return 0;
+			}
+		});
+	}, [sitesWithHeat, drawerSearchQuery, siteSortOption]);
 
 	// Search results for autocomplete dropdown
 	const searchResults = useMemo(() => {
@@ -116,10 +172,10 @@ export const MobileSiteExplorer = ({ initialSites, initialZones, initialBounds }
 
 		if (focusParam) {
 			selectSite(focusParam);
-			setDrawerSnap(SNAP_POINTS[1]); // Half screen
+			setDrawerSnap(SNAP_HALF); // Half screen for site detail
 		} else if (siteParam) {
 			selectSite(siteParam);
-			setDrawerSnap(SNAP_POINTS[1]);
+			setDrawerSnap(SNAP_HALF);
 		}
 	}, [searchParams, selectSite, sites, isHydrated]);
 
@@ -157,24 +213,20 @@ export const MobileSiteExplorer = ({ initialSites, initialZones, initialBounds }
 		(siteId: string) => {
 			selectSite(siteId);
 			setViewMode("map");
-			setDrawerSnap(SNAP_POINTS[1]); // Open to half to show site details
+			setDrawerSnap(SNAP_HALF); // Open to half to show site details
 		},
 		[selectSite]
 	);
 
 	const handleFocusSite = useCallback(
 		(siteId: string) => {
-			const site = sites.find((s) => s.id === siteId);
-			if (site && mapRef.current) {
-				mapRef.current.flyTo([site.coordinates.lat, site.coordinates.lng], 10, { duration: 0.8 });
-			}
 			selectSite(siteId);
 			setViewMode("map");
 			setSearchQuery("");
 			setShowSearchDropdown(false);
-			setDrawerSnap(SNAP_POINTS[1]);
+			setDrawerSnap(SNAP_HALF);
 		},
-		[sites, selectSite]
+		[selectSite]
 	);
 
 	const handleSearchSelect = (site: MapSiteFeature) => {
@@ -183,10 +235,85 @@ export const MobileSiteExplorer = ({ initialSites, initialZones, initialBounds }
 
 	const handleCloseSiteDetail = useCallback(() => {
 		selectSite(null);
+		// Reset drawer to default peek position when closing site details
+		setDrawerSnap(SNAP_PEEK);
 	}, [selectSite]);
 
+	// Handle map movement - find nearest site to focus point
+	const handleMapMove = useCallback(
+		(map: L.Map) => {
+			// Don't show focus tooltip when a site is already selected
+			if (selectedSiteId) {
+				setFocusSite(null);
+				setFocusSitePosition(null);
+				return;
+			}
+
+			// Get viewport bounds for early filtering
+			const bounds = map.getBounds();
+
+			// Get the focus point in container coordinates
+			const containerSize = map.getSize();
+			const focusX = containerSize.x / 2;
+			// Calculate focus Y based on drawer state (shifted up when drawer is open)
+			const visibleAreaPercent = (100 - drawerSnap) / 100;
+			const focusY = (visibleAreaPercent / 2) * containerSize.y;
+
+			// Find the nearest site to the focus point
+			let nearestSite: MapSiteFeature | null = null;
+			let nearestDistance = Infinity;
+			let nearestPosition: { x: number; y: number } | null = null;
+
+			// Only check visible sites (viewport culling for performance)
+			const visibleSites = sitesWithHeat.filter((site) => bounds.contains([site.coordinates.lat, site.coordinates.lng]));
+
+			// Cap at 100 sites for performance
+			const sitesToCheck = visibleSites.slice(0, 100);
+
+			for (const site of sitesToCheck) {
+				// Convert site coordinates to container point
+				const siteLatLng = L.latLng(site.coordinates.lat, site.coordinates.lng);
+				const sitePoint = map.latLngToContainerPoint(siteLatLng);
+
+				// Calculate pixel distance from focus point
+				const distance = getPixelDistance(focusX, focusY, sitePoint.x, sitePoint.y);
+
+				if (distance < nearestDistance) {
+					nearestDistance = distance;
+					nearestSite = site;
+					nearestPosition = { x: sitePoint.x, y: sitePoint.y };
+				}
+			}
+
+			// Update state if nearest site is within threshold
+			if (nearestSite && nearestDistance <= FOCUS_THRESHOLD_PX && nearestPosition) {
+				setFocusSite(nearestSite);
+				setFocusSitePosition(nearestPosition);
+			} else {
+				setFocusSite(null);
+				setFocusSitePosition(null);
+			}
+		},
+		[selectedSiteId, sitesWithHeat, drawerSnap]
+	);
+
+	// Clear focus site when a site is selected
+	useEffect(() => {
+		if (selectedSiteId) {
+			setFocusSite(null);
+			setFocusSitePosition(null);
+		}
+	}, [selectedSiteId]);
+
 	// Check if drawer is expanded (beyond peek)
-	const isDrawerExpanded = drawerSnap !== SNAP_POINTS[0];
+	const isDrawerExpanded = drawerSnap !== SNAP_PEEK;
+
+	// Ensure drawer expands when a site is selected
+	useEffect(() => {
+		if (selectedSiteId && selectedSite) {
+			setDrawerSnap(SNAP_HALF);
+		}
+	}, [selectedSiteId, selectedSite]);
 
 	return (
 		<div className="relative h-[100dvh] w-full overflow-hidden bg-background">
@@ -196,6 +323,7 @@ export const MobileSiteExplorer = ({ initialSites, initialZones, initialBounds }
 					sites={sitesWithHeat}
 					zones={zones}
 					selectedSiteId={selectedSiteId}
+					autoHoveredSiteId={focusSite?.id}
 					onSelect={handleSelectSite}
 					className="h-full w-full"
 					onBoundsChange={handleBoundsChange}
@@ -207,14 +335,33 @@ export const MobileSiteExplorer = ({ initialSites, initialZones, initialBounds }
 					onMapReady={(map) => {
 						mapRef.current = map;
 					}}
+					onMapMove={handleMapMove}
+					drawerHeightPercent={SNAP_HALF}
 				/>
 			</div>
+
+			{/* Focus point indicator and tooltip - outside map container for proper z-index */}
+			{viewMode === "map" && !selectedSiteId && (
+				<>
+					<FocusPointIndicator focusY={focusPoint.focusYPixels} isActive={!!focusSite} />
+					<SiteFocusTooltip site={focusSite} markerPosition={focusSitePosition} onSelect={handleSelectSite} />
+				</>
+			)}
 
 			{/* List view - full screen when active */}
 			{viewMode === "list" && (
 				<div className="absolute inset-0 bg-background flex flex-col pt-16">
+					<div className="px-3 py-2 border-b border-border/30">
+						<SiteListHeader
+							sortOption={siteSortOption}
+							onSortChange={setSiteSortOption}
+							viewMode={siteListViewMode}
+							onViewModeChange={setSiteListViewMode}
+							siteCount={sortedSitesForDrawer.length}
+						/>
+					</div>
 					<ScrollArea className="flex-1">
-						<SiteListWithThumbnails sites={filteredSites} onSelect={handleFocusSite} />
+						<SiteListWithThumbnails sites={sortedSitesForDrawer} onSelect={handleFocusSite} viewMode={siteListViewMode} />
 					</ScrollArea>
 				</div>
 			)}
@@ -222,11 +369,11 @@ export const MobileSiteExplorer = ({ initialSites, initialZones, initialBounds }
 			{/* Top bar - minimal controls */}
 			<div
 				className={cn(
-					"absolute top-0 left-0 right-0 pt-safe px-3 pb-2 bg-gradient-to-b from-background/95 via-background/80 to-transparent",
+					"absolute top-0 left-0 right-0 pt-2 px-3 pb-2 bg-gradient-to-b from-background/95 via-background/80 to-transparent",
 					zClass.mapControls
 				)}
 			>
-				<div className="flex items-center gap-2 mt-2">
+				<div className="flex items-center gap-2">
 					{/* View toggle */}
 					<div className="flex items-center bg-card rounded-full shadow-lg p-1">
 						<button
@@ -358,85 +505,111 @@ export const MobileSiteExplorer = ({ initialSites, initialZones, initialBounds }
 				</div>
 			)}
 
-			{/* Bottom drawer using vaul - only in map view */}
+			{/* Bottom drawer - custom implementation for reliable snap points and scrolling */}
 			{viewMode === "map" && (
-				<Drawer
-					open={true}
-					modal={false}
-					showOverlay={false}
-					snapPoints={SNAP_POINTS}
-					activeSnapPoint={drawerSnap}
-					setActiveSnapPoint={setDrawerSnap}
-					direction="bottom"
-				>
-					<DrawerContent className="max-h-[92dvh]">
-						{/* Drawer header */}
-						<div className="flex items-center justify-between px-4 py-2 border-b border-border/30">
-							{/* Show back button when viewing site details */}
-							{selectedSite ? (
-								<Button variant="ghost" size="sm" className="h-8 gap-1.5 -ml-2" onClick={handleCloseSiteDetail}>
-									<ChevronLeft className="h-4 w-4" />
-									<span className="text-xs">Back to sites</span>
-								</Button>
-							) : (
-								<div className="flex items-center gap-1 p-0.5 bg-secondary/30 rounded-lg">
-									<button
-										onClick={() => setDrawerContent("sites")}
-										className={cn(
-											"flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
-											drawerContent === "sites" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
-										)}
-									>
-										<MapPin className="h-3.5 w-3.5" />
-										Sites
-									</button>
-									<button
-										onClick={() => setDrawerContent("activity")}
-										className={cn(
-											"flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
-											drawerContent === "activity" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
-										)}
-									>
-										<Sparkles className="h-3.5 w-3.5" />
-										Activity
-									</button>
+				<MobileDrawer
+					snap={drawerSnap}
+					onSnapChange={setDrawerSnap}
+					header={
+						selectedSite ? null : (
+							// Compact header with Sites/Activity toggle and search
+							<div className="flex items-center justify-between px-3 py-1.5 gap-2">
+								{/* Left: Sites/Activity toggle (hidden when search is open) */}
+								<div className={cn("flex items-center transition-all", showDrawerSearch ? "w-0 opacity-0 overflow-hidden" : "flex-1")}>
+									<div className="flex items-center gap-0.5 p-0.5 bg-secondary/30 rounded-full">
+										<button
+											onClick={() => setDrawerContent("sites")}
+											className={cn(
+												"flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors",
+												drawerContent === "sites" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
+											)}
+										>
+											<MapPin className="h-3 w-3" />
+											Sites
+										</button>
+										<button
+											onClick={() => setDrawerContent("activity")}
+											className={cn(
+												"flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors",
+												drawerContent === "activity" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
+											)}
+										>
+											<Sparkles className="h-3 w-3" />
+											Activity
+										</button>
+									</div>
 								</div>
-							)}
 
-							{/* What's Hot Panel */}
-							<div className="relative">
-								<WhatsHotPanel sites={sitesWithHeat} onFocusSite={handleFocusSite} />
+								{/* Search input (expands when active) */}
+								<div className={cn("flex items-center gap-1 transition-all", showDrawerSearch ? "flex-1" : "")}>
+									{showDrawerSearch ? (
+										<div className="flex-1 flex items-center gap-1">
+											<div className="relative flex-1">
+												<Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+												<Input
+													ref={drawerSearchInputRef}
+													value={drawerSearchQuery}
+													onChange={(e) => setDrawerSearchQuery(e.target.value)}
+													placeholder="Search sites..."
+													className="h-7 pl-8 pr-8 text-xs bg-muted/50 rounded-full border-border/50"
+													autoFocus
+												/>
+												{drawerSearchQuery && (
+													<button
+														className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted"
+														onClick={() => setDrawerSearchQuery("")}
+													>
+														<X className="h-3 w-3 text-muted-foreground" />
+													</button>
+												)}
+											</div>
+											<button
+												onClick={() => {
+													setShowDrawerSearch(false);
+													setDrawerSearchQuery("");
+												}}
+												className="p-1.5 rounded-full hover:bg-muted/50 text-muted-foreground"
+											>
+												<X className="h-4 w-4" />
+											</button>
+										</div>
+									) : (
+										<button
+											onClick={() => {
+												setShowDrawerSearch(true);
+												setTimeout(() => drawerSearchInputRef.current?.focus(), 100);
+											}}
+											className={cn(
+												"p-1.5 rounded-full transition-colors",
+												drawerSearchQuery ? "bg-primary/10 text-primary" : "hover:bg-muted/50 text-muted-foreground"
+											)}
+										>
+											<Search className="h-4 w-4" />
+										</button>
+									)}
+								</div>
 							</div>
-
-							{/* Quick nav links */}
-							<div className="flex items-center gap-1">
-								<Link href="/activity" className="p-2 text-muted-foreground hover:text-foreground transition-colors">
-									<Activity className="h-4 w-4" />
-								</Link>
-								<Link href="/profile" className="p-2 text-muted-foreground hover:text-foreground transition-colors">
-									<Avatar className="h-5 w-5 border border-border/40">
-										<AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-[8px]">{initials}</AvatarFallback>
-									</Avatar>
-								</Link>
-							</div>
-						</div>
-
-						{/* Drawer content */}
-						<div className="flex-1 overflow-hidden">
-							{selectedSite ? (
-								<ScrollArea className="h-full">
-									<SiteDetailCard site={selectedSite} onClose={handleCloseSiteDetail} onFocus={handleFocusSite} />
-								</ScrollArea>
-							) : drawerContent === "sites" ? (
-								<ScrollArea className="h-full">
-									<SiteListWithThumbnails sites={filteredSites} onSelect={handleFocusSite} />
-								</ScrollArea>
-							) : (
-								<HomeFeed sites={filteredSites} onFocusSite={handleFocusSite} className="h-full" />
-							)}
-						</div>
-					</DrawerContent>
-				</Drawer>
+						)
+					}
+				>
+					{/* Drawer content */}
+					{selectedSite ? (
+						<SiteDetailCard site={selectedSite} onClose={handleCloseSiteDetail} onFocus={handleFocusSite} onExpand={() => setDrawerSnap(SNAP_FULL)} />
+					) : drawerContent === "sites" ? (
+						<>
+							<SiteListHeader
+								sortOption={siteSortOption}
+								onSortChange={setSiteSortOption}
+								viewMode={siteListViewMode}
+								onViewModeChange={setSiteListViewMode}
+								siteCount={sortedSitesForDrawer.length}
+							/>
+							<SiteListWithThumbnails sites={sortedSitesForDrawer} onSelect={handleFocusSite} viewMode={siteListViewMode} />
+						</>
+					) : (
+						<HomeFeed sites={filteredSites} onFocusSite={handleFocusSite} className="h-full" />
+					)}
+				</MobileDrawer>
 			)}
 
 			{/* Tap to dismiss search dropdown */}
@@ -445,15 +618,62 @@ export const MobileSiteExplorer = ({ initialSites, initialZones, initialBounds }
 	);
 };
 
-// Site detail card component
-function SiteDetailCard({ site, onClose, onFocus }: { site: MapSiteFeature; onClose: () => void; onFocus: (id: string) => void }) {
+// Collapsible section component
+function CollapsibleSection({
+	title,
+	icon,
+	expanded,
+	onToggle,
+	children,
+	badge,
+}: {
+	title: string;
+	icon: React.ReactNode;
+	expanded: boolean;
+	onToggle: () => void;
+	children: React.ReactNode;
+	badge?: string | number;
+}) {
 	return (
-		<div className="p-4 space-y-4">
+		<div className="border border-border/40 rounded-lg overflow-hidden">
+			<button onClick={onToggle} className="w-full flex items-center justify-between px-3 py-2.5 bg-muted/30 hover:bg-muted/50 transition-colors">
+				<div className="flex items-center gap-2">
+					{icon}
+					<span className="text-sm font-medium">{title}</span>
+					{badge !== undefined && (
+						<Badge variant="secondary" className="text-[10px] h-4 px-1.5">
+							{badge}
+						</Badge>
+					)}
+				</div>
+				<ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", expanded && "rotate-180")} />
+			</button>
+			{expanded && <div className="p-3 border-t border-border/30">{children}</div>}
+		</div>
+	);
+}
+
+// Site detail card component
+function SiteDetailCard({
+	site,
+	onClose,
+	onFocus,
+	onExpand,
+}: {
+	site: MapSiteFeature;
+	onClose: () => void;
+	onFocus: (id: string) => void;
+	onExpand: () => void;
+}) {
+	const [expandedSection, setExpandedSection] = useState<"overview" | "media" | "discussion">("overview");
+
+	return (
+		<div className="px-4 py-2 space-y-3">
 			{/* Header */}
 			<div className="flex items-start justify-between gap-3">
 				<div className="flex-1 min-w-0">
 					<h2 className="text-lg font-bold truncate">{site.name}</h2>
-					<p className="text-sm text-muted-foreground capitalize">{site.siteType}</p>
+					<p className="text-sm text-muted-foreground capitalize">{site.siteType.replace(/_/g, " ")}</p>
 				</div>
 				<div className="flex items-center gap-1">
 					<Button size="icon" variant="ghost" onClick={() => onFocus(site.id)}>
@@ -476,43 +696,209 @@ function SiteDetailCard({ site, onClose, onFocus }: { site: MapSiteFeature; onCl
 				)}
 			</div>
 
-			{/* Description */}
-			{site.summary && <p className="text-sm text-muted-foreground">{site.summary}</p>}
+			{/* Collapsible sections */}
+			<div className="space-y-2">
+				{/* Overview Section */}
+				<CollapsibleSection
+					title="Overview"
+					icon={<Info className="h-4 w-4 text-muted-foreground" />}
+					expanded={expandedSection === "overview"}
+					onToggle={() => setExpandedSection(expandedSection === "overview" ? "overview" : "overview")}
+				>
+					<div className="space-y-3">
+						{/* Description */}
+						{site.summary && <p className="text-sm text-muted-foreground">{site.summary}</p>}
 
-			{/* Tags */}
-			{site.tags && (site.tags.cultures?.length > 0 || site.tags.themes?.length > 0) && (
-				<div className="flex flex-wrap gap-1.5">
-					{site.tags.cultures?.map((tag) => (
-						<Badge key={tag} variant="secondary" className="text-xs">
-							{tag}
-						</Badge>
-					))}
-					{site.tags.themes?.map((tag: string) => (
-						<Badge key={tag} variant="outline" className="text-xs">
-							{tag}
-						</Badge>
-					))}
-				</div>
-			)}
+						{/* Tags */}
+						{site.tags && (site.tags.cultures?.length > 0 || site.tags.themes?.length > 0) && (
+							<div className="flex flex-wrap gap-1.5">
+								{site.tags.cultures?.map((tag) => (
+									<Badge key={tag} variant="secondary" className="text-xs">
+										{tag}
+									</Badge>
+								))}
+								{site.tags.themes?.map((tag: string) => (
+									<Badge key={tag} variant="outline" className="text-xs">
+										{tag}
+									</Badge>
+								))}
+							</div>
+						)}
 
-			{/* Media count */}
-			{site.mediaCount > 0 && <p className="text-xs text-muted-foreground">{site.mediaCount} photos</p>}
+						{/* Coordinates */}
+						<p className="text-xs text-muted-foreground">
+							{site.coordinates.lat.toFixed(4)}, {site.coordinates.lng.toFixed(4)}
+						</p>
+					</div>
+				</CollapsibleSection>
+
+				{/* Media Section */}
+				<CollapsibleSection
+					title="Media"
+					icon={<ImageIcon className="h-4 w-4 text-muted-foreground" />}
+					expanded={expandedSection === "media"}
+					onToggle={() => setExpandedSection("media")}
+					badge={site.mediaCount > 0 ? site.mediaCount : undefined}
+				>
+					{site.mediaCount > 0 || site.thumbnailUrl ? (
+						<div className="space-y-2">
+							<div className="grid grid-cols-3 gap-1.5">
+								{/* First slot: show actual thumbnail if available */}
+								{site.thumbnailUrl ? (
+									<div className="aspect-square rounded bg-muted overflow-hidden">
+										<img src={site.thumbnailUrl} alt={site.name} className="w-full h-full object-cover" loading="lazy" />
+									</div>
+								) : (
+									<div className="aspect-square rounded bg-muted flex items-center justify-center">
+										<ImageIcon className="h-4 w-4 text-muted-foreground/40" />
+									</div>
+								)}
+								{/* Remaining slots as placeholders */}
+								{Array.from({ length: Math.min(Math.max(site.mediaCount - 1, 0), 5) }).map((_, i) => (
+									<div key={i} className="aspect-square rounded bg-muted flex items-center justify-center">
+										<ImageIcon className="h-4 w-4 text-muted-foreground/40" />
+									</div>
+								))}
+							</div>
+							{site.mediaCount > 6 && <p className="text-[10px] text-muted-foreground text-center">+{site.mediaCount - 6} more</p>}
+						</div>
+					) : (
+						<p className="text-xs text-muted-foreground text-center py-2">No media uploaded yet</p>
+					)}
+				</CollapsibleSection>
+
+				{/* Discussion Section */}
+				<CollapsibleSection
+					title="Discussion"
+					icon={<MessageSquare className="h-4 w-4 text-muted-foreground" />}
+					expanded={expandedSection === "discussion"}
+					onToggle={() => setExpandedSection("discussion")}
+				>
+					<DrawerComments siteId={site.id} />
+				</CollapsibleSection>
+			</div>
 
 			{/* Actions */}
 			<div className="flex gap-2 pt-2">
-				<Button className="flex-1" size="sm">
+				<Button className="flex-1" size="sm" onClick={onExpand}>
 					View Full Details
 				</Button>
-				<Button variant="outline" size="sm">
-					Contribute
+				<Button variant="outline" size="sm" asChild>
+					<Link href={`/contribute?site=${site.id}`}>Contribute</Link>
 				</Button>
 			</div>
 		</div>
 	);
 }
 
+// Site list header with sort and view toggle
+function SiteListHeader({
+	sortOption,
+	onSortChange,
+	viewMode,
+	onViewModeChange,
+	siteCount,
+}: {
+	sortOption: SiteSortOption;
+	onSortChange: (option: SiteSortOption) => void;
+	viewMode: SiteListViewMode;
+	onViewModeChange: (mode: SiteListViewMode) => void;
+	siteCount: number;
+}) {
+	const [showSortMenu, setShowSortMenu] = useState(false);
+
+	const sortOptions: { value: SiteSortOption; label: string; icon: React.ReactNode }[] = [
+		{ value: "importance", label: "Most Famous", icon: <Star className="h-3.5 w-3.5" /> },
+		{ value: "name", label: "Name A-Z", icon: <SortAsc className="h-3.5 w-3.5" /> },
+		{ value: "recent", label: "Recently Updated", icon: <Clock className="h-3.5 w-3.5" /> },
+		{ value: "mediaCount", label: "Most Photos", icon: <ImageIcon className="h-3.5 w-3.5" /> },
+	];
+
+	const currentSort = sortOptions.find((opt) => opt.value === sortOption);
+
+	return (
+		<div className="px-3 py-2">
+			{/* Controls row */}
+			<div className="flex items-center justify-between gap-2">
+				{/* Sort dropdown */}
+				<div className="relative">
+					<button
+						onClick={() => setShowSortMenu(!showSortMenu)}
+						className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium bg-muted/50 rounded-lg hover:bg-muted transition-colors"
+					>
+						{currentSort?.icon}
+						<span className="hidden xs:inline">{currentSort?.label}</span>
+						<ChevronDown className={cn("h-3 w-3 transition-transform", showSortMenu && "rotate-180")} />
+					</button>
+
+					{showSortMenu && (
+						<>
+							<div className="fixed inset-0 z-40" onClick={() => setShowSortMenu(false)} />
+							<div className="absolute top-full left-0 mt-1 bg-card rounded-lg shadow-xl border border-border/50 overflow-hidden z-50 min-w-[140px]">
+								{sortOptions.map((option) => (
+									<button
+										key={option.value}
+										onClick={() => {
+											onSortChange(option.value);
+											setShowSortMenu(false);
+										}}
+										className={cn(
+											"w-full px-3 py-2 text-left text-xs flex items-center gap-2 hover:bg-muted/50 transition-colors",
+											sortOption === option.value && "bg-primary/10 text-primary"
+										)}
+									>
+										{option.icon}
+										{option.label}
+									</button>
+								))}
+							</div>
+						</>
+					)}
+				</div>
+
+				{/* Site count */}
+				<span className="text-xs text-muted-foreground">
+					{siteCount} site{siteCount !== 1 ? "s" : ""}
+				</span>
+
+				{/* View mode toggle */}
+				<div className="flex items-center bg-muted/50 rounded-lg p-0.5">
+					<button
+						onClick={() => onViewModeChange("card")}
+						className={cn(
+							"p-1.5 rounded-md transition-colors",
+							viewMode === "card" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+						)}
+						title="Card view"
+					>
+						<Grid3X3 className="h-3.5 w-3.5" />
+					</button>
+					<button
+						onClick={() => onViewModeChange("list")}
+						className={cn(
+							"p-1.5 rounded-md transition-colors",
+							viewMode === "list" ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+						)}
+						title="List view"
+					>
+						<List className="h-3.5 w-3.5" />
+					</button>
+				</div>
+			</div>
+		</div>
+	);
+}
+
 // Site list with thumbnails component
-function SiteListWithThumbnails({ sites, onSelect }: { sites: MapSiteFeature[]; onSelect: (id: string) => void }) {
+function SiteListWithThumbnails({
+	sites,
+	onSelect,
+	viewMode = "card",
+}: {
+	sites: MapSiteFeature[];
+	onSelect: (id: string) => void;
+	viewMode?: SiteListViewMode;
+}) {
 	if (sites.length === 0) {
 		return (
 			<div className="p-8 text-center text-muted-foreground">
@@ -522,6 +908,60 @@ function SiteListWithThumbnails({ sites, onSelect }: { sites: MapSiteFeature[]; 
 		);
 	}
 
+	// Compact list view
+	if (viewMode === "list") {
+		return (
+			<div className="divide-y divide-border/30">
+				{sites.map((site) => {
+					const SiteIcon = getSiteTypeIcon(site.siteType);
+					const importanceScore = site.effectiveScore ?? site.importanceScore ?? 50;
+					return (
+						<button
+							key={site.id}
+							onClick={() => onSelect(site.id)}
+							className="w-full px-3 py-2.5 flex items-center gap-3 hover:bg-muted/50 transition-colors text-left"
+						>
+							{/* Thumbnail or icon */}
+							<div className="h-12 w-12 rounded-lg bg-muted flex-shrink-0 overflow-hidden">
+								{site.thumbnailUrl ? (
+									<img src={site.thumbnailUrl} alt={site.name} className="w-full h-full object-cover" loading="lazy" />
+								) : (
+									<div className="w-full h-full flex items-center justify-center">
+										<SiteIcon className="h-5 w-5 text-muted-foreground/50" />
+									</div>
+								)}
+							</div>
+							{/* Info */}
+							<div className="flex-1 min-w-0">
+								<div className="flex items-center gap-1.5">
+									<p className="font-medium text-sm truncate">{site.name}</p>
+									{site.verificationStatus === "verified" && <span className="text-primary text-[10px]">✓</span>}
+								</div>
+								<p className="text-xs text-muted-foreground truncate capitalize">{site.siteType.replace(/_/g, " ")}</p>
+							</div>
+							{/* Right side info */}
+							<div className="flex flex-col items-end gap-0.5 flex-shrink-0">
+								{importanceScore >= 70 && (
+									<Badge variant="secondary" className="text-[9px] px-1.5 py-0">
+										<Star className="h-2.5 w-2.5 mr-0.5" />
+										Notable
+									</Badge>
+								)}
+								{site.mediaCount > 0 && (
+									<span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+										<ImageIcon className="h-2.5 w-2.5" />
+										{site.mediaCount}
+									</span>
+								)}
+							</div>
+						</button>
+					);
+				})}
+			</div>
+		);
+	}
+
+	// Card grid view (default)
 	return (
 		<div className="p-3 grid grid-cols-2 gap-3">
 			{sites.map((site) => (

@@ -7,6 +7,17 @@ export type ZoneVerificationState = "draft" | "published";
 // Heat tier for site popularity indicators
 export type HeatTier = "hot" | "rising" | "active" | "normal" | "low";
 
+// Importance tier based on effective score (base importance + decayed activity)
+export type ImportanceTier = "landmark" | "major" | "notable" | "minor";
+
+// Helper to derive importance tier from effective score
+export const getImportanceTier = (effectiveScore: number): ImportanceTier => {
+  if (effectiveScore >= 80) return "landmark";
+  if (effectiveScore >= 60) return "major";
+  if (effectiveScore >= 40) return "notable";
+  return "minor";
+};
+
 export interface CoordinatePair {
   lat: number;
   lng: number;
@@ -42,6 +53,7 @@ export interface SiteRow {
   related_research_ids: string[];
   updated_at: string;
   updated_by: string;
+  thumbnail_url?: string;
 }
 
 export type SiteTagType = "culture" | "era" | "theme";
@@ -123,10 +135,17 @@ export interface MapSiteFeature {
   updatedAt: string;
   updatedBy: string;
   searchText: string;
-  // Heat/popularity indicators
+  // Heat/popularity indicators (legacy)
   heatTier?: HeatTier;
   heatScore?: number; // 0-100
   trendReason?: string; // Why it's trending, e.g., "12 new photos"
+  // Importance & Activity scoring
+  importanceScore?: number; // 0-100, base static score
+  activityScore?: number; // 0+, raw activity points from contributions
+  activityUpdatedAt?: string; // ISO timestamp of last activity
+  effectiveScore?: number; // Computed: importance + decayed activity
+  importanceTier?: ImportanceTier; // Derived tier for UI display
+  isTrending?: boolean; // High activity in recent days
 }
 
 export interface MapDataResult {
@@ -134,9 +153,17 @@ export interface MapDataResult {
   zones: MapZoneFeature[];
   meta: {
     totalSites: number;
+    totalBeforeLimit?: number;
     totalZones: number;
     bounds: BoundingBox;
     tagCounts: Record<string, number>;
+    layerCounts?: {
+      official: number;
+      community: number;
+      total: number;
+    };
+    wasLimited?: boolean;
+    zoom?: number;
   };
 }
 
@@ -152,6 +179,37 @@ export interface MapFilters {
   categories: SiteCategory[];
   zones: string[];
   tags: string[];
+  // Importance filtering
+  minImportance: number; // 0-100, minimum effective score to show
+  importanceTiers: ImportanceTier[]; // Filter by specific tiers
+  showTrending: boolean; // Quick toggle to prioritize recent activity
+}
+
+// Smart map query parameters for zoom-aware loading
+export interface SmartMapQuery {
+  bounds: BoundingBox;
+  zoom: number;
+  siteTypes?: string[];
+  minScore?: number;
+  limit?: number;
+}
+
+// Response from smart map API
+export interface SmartMapResponse {
+  sites: MapSiteFeature[];
+  meta: {
+    total: number;
+    showing: number;
+    hasMore: boolean;
+    hiddenCount: number;
+    zoom: number;
+    bounds: BoundingBox;
+    filters?: {
+      siteTypes: string[] | null;
+      minScore: number;
+      limit: number;
+    };
+  };
 }
 
 export interface DraftSiteInput {

@@ -33,14 +33,7 @@ import { cn, timeAgo } from "@/shared/lib/utils";
 import { zClass } from "@/shared/lib/z-index";
 
 // Activity/contribution types (matching home-feed.tsx)
-type ContributionType =
-	| "new_photos"
-	| "new_video"
-	| "research_update"
-	| "site_update"
-	| "expert_post"
-	| "connection_found"
-	| "event_announcement";
+type ContributionType = "new_photos" | "new_video" | "research_update" | "site_update" | "expert_post" | "connection_found" | "event_announcement";
 
 interface FeedItemAuthor {
 	name: string;
@@ -71,12 +64,21 @@ interface FeedItemExternalLink {
 export type SourceType = "official" | "community" | "system";
 
 // Change type for specific activity labels
-export type ChangeType = 
-	| "new_site" | "site_verified" | "video_added" | "photos_added" 
-	| "document_added" | "description_updated" 
-	| "coordinates_updated" | "metadata_updated" | "trending" 
-	| "milestone" | "post_created" | "research_published" 
-	| "event_announced" | "connection_proposed";
+export type ChangeType =
+	| "new_site"
+	| "site_verified"
+	| "video_added"
+	| "photos_added"
+	| "document_added"
+	| "description_updated"
+	| "coordinates_updated"
+	| "metadata_updated"
+	| "trending"
+	| "milestone"
+	| "post_created"
+	| "research_published"
+	| "event_announced"
+	| "connection_proposed";
 
 export interface FeedItem {
 	id: string;
@@ -93,10 +95,10 @@ export interface FeedItem {
 	tags: string[];
 	externalLink?: FeedItemExternalLink;
 	// New fields for enhanced activity tracking
-	sourceType?: SourceType;         // official, community, system
-	changeType?: ChangeType;         // Specific type of change
-	changeMagnitude?: number;        // 0-100, importance ranking
-	mediaCount?: number;             // For "X photos added" labels
+	sourceType?: SourceType; // official, community, system
+	changeType?: ChangeType; // Specific type of change
+	changeMagnitude?: number; // 0-100, importance ranking
+	mediaCount?: number; // For "X photos added" labels
 }
 
 interface ActivityDetailDrawerProps {
@@ -257,13 +259,7 @@ function getMockComments(itemId: string): Comment[] {
 	];
 }
 
-export function ActivityDetailDrawer({
-	item,
-	isOpen,
-	onClose,
-	onFocusSite,
-	className,
-}: ActivityDetailDrawerProps) {
+export function ActivityDetailDrawer({ item, isOpen, onClose, onFocusSite, className }: ActivityDetailDrawerProps) {
 	const [isLoading, setIsLoading] = useState(true);
 	const [isUpvoted, setIsUpvoted] = useState(false);
 	const [isBookmarked, setIsBookmarked] = useState(false);
@@ -309,10 +305,7 @@ export function ActivityDetailDrawer({
 						animate={{ opacity: 1 }}
 						exit={{ opacity: 0 }}
 						transition={{ duration: 0.2 }}
-						className={cn(
-							"fixed inset-0 bg-black/40 backdrop-blur-sm lg:hidden",
-							zClass.modalBackdrop
-						)}
+						className={cn("fixed inset-0 bg-black/40 backdrop-blur-sm lg:hidden", zClass.modalBackdrop)}
 						onClick={onClose}
 					/>
 
@@ -323,7 +316,7 @@ export function ActivityDetailDrawer({
 						exit={{ x: "100%" }}
 						transition={{ type: "spring", damping: 25, stiffness: 300 }}
 						className={cn(
-							"fixed right-0 top-0 h-full w-full max-w-lg border-l border-border/40 bg-[#0e1217] shadow-2xl",
+							"fixed right-0 top-0 h-full w-full max-w-lg border-l border-border/40 bg-background shadow-2xl",
 							zClass.modal,
 							"lg:w-[480px]",
 							className
@@ -345,12 +338,7 @@ export function ActivityDetailDrawer({
 									</div>
 								</div>
 							</div>
-							<Button
-								size="icon"
-								variant="ghost"
-								className="shrink-0 h-8 w-8"
-								onClick={onClose}
-							>
+							<Button size="icon" variant="ghost" className="shrink-0 h-8 w-8" onClick={onClose}>
 								<X className="h-4 w-4" />
 							</Button>
 						</div>
@@ -369,7 +357,11 @@ export function ActivityDetailDrawer({
 										<Avatar className="h-11 w-11 border border-border/40">
 											<AvatarImage src={item.author.avatar} />
 											<AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20">
-												{item.author.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+												{item.author.name
+													.split(" ")
+													.map((n) => n[0])
+													.join("")
+													.slice(0, 2)}
 											</AvatarFallback>
 										</Avatar>
 										<div className="flex-1">
@@ -402,9 +394,7 @@ export function ActivityDetailDrawer({
 											<MapPin className="h-4 w-4 text-emerald-400" />
 											<div className="flex-1 min-w-0">
 												<p className="text-sm font-medium truncate">{item.siteName}</p>
-												{item.siteLocation && (
-													<p className="text-xs text-muted-foreground">{item.siteLocation}</p>
-												)}
+												{item.siteLocation && <p className="text-xs text-muted-foreground">{item.siteLocation}</p>}
 											</div>
 											<ChevronRight className="h-4 w-4 text-muted-foreground" />
 										</button>
@@ -429,9 +419,7 @@ export function ActivityDetailDrawer({
 												<div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-pink-900/30 to-pink-950/50">
 													<div className="text-center">
 														<ImageIcon className="h-12 w-12 text-pink-400 mx-auto mb-2" />
-														<span className="text-lg font-medium text-pink-300">
-															{item.media.count} photos
-														</span>
+														<span className="text-lg font-medium text-pink-300">{item.media.count} photos</span>
 														<p className="text-xs text-pink-400/80 mt-1">Click to view gallery</p>
 													</div>
 												</div>
@@ -459,10 +447,7 @@ export function ActivityDetailDrawer({
 									{item.tags.length > 0 && (
 										<div className="flex flex-wrap gap-2">
 											{item.tags.map((tag) => (
-												<span
-													key={tag}
-													className="text-xs text-primary hover:underline cursor-pointer"
-												>
+												<span key={tag} className="text-xs text-primary hover:underline cursor-pointer">
 													#{tag}
 												</span>
 											))}
@@ -479,9 +464,7 @@ export function ActivityDetailDrawer({
 											)}
 										>
 											<ThumbsUp className={cn("h-4 w-4", isUpvoted && "fill-current")} />
-											<span className="text-sm font-medium">
-												{item.engagement.upvotes + (isUpvoted ? 1 : 0)}
-											</span>
+											<span className="text-sm font-medium">{item.engagement.upvotes + (isUpvoted ? 1 : 0)}</span>
 										</button>
 										<button className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
 											<MessageSquare className="h-4 w-4" />
@@ -490,9 +473,7 @@ export function ActivityDetailDrawer({
 										<span className="flex items-center gap-1.5 text-muted-foreground">
 											<Eye className="h-4 w-4" />
 											<span className="text-sm">
-												{item.engagement.views > 1000
-													? `${(item.engagement.views / 1000).toFixed(1)}K`
-													: item.engagement.views}
+												{item.engagement.views > 1000 ? `${(item.engagement.views / 1000).toFixed(1)}K` : item.engagement.views}
 											</span>
 										</span>
 										<div className="flex-1" />
@@ -500,9 +481,7 @@ export function ActivityDetailDrawer({
 											onClick={() => setIsBookmarked(!isBookmarked)}
 											className={cn(
 												"p-1.5 rounded transition-colors",
-												isBookmarked
-													? "text-primary bg-primary/10"
-													: "text-muted-foreground hover:text-foreground"
+												isBookmarked ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
 											)}
 										>
 											<Bookmark className={cn("h-4 w-4", isBookmarked && "fill-current")} />
@@ -514,14 +493,16 @@ export function ActivityDetailDrawer({
 
 									{/* Comments Section */}
 									<div className="space-y-3">
-										<h3 className="text-sm font-semibold">
-											Comments ({comments.length})
-										</h3>
+										<h3 className="text-sm font-semibold">Comments ({comments.length})</h3>
 										{comments.map((comment) => (
 											<div key={comment.id} className="flex gap-3">
 												<Avatar className="h-8 w-8 shrink-0">
 													<AvatarFallback className="text-xs bg-secondary">
-														{comment.author.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+														{comment.author.name
+															.split(" ")
+															.map((n) => n[0])
+															.join("")
+															.slice(0, 2)}
 													</AvatarFallback>
 												</Avatar>
 												<div className="flex-1 min-w-0">
@@ -532,21 +513,15 @@ export function ActivityDetailDrawer({
 																✓
 															</Badge>
 														)}
-														<span className="text-[10px] text-muted-foreground">
-															{timeAgo(comment.timestamp)}
-														</span>
+														<span className="text-[10px] text-muted-foreground">{timeAgo(comment.timestamp)}</span>
 													</div>
-													<p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-														{comment.content}
-													</p>
+													<p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{comment.content}</p>
 													<div className="flex items-center gap-3 mt-1.5">
 														<button className="text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-1">
 															<ThumbsUp className="h-3 w-3" />
 															{comment.likes}
 														</button>
-														<button className="text-[10px] text-muted-foreground hover:text-foreground">
-															Reply
-														</button>
+														<button className="text-[10px] text-muted-foreground hover:text-foreground">Reply</button>
 													</div>
 												</div>
 											</div>
@@ -591,14 +566,10 @@ export function ActivityDetailDrawer({
 						)}
 
 						{/* Footer Actions */}
-						<div className="absolute bottom-0 left-0 right-0 border-t border-border/40 bg-[#0e1217] p-4">
+						<div className="absolute bottom-0 left-0 right-0 border-t border-border/40 bg-background p-4">
 							<div className="flex gap-2">
 								{item.siteId && (
-									<Button
-										variant="default"
-										className="flex-1"
-										onClick={() => onFocusSite?.(item.siteId!)}
-									>
+									<Button variant="default" className="flex-1" onClick={() => onFocusSite?.(item.siteId!)}>
 										<MapPin className="h-4 w-4 mr-2" />
 										View on Map
 									</Button>
@@ -631,4 +602,3 @@ export function ActivityDetailDrawer({
 		</AnimatePresence>
 	);
 }
-

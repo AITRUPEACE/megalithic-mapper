@@ -7,35 +7,60 @@
 @tailwind utilities;
 
 @layer base {
-  /* Light theme - Google Maps inspired with warm accents */
+  /* Light theme - Warm, inviting with clear visual hierarchy */
   :root {
-    --background: 0 0% 98%;
-    --foreground: 220 20% 15%;
+    /* Subtle warm cream tint for depth (not stark white) */
+    --background: 35 25% 96%;
+    --foreground: 220 25% 12%;
+    
+    /* Pure white cards stand out against tinted background */
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 15%;
+    --card-foreground: 220 25% 12%;
+    
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 15%;
-    --primary: 23 94% 52%;
+    --popover-foreground: 220 25% 12%;
+    
+    /* Warm orange primary - exploration/discovery feel */
+    --primary: 24 95% 50%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 10% 94%;
-    --secondary-foreground: 220 20% 25%;
-    --muted: 220 10% 94%;
-    --muted-foreground: 220 10% 45%;
-    --accent: 45 100% 50%;
-    --accent-foreground: 220 20% 10%;
-    --destructive: 0 84% 60%;
+    
+    /* Cool slate secondary for contrast with warm bg */
+    --secondary: 215 20% 93%;
+    --secondary-foreground: 220 25% 20%;
+    
+    /* Muted with slight warmth */
+    --muted: 30 15% 94%;
+    --muted-foreground: 220 15% 40%;
+    
+    /* Golden amber accent */
+    --accent: 38 95% 50%;
+    --accent-foreground: 220 25% 10%;
+    
+    --destructive: 0 80% 55%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 15% 88%;
-    --input: 220 15% 88%;
-    --ring: 23 94% 52%;
+    
+    /* Stronger borders for better definition */
+    --border: 220 20% 82%;
+    --input: 220 20% 85%;
+    --ring: 24 95% 50%;
     --radius: 0.75rem;
     
+    /* Sidebar with subtle tint for hierarchy */
+    --sidebar: 35 20% 98%;
+    
     /* Map-specific colors for light mode */
-    --map-bg: 220 15% 96%;
+    --map-bg: 35 15% 95%;
     --map-overlay: 0 0% 100%;
+    
+    /* Light mode shadows (more prominent than dark) */
+    --shadow-color: 220 25% 12%;
+    --shadow-sm: 0 1px 2px hsl(var(--shadow-color) / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(var(--shadow-color) / 0.08), 0 2px 4px -2px hsl(var(--shadow-color) / 0.06);
+    --shadow-lg: 0 10px 15px -3px hsl(var(--shadow-color) / 0.1), 0 4px 6px -4px hsl(var(--shadow-color) / 0.08);
+    --shadow-xl: 0 20px 25px -5px hsl(var(--shadow-color) / 0.1), 0 8px 10px -6px hsl(var(--shadow-color) / 0.08);
   }
 
-  /* Dark theme - daily.dev inspired */
+  /* Dark theme - daily.dev inspired immersive experience */
   .dark {
     --background: 220 20% 4%;
     --foreground: 210 20% 93%;
@@ -57,9 +82,19 @@
     --input: 220 15% 18%;
     --ring: 23 94% 58%;
     
+    /* Sidebar matches background in dark mode */
+    --sidebar: 220 20% 4%;
+    
     /* Map-specific colors for dark mode */
     --map-bg: 220 20% 6%;
     --map-overlay: 220 18% 9%;
+    
+    /* Dark mode shadows (subtle, mostly for blur effects) */
+    --shadow-color: 0 0% 0%;
+    --shadow-sm: 0 1px 2px hsl(var(--shadow-color) / 0.3);
+    --shadow-md: 0 4px 6px -1px hsl(var(--shadow-color) / 0.4);
+    --shadow-lg: 0 10px 15px -3px hsl(var(--shadow-color) / 0.5);
+    --shadow-xl: 0 20px 25px -5px hsl(var(--shadow-color) / 0.5);
   }
 
   * {
@@ -81,8 +116,26 @@
 }
 
 @layer components {
+  /* Glass panel - adapts to theme */
   .glass-panel {
-    @apply rounded-xl border border-border/60 bg-card/70 shadow-lg shadow-black/20 backdrop-blur;
+    @apply rounded-xl border border-border/60 bg-card/95 backdrop-blur;
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Elevated card - for cards that need to "pop" */
+  .card-elevated {
+    @apply bg-card border border-border/60;
+    box-shadow: var(--shadow-md);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  
+  .card-elevated:hover {
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Light mode specific enhancements */
+  :root .card-elevated {
+    @apply border-border/40;
   }
 
   .map-overlay {
@@ -165,11 +218,11 @@
   /* Icon styling - color and shadow for visibility */
   .site-marker svg {
     color: var(--bg-color);
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 1px rgba(0, 0, 0, 0.8));
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
   }
 
   .site-marker.selected svg {
-    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 3px rgba(255, 255, 255, 0.4));
   }
 
   /* Fire badge for hot sites */
@@ -189,11 +242,11 @@
 
   /* Heat tier glow on icons */
   .site-marker.heat-hot svg {
-    filter: drop-shadow(0 0 6px rgba(251, 146, 60, 0.8)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 2px rgba(251, 146, 60, 0.5));
   }
 
   .site-marker.heat-rising svg {
-    filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.6)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 2px rgba(251, 191, 36, 0.4));
   }
 
   /* Legacy marker styles (keep for compatibility) */

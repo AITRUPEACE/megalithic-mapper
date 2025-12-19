@@ -22,6 +22,15 @@ function parseYouTubeUrl(url: string): { videoId: string; thumbnail: string } | 
   return null;
 }
 
+// Helper to extract hashtags from post body
+function extractHashtags(text: string): string[] {
+  const hashtagRegex = /#([\w-]+)/g;
+  const matches = [...text.matchAll(hashtagRegex)];
+  // Dedupe and lowercase
+  const tags = [...new Set(matches.map(m => m[1].toLowerCase()))];
+  return tags;
+}
+
 // POST /api/posts - Create a new post
 export async function POST(request: NextRequest) {
   try {
@@ -77,6 +86,9 @@ export async function POST(request: NextRequest) {
     // Generate excerpt
     const excerpt = postBody.slice(0, 200).trim() + (postBody.length > 200 ? "..." : "");
 
+    // Extract hashtags from post body
+    const tags = extractHashtags(postBody);
+
     // Create the post
     const { data: post, error: postError } = await mapSchema
       .from("posts")
@@ -92,6 +104,7 @@ export async function POST(request: NextRequest) {
         visibility,
         media_ids: mediaIds,
         external_links: processedLinks,
+        tags,
         published_at: visibility === "public" ? new Date().toISOString() : null,
       })
       .select()
@@ -129,6 +142,7 @@ export async function GET(request: NextRequest) {
     const siteId = searchParams.get("siteId");
     const authorId = searchParams.get("authorId");
     const postType = searchParams.get("type");
+    const tag = searchParams.get("tag"); // Filter by hashtag
     const limit = parseInt(searchParams.get("limit") || "20");
     const offset = parseInt(searchParams.get("offset") || "0");
 
@@ -137,7 +151,7 @@ export async function GET(request: NextRequest) {
       .select(`
         id, title, body, body_format, excerpt,
         target_type, target_id, post_type, visibility,
-        media_ids, external_links,
+        media_ids, external_links, tags,
         likes_count, comments_count, shares_count, views_count,
         created_at, updated_at, published_at,
         author_id
@@ -158,6 +172,11 @@ export async function GET(request: NextRequest) {
 
     if (postType) {
       query = query.eq("post_type", postType);
+    }
+
+    if (tag) {
+      // Filter posts that contain this tag
+      query = query.contains("tags", [tag.toLowerCase()]);
     }
 
     const { data: posts, error } = await query;

@@ -9,8 +9,9 @@ import type {
   MapSiteFeature,
   MapZoneFeature,
   TagCollection,
+  ImportanceTier,
 } from "@/entities/map/model/types";
-import { WORLD_BOUNDS } from "@/entities/map/model/types";
+import { WORLD_BOUNDS, getImportanceTier } from "@/entities/map/model/types";
 
 const DEFAULT_FILTERS: MapFilters = {
   search: "",
@@ -24,6 +25,10 @@ const DEFAULT_FILTERS: MapFilters = {
   categories: [],
   zones: [],
   tags: [],
+  // Importance filtering defaults
+  minImportance: 0, // Show all by default
+  importanceTiers: [], // Empty = all tiers
+  showTrending: false,
 };
 
 const normalizeTags = (tags: TagCollection): TagCollection => ({
@@ -138,6 +143,17 @@ export const applySiteFilters = (sites: MapSiteFeature[], filters: MapFilters): 
 
     const matchesResearch = !filters.researchOnly || site.relatedResearchIds.length > 0;
 
+    // Importance filtering
+    const effectiveScore = site.effectiveScore ?? site.importanceScore ?? 50;
+    const matchesMinImportance = effectiveScore >= filters.minImportance;
+
+    const siteTier = site.importanceTier ?? getImportanceTier(effectiveScore);
+    const matchesImportanceTiers =
+      filters.importanceTiers.length === 0 || filters.importanceTiers.includes(siteTier);
+
+    // Trending filter - if showTrending is enabled, only show trending sites
+    const matchesTrending = !filters.showTrending || site.isTrending === true;
+
     return (
       matchesSearch &&
       matchesCultures &&
@@ -149,7 +165,10 @@ export const applySiteFilters = (sites: MapSiteFeature[], filters: MapFilters): 
       matchesCommunityTier &&
       matchesZones &&
       matchesTags &&
-      matchesResearch
+      matchesResearch &&
+      matchesMinImportance &&
+      matchesImportanceTiers &&
+      matchesTrending
     );
   });
 
@@ -157,11 +176,20 @@ export interface MapStoreState {
   sites: MapSiteFeature[];
   zones: MapZoneFeature[];
   bounds: BoundingBox;
+  zoom: number;
   filters: MapFilters;
   selectedSiteId: string | null;
+  // Metadata from smart loading
+  meta: {
+    total: number;
+    showing: number;
+    hasMore: boolean;
+    hiddenCount: number;
+  };
   initialize: (payload: { sites: MapSiteFeature[]; zones: MapZoneFeature[]; bounds: BoundingBox }) => void;
-  replaceData: (payload: { sites: MapSiteFeature[]; zones: MapZoneFeature[] }) => void;
+  replaceData: (payload: { sites: MapSiteFeature[]; zones: MapZoneFeature[]; meta?: MapStoreState["meta"] }) => void;
   setBounds: (bounds: BoundingBox) => void;
+  setZoom: (zoom: number) => void;
   setFilters: (update: Partial<MapFilters>) => void;
   clearFilters: () => void;
   selectSite: (id: string | null) => void;
@@ -169,14 +197,29 @@ export interface MapStoreState {
   optimisticUpsertZone: (zone: DraftZoneInput) => MapZoneFeature;
 }
 
+const DEFAULT_META = {
+  total: 0,
+  showing: 0,
+  hasMore: false,
+  hiddenCount: 0,
+};
+
 export const useMapStore = create<MapStoreState>((set, get) => ({
   sites: [],
   zones: [],
   bounds: WORLD_BOUNDS,
+  zoom: 3,
   filters: DEFAULT_FILTERS,
   selectedSiteId: null,
-  initialize: ({ sites, zones, bounds }) => set({ sites, zones, bounds, filters: { ...DEFAULT_FILTERS } }),
-  replaceData: ({ sites, zones }) =>
+  meta: DEFAULT_META,
+  initialize: ({ sites, zones, bounds }) => set({ 
+    sites, 
+    zones, 
+    bounds, 
+    filters: { ...DEFAULT_FILTERS },
+    meta: { ...DEFAULT_META, total: sites.length, showing: sites.length },
+  }),
+  replaceData: ({ sites, zones, meta }) =>
     set((state) => {
       const siteMap = new Map(state.sites.map((site) => [site.id, site] as const));
       sites.forEach((site) => siteMap.set(site.id, site));
@@ -187,9 +230,11 @@ export const useMapStore = create<MapStoreState>((set, get) => ({
       return {
         sites: Array.from(siteMap.values()),
         zones: Array.from(zoneMap.values()),
+        meta: meta ?? state.meta,
       };
     }),
   setBounds: (bounds) => set({ bounds }),
+  setZoom: (zoom) => set({ zoom }),
   setFilters: (update) => set((state) => ({ filters: { ...state.filters, ...update } })),
   clearFilters: () => set({ filters: { ...DEFAULT_FILTERS } }),
   selectSite: (id) => set({ selectedSiteId: id }),

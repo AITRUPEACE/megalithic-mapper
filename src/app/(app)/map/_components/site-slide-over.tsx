@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { X, ExternalLink, MapPin, MessageSquare, Image, FileText, Heart, Camera } from "lucide-react";
+import { X, ExternalLink, MapPin, MessageSquare, Image, FileText, Heart, Camera, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
@@ -12,6 +12,7 @@ import { zClass } from "@/shared/lib/z-index";
 import type { MapSiteFeature } from "@/entities/map/model/types";
 import Link from "next/link";
 import NextImage from "next/image";
+import { DrawerComments } from "@/components/discussion/drawer-comments";
 
 // Mock media data - in production this would come from the API
 interface SiteMedia {
@@ -380,13 +381,7 @@ export function SiteSlideOver({ site, isOpen, onClose, className }: SiteSlideOve
 								</TabsContent>
 
 								<TabsContent value="discussion" className="mt-4">
-									<div className="flex flex-col items-center justify-center py-12 text-center">
-										<MessageSquare className="h-12 w-12 text-muted-foreground/50 mb-4" />
-										<p className="text-sm text-muted-foreground">Start or join the discussion</p>
-										<Button variant="outline" size="sm" className="mt-4">
-											View Discussion
-										</Button>
-									</div>
+									<DrawerComments siteId={site.id} />
 								</TabsContent>
 							</Tabs>
 						</ScrollArea>
@@ -395,15 +390,15 @@ export function SiteSlideOver({ site, isOpen, onClose, className }: SiteSlideOve
 						<div className="absolute bottom-0 left-0 right-0 border-t border-border/40 bg-card p-4">
 							<div className="flex gap-2">
 								<Button asChild className="flex-1">
-									<Link href={`/research?site=${site.id}`}>
-										<FileText className="h-4 w-4 mr-2" />
-										Research Hub
+									<Link href={`/sites/${site.id}`}>
+										<ExternalLink className="h-4 w-4 mr-2" />
+										View Full Details
 									</Link>
 								</Button>
 								<Button variant="outline" asChild className="flex-1">
-									<Link href={`/forum?site=${site.id}`}>
-										<MessageSquare className="h-4 w-4 mr-2" />
-										Discuss
+									<Link href={`/contribute?site=${site.id}`}>
+										<Plus className="h-4 w-4 mr-2" />
+										Contribute
 									</Link>
 								</Button>
 							</div>

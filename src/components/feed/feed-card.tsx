@@ -22,12 +22,7 @@ import {
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/shared/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/shared/ui/dropdown-menu";
 import { cn } from "@/shared/lib/utils";
 
 export interface FeedCardProps {
@@ -123,7 +118,7 @@ export function FeedCard({
 
 	if (variant === "compact") {
 		return (
-			<article className="group relative flex gap-3 rounded-2xl border border-border/30 bg-[#1a1f26] p-3 transition-all hover:border-border/50 hover:bg-[#1e2430]">
+			<article className="group relative flex gap-3 rounded-2xl border border-border/30 bg-card p-3 transition-all hover:border-border/50 hover:bg-muted/50">
 				{/* Content */}
 				<div className="flex-1 min-w-0">
 					{/* Source & Type */}
@@ -131,13 +126,7 @@ export function FeedCard({
 						{source && (
 							<div className="flex items-center gap-1.5">
 								{source.icon ? (
-									<Image
-										src={source.icon}
-										alt={source.name}
-										width={16}
-										height={16}
-										className="rounded"
-									/>
+									<Image src={source.icon} alt={source.name} width={16} height={16} className="rounded" />
 								) : (
 									<TypeIcon className={cn("h-4 w-4", typeColors[type])} />
 								)}
@@ -148,26 +137,18 @@ export function FeedCard({
 
 					{/* Title */}
 					<Link href={href}>
-						<h3 className="text-sm font-semibold leading-snug text-foreground line-clamp-2 group-hover:text-primary transition-colors">
-							{title}
-						</h3>
+						<h3 className="text-sm font-semibold leading-snug text-foreground line-clamp-2 group-hover:text-primary transition-colors">{title}</h3>
 					</Link>
 
 					{/* Tags */}
 					{tags.length > 0 && (
 						<div className="flex items-center gap-1.5 mt-2">
 							{tags.slice(0, 3).map((tag) => (
-								<Link
-									key={tag}
-									href={`/tags/${tag}`}
-									className="text-[11px] text-muted-foreground hover:text-primary transition-colors"
-								>
+								<Link key={tag} href={`/tags/${tag}`} className="text-[11px] text-muted-foreground hover:text-primary transition-colors">
 									#{tag}
 								</Link>
 							))}
-							{tags.length > 3 && (
-								<span className="text-[11px] text-muted-foreground">+{tags.length - 3}</span>
-							)}
+							{tags.length > 3 && <span className="text-[11px] text-muted-foreground">+{tags.length - 3}</span>}
 						</div>
 					)}
 
@@ -183,15 +164,7 @@ export function FeedCard({
 							)}
 						</div>
 						<div className="flex items-center gap-1">
-							<Button
-								variant="ghost"
-								size="sm"
-								className={cn(
-									"h-7 px-2 gap-1 text-xs",
-									localUpvoted && "text-primary"
-								)}
-								onClick={handleUpvote}
-							>
+							<Button variant="ghost" size="sm" className={cn("h-7 px-2 gap-1 text-xs", localUpvoted && "text-primary")} onClick={handleUpvote}>
 								<ArrowUp className={cn("h-3.5 w-3.5", localUpvoted && "fill-current")} />
 								{localUpvotes}
 							</Button>
@@ -199,12 +172,7 @@ export function FeedCard({
 								<MessageSquare className="h-3.5 w-3.5" />
 								{comments}
 							</Button>
-							<Button
-								variant="ghost"
-								size="icon"
-								className={cn("h-7 w-7", localBookmarked && "text-primary")}
-								onClick={handleBookmark}
-							>
+							<Button variant="ghost" size="icon" className={cn("h-7 w-7", localBookmarked && "text-primary")} onClick={handleBookmark}>
 								<Bookmark className={cn("h-3.5 w-3.5", localBookmarked && "fill-current")} />
 							</Button>
 						</div>
@@ -215,12 +183,7 @@ export function FeedCard({
 				{thumbnail && (
 					<Link href={href} className="shrink-0">
 						<div className="relative h-20 w-20 overflow-hidden rounded-lg bg-secondary/30">
-							<Image
-								src={thumbnail}
-								alt={title}
-								fill
-								className="object-cover"
-							/>
+							<Image src={thumbnail} alt={title} fill className="object-cover" />
 						</div>
 					</Link>
 				)}
@@ -229,24 +192,14 @@ export function FeedCard({
 	}
 
 	return (
-		<article className="group relative overflow-hidden rounded-2xl border border-border/30 bg-[#1a1f26] transition-all hover:border-border/50 hover:bg-[#1e2430]">
+		<article className="group relative overflow-hidden rounded-2xl border border-border/30 bg-card transition-all hover:border-border/50 hover:bg-muted/50">
 			{/* Thumbnail */}
 			{thumbnail && (
 				<Link href={href} className="block relative aspect-[16/9] overflow-hidden bg-secondary/30">
-					<Image
-						src={thumbnail}
-						alt={title}
-						fill
-						className="object-cover transition-transform duration-300 group-hover:scale-105"
-					/>
+					<Image src={thumbnail} alt={title} fill className="object-cover transition-transform duration-300 group-hover:scale-105" />
 					{/* Type badge overlay */}
 					<div className="absolute top-3 left-3">
-						<Badge
-							className={cn(
-								"gap-1 bg-black/60 backdrop-blur-sm border-0",
-								typeColors[type]
-							)}
-						>
+						<Badge className={cn("gap-1 bg-black/60 backdrop-blur-sm border-0", typeColors[type])}>
 							<TypeIcon className="h-3 w-3" />
 							{type.charAt(0).toUpperCase() + type.slice(1)}
 						</Badge>
@@ -262,18 +215,9 @@ export function FeedCard({
 						{source ? (
 							<div className="flex items-center gap-2">
 								{source.icon ? (
-									<Image
-										src={source.icon}
-										alt={source.name}
-										width={20}
-										height={20}
-										className="rounded"
-									/>
+									<Image src={source.icon} alt={source.name} width={20} height={20} className="rounded" />
 								) : (
-									<div className={cn(
-										"flex h-5 w-5 items-center justify-center rounded",
-										"bg-gradient-to-br from-primary/20 to-accent/20"
-									)}>
+									<div className={cn("flex h-5 w-5 items-center justify-center rounded", "bg-gradient-to-br from-primary/20 to-accent/20")}>
 										<TypeIcon className={cn("h-3 w-3", typeColors[type])} />
 									</div>
 								)}
@@ -283,13 +227,13 @@ export function FeedCard({
 							<Link href={`/profile/${author.username}`} className="flex items-center gap-2">
 								<Avatar className="h-5 w-5">
 									{author.avatar && <AvatarImage src={author.avatar} />}
-									<AvatarFallback className="text-[10px]">
-										{author.name.slice(0, 2).toUpperCase()}
-									</AvatarFallback>
+									<AvatarFallback className="text-[10px]">{author.name.slice(0, 2).toUpperCase()}</AvatarFallback>
 								</Avatar>
 								<span className="text-xs font-medium text-muted-foreground">{author.name}</span>
 								{author.isVerified && (
-									<Badge variant="secondary" className="h-4 px-1 text-[9px]">✓</Badge>
+									<Badge variant="secondary" className="h-4 px-1 text-[9px]">
+										✓
+									</Badge>
 								)}
 							</Link>
 						)}
@@ -297,15 +241,11 @@ export function FeedCard({
 
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<Button
-								variant="ghost"
-								size="icon"
-								className="h-7 w-7 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
-							>
+							<Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
 								<MoreHorizontal className="h-4 w-4" />
 							</Button>
 						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="bg-[#1a1f26] border-border/40">
+						<DropdownMenuContent align="end" className="bg-card border-border/40">
 							<DropdownMenuItem>
 								<Share2 className="mr-2 h-4 w-4" />
 								Share
@@ -320,17 +260,11 @@ export function FeedCard({
 
 				{/* Title */}
 				<Link href={href}>
-					<h3 className="text-base font-semibold leading-snug text-foreground line-clamp-2 group-hover:text-primary transition-colors">
-						{title}
-					</h3>
+					<h3 className="text-base font-semibold leading-snug text-foreground line-clamp-2 group-hover:text-primary transition-colors">{title}</h3>
 				</Link>
 
 				{/* Excerpt */}
-				{excerpt && (
-					<p className="mt-2 text-sm text-muted-foreground line-clamp-2">
-						{excerpt}
-					</p>
-				)}
+				{excerpt && <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{excerpt}</p>}
 
 				{/* Tags */}
 				{tags.length > 0 && (
@@ -344,9 +278,7 @@ export function FeedCard({
 								#{tag}
 							</Link>
 						))}
-						{tags.length > 4 && (
-							<span className="text-[11px] text-muted-foreground">+{tags.length - 4}</span>
-						)}
+						{tags.length > 4 && <span className="text-[11px] text-muted-foreground">+{tags.length - 4}</span>}
 					</div>
 				)}
 
@@ -374,21 +306,14 @@ export function FeedCard({
 							size="sm"
 							className={cn(
 								"h-8 px-2.5 gap-1.5 text-xs font-medium rounded-lg",
-								localUpvoted
-									? "bg-primary/10 text-primary hover:bg-primary/20"
-									: "hover:bg-secondary/50"
+								localUpvoted ? "bg-primary/10 text-primary hover:bg-primary/20" : "hover:bg-secondary/50"
 							)}
 							onClick={handleUpvote}
 						>
 							<ArrowUp className={cn("h-4 w-4", localUpvoted && "fill-current")} />
 							{localUpvotes}
 						</Button>
-						<Button
-							variant="ghost"
-							size="sm"
-							className="h-8 px-2.5 gap-1.5 text-xs font-medium rounded-lg hover:bg-secondary/50"
-							asChild
-						>
+						<Button variant="ghost" size="sm" className="h-8 px-2.5 gap-1.5 text-xs font-medium rounded-lg hover:bg-secondary/50" asChild>
 							<Link href={`${href}#comments`}>
 								<MessageSquare className="h-4 w-4" />
 								{comments}
@@ -397,21 +322,12 @@ export function FeedCard({
 						<Button
 							variant="ghost"
 							size="icon"
-							className={cn(
-								"h-8 w-8 rounded-lg",
-								localBookmarked
-									? "bg-primary/10 text-primary hover:bg-primary/20"
-									: "hover:bg-secondary/50"
-							)}
+							className={cn("h-8 w-8 rounded-lg", localBookmarked ? "bg-primary/10 text-primary hover:bg-primary/20" : "hover:bg-secondary/50")}
 							onClick={handleBookmark}
 						>
 							<Bookmark className={cn("h-4 w-4", localBookmarked && "fill-current")} />
 						</Button>
-						<Button
-							variant="ghost"
-							size="icon"
-							className="h-8 w-8 rounded-lg hover:bg-secondary/50"
-						>
+						<Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-secondary/50">
 							<Share2 className="h-4 w-4" />
 						</Button>
 					</div>
@@ -424,36 +340,23 @@ export function FeedCard({
 // Featured card variant for hero sections
 export function FeaturedFeedCard(props: FeedCardProps) {
 	return (
-		<article className="group relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-[#1a1f26] to-[#1e2430]">
+		<article className="group relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-card to-muted/50">
 			<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10" />
-			
+
 			{/* Background Image */}
 			{props.thumbnail && (
 				<div className="relative aspect-[21/9] overflow-hidden">
-					<Image
-						src={props.thumbnail}
-						alt={props.title}
-						fill
-						className="object-cover transition-transform duration-500 group-hover:scale-105"
-					/>
+					<Image src={props.thumbnail} alt={props.title} fill className="object-cover transition-transform duration-500 group-hover:scale-105" />
 				</div>
 			)}
 
 			{/* Content Overlay */}
 			<div className="absolute bottom-0 left-0 right-0 z-20 p-6">
-				<Badge className="mb-3 bg-primary text-primary-foreground">
-					Featured
-				</Badge>
+				<Badge className="mb-3 bg-primary text-primary-foreground">Featured</Badge>
 				<Link href={props.href}>
-					<h2 className="text-2xl font-bold text-white leading-tight mb-2 group-hover:text-primary transition-colors">
-						{props.title}
-					</h2>
+					<h2 className="text-2xl font-bold text-white leading-tight mb-2 group-hover:text-primary transition-colors">{props.title}</h2>
 				</Link>
-				{props.excerpt && (
-					<p className="text-sm text-white/80 line-clamp-2 mb-4">
-						{props.excerpt}
-					</p>
-				)}
+				{props.excerpt && <p className="text-sm text-white/80 line-clamp-2 mb-4">{props.excerpt}</p>}
 				<div className="flex items-center gap-4 text-sm text-white/70">
 					<span className="flex items-center gap-1">
 						<ArrowUp className="h-4 w-4" />
@@ -469,4 +372,3 @@ export function FeaturedFeedCard(props: FeedCardProps) {
 		</article>
 	);
 }
-

@@ -16,6 +16,7 @@ import { SiteSlideOver } from "./site-slide-over";
 import { SiteEditor } from "./site-editor";
 import { ZoneEditor } from "./zone-editor";
 import { WhatsHotPanel, getSimulatedHeatData } from "./whats-hot-panel";
+import { MapFilterPanel } from "./map-filter-panel";
 import { loadMapData } from "../actions";
 import { useIsMobile } from "@/shared/hooks/use-media-query";
 import type L from "leaflet";
@@ -63,7 +64,8 @@ export const SiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 
 // Desktop version of the explorer
 const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: SiteExplorerProps) => {
-	const { sites, zones, filters, selectedSiteId, selectSite, initialize, replaceData, setBounds } = useMapStore();
+	const { sites, zones, filters, selectedSiteId, meta, zoom, selectSite, initialize, replaceData, setBounds, setZoom, setFilters, clearFilters } =
+		useMapStore();
 
 	const searchParams = useSearchParams();
 	const [activeEditor, setActiveEditor] = useState<"site" | "zone" | null>(null);
@@ -78,6 +80,7 @@ const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 	const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
 	const [activeQuickFilters, setActiveQuickFilters] = useState<string[]>([]);
 	const [searchQuery, setSearchQuery] = useState("");
+	const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
 
 	useEffect(() => {
 		if (activeEditor !== "site") {
@@ -92,7 +95,7 @@ const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 	}, [initialize, initialSites, initialZones, initialBounds]);
 
 	const filteredSites = useMemo(() => applySiteFilters(sites, filters), [sites, filters]);
-	
+
 	// Add heat tier data to filtered sites for map display
 	const sitesWithHeat = useMemo(() => getSimulatedHeatData(filteredSites), [filteredSites]);
 	const selectedSite = useMemo(() => sites.find((site) => site.id === selectedSiteId) ?? null, [sites, selectedSiteId]);
@@ -128,6 +131,14 @@ const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 			}
 		}
 	}, [focusParam, projectParam, siteParam, selectSite, sites, isHydrated]);
+
+	// Track zoom changes for smart loading
+	const handleZoomChange = useCallback(
+		(newZoom: number) => {
+			setZoom(newZoom);
+		},
+		[setZoom]
+	);
 
 	const handleBoundsChange = useCallback(
 		(bounds: L.LatLngBounds) => {
@@ -180,7 +191,11 @@ const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 		(siteId: string) => {
 			const site = sites.find((s) => s.id === siteId);
 			if (site && mapRef.current) {
-				mapRef.current.flyTo([site.coordinates.lat, site.coordinates.lng], 8, { duration: 0.8 });
+				// Only zoom in, never zoom out - keep current zoom if already zoomed in more
+				const SITE_FOCUS_ZOOM = 8;
+				const currentZoom = mapRef.current.getZoom();
+				const targetZoom = Math.max(currentZoom, SITE_FOCUS_ZOOM);
+				mapRef.current.flyTo([site.coordinates.lat, site.coordinates.lng], targetZoom, { duration: 0.8 });
 			}
 			selectSite(siteId);
 			// If in feed-only mode, switch to split to show the map
@@ -238,7 +253,7 @@ const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 									onClick={() => setViewMode("feed")}
 									className={cn(
 										"flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium transition-colors",
-										viewMode === "feed" ? "bg-white text-slate-900 shadow-sm" : "text-muted-foreground hover:text-foreground"
+										viewMode === "feed" ? "bg-foreground text-background shadow-sm" : "text-muted-foreground hover:text-foreground"
 									)}
 								>
 									<List className="h-3.5 w-3.5" />
@@ -248,7 +263,7 @@ const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 									onClick={() => setViewMode("split")}
 									className={cn(
 										"flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium transition-colors hidden md:flex",
-										viewMode === "split" ? "bg-white text-slate-900 shadow-sm" : "text-muted-foreground hover:text-foreground"
+										viewMode === "split" ? "bg-foreground text-background shadow-sm" : "text-muted-foreground hover:text-foreground"
 									)}
 								>
 									Split
@@ -257,7 +272,7 @@ const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 									onClick={() => setViewMode("map")}
 									className={cn(
 										"flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium transition-colors",
-										viewMode === "map" ? "bg-white text-slate-900 shadow-sm" : "text-muted-foreground hover:text-foreground"
+										viewMode === "map" ? "bg-foreground text-background shadow-sm" : "text-muted-foreground hover:text-foreground"
 									)}
 								>
 									<MapIcon className="h-3.5 w-3.5" />
@@ -357,23 +372,28 @@ const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 						</div>
 					</div>
 
-					{/* Quick filter chips */}
-					<div className={cn("absolute top-14 left-3 flex gap-1.5 overflow-x-auto max-w-[calc(100%-1.5rem)] pb-1", zClass.mapFilters)}>
-						{QUICK_FILTERS.map((filter) => (
-							<button
-								key={filter.id}
-								onClick={() => toggleQuickFilter(filter.id)}
-								className={cn(
-									"shrink-0 rounded-full px-2.5 py-1 text-xs font-medium transition-all shadow-md",
-									activeQuickFilters.includes(filter.id)
-										? "bg-primary text-primary-foreground"
-										: "bg-card/95 backdrop-blur text-foreground hover:bg-card"
-								)}
-							>
-								{filter.label}
-							</button>
-						))}
+					{/* Filter Panel */}
+					<div className={cn("absolute top-14 left-3", zClass.mapFilters)}>
+						<MapFilterPanel
+							filters={filters}
+							onFiltersChange={setFilters}
+							onClearFilters={clearFilters}
+							meta={meta}
+							isOpen={isFilterPanelOpen}
+							onToggle={() => setIsFilterPanelOpen(!isFilterPanelOpen)}
+						/>
 					</div>
+
+					{/* Site count indicator (when filter panel is closed) */}
+					{!isFilterPanelOpen && meta.total > 0 && (
+						<div className={cn("absolute bottom-3 left-3 bg-card/95 backdrop-blur rounded-lg px-3 py-1.5 shadow-md", zClass.mapFilters)}>
+							<span className="text-xs text-muted-foreground">
+								Showing <span className="font-medium text-foreground">{meta.showing}</span> of{" "}
+								<span className="font-medium text-foreground">{meta.total}</span> sites
+								{meta.hasMore && <span className="text-primary ml-1">• Zoom in for more</span>}
+							</span>
+						</div>
+					)}
 
 					{/* Floating editors */}
 					{activeEditor === "site" && (
@@ -402,6 +422,7 @@ const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 						onSelect={handleSelectSite}
 						className="absolute inset-0"
 						onBoundsChange={handleBoundsChange}
+						onZoomChange={handleZoomChange}
 						onMapClick={(lat, lng) => {
 							if (activeEditor === "site") {
 								setPendingCoordinates({ lat, lng });

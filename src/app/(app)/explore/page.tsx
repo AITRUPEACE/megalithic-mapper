@@ -7,21 +7,7 @@ import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
 import { Card, CardContent } from "@/shared/ui/card";
 import { Input } from "@/shared/ui/input";
-import {
-	Compass,
-	Search,
-	TrendingUp,
-	Clock,
-	LayoutGrid,
-	List,
-	ChevronRight,
-	Globe,
-	MapPin,
-	Flame,
-	Zap,
-	ArrowUp,
-	Star,
-} from "lucide-react";
+import { Compass, Search, TrendingUp, Clock, LayoutGrid, List, ChevronRight, Globe, MapPin, Flame, Zap, ArrowUp, Star } from "lucide-react";
 import { cn } from "@/shared/lib/utils";
 
 // Feed algorithm and mock data
@@ -90,10 +76,7 @@ export default function ExplorePage() {
 	}, [activeSort, activeRegion, activeTime, searchTerm]);
 
 	// Get trending stats
-	const totalEngagement = mockFeedItems.reduce(
-		(sum, item) => sum + item.engagement.upvotes + item.engagement.comments,
-		0
-	);
+	const totalEngagement = mockFeedItems.reduce((sum, item) => sum + item.engagement.upvotes + item.engagement.comments, 0);
 	const totalViews = mockFeedItems.reduce((sum, item) => sum + item.engagement.views, 0);
 	const hotItems = mockFeedItems.filter((item) => item.recentEngagement.upvotesLast24h > 100).length;
 
@@ -107,8 +90,7 @@ export default function ExplorePage() {
 						<h1 className="text-xl font-bold sm:text-2xl">Explore</h1>
 					</div>
 					<p className="text-sm text-muted-foreground max-w-lg">
-						Discover trending content from the global research community. Find new sites, 
-						expert insights, and hot discussions.
+						Discover trending content from the global research community. Find new sites, expert insights, and hot discussions.
 					</p>
 				</div>
 				<div className="flex items-center gap-2">
@@ -130,8 +112,8 @@ export default function ExplorePage() {
 							<div>
 								<h3 className="font-semibold text-sm">Discovery Feed</h3>
 								<p className="text-xs text-muted-foreground mt-0.5">
-									Content ranked by engagement velocity—how fast it's gaining traction. 
-									Hot items have high activity in the last 24 hours. Rising shows emerging content.
+									Content ranked by engagement velocity—how fast it's gaining traction. Hot items have high activity in the last 24 hours. Rising
+									shows emerging content.
 								</p>
 							</div>
 						</div>
@@ -150,7 +132,7 @@ export default function ExplorePage() {
 			</Card>
 
 			{/* Search & Filters */}
-			<Card className="bg-[#1a1f26] border-border/30">
+			<Card className="bg-card border-border/30">
 				<CardContent className="p-4 space-y-4">
 					{/* Search */}
 					<div className="relative">
@@ -174,10 +156,7 @@ export default function ExplorePage() {
 										key={option.id}
 										variant={activeSort === option.id ? "secondary" : "ghost"}
 										size="sm"
-										className={cn(
-											"gap-1.5",
-											activeSort === option.id && "bg-white text-slate-900 hover:bg-white/90"
-										)}
+										className={cn("gap-1.5", activeSort === option.id && "bg-foreground text-background hover:bg-foreground/90")}
 										onClick={() => setActiveSort(option.id)}
 										title={option.description}
 									>
@@ -206,20 +185,10 @@ export default function ExplorePage() {
 
 							{/* View Mode */}
 							<div className="flex items-center gap-1 border-l border-border/40 pl-2">
-								<Button
-									variant={viewMode === "grid" ? "secondary" : "ghost"}
-									size="icon"
-									className="h-8 w-8"
-									onClick={() => setViewMode("grid")}
-								>
+								<Button variant={viewMode === "grid" ? "secondary" : "ghost"} size="icon" className="h-8 w-8" onClick={() => setViewMode("grid")}>
 									<LayoutGrid className="h-4 w-4" />
 								</Button>
-								<Button
-									variant={viewMode === "list" ? "secondary" : "ghost"}
-									size="icon"
-									className="h-8 w-8"
-									onClick={() => setViewMode("list")}
-								>
+								<Button variant={viewMode === "list" ? "secondary" : "ghost"} size="icon" className="h-8 w-8" onClick={() => setViewMode("list")}>
 									<List className="h-4 w-4" />
 								</Button>
 							</div>
@@ -236,9 +205,7 @@ export default function ExplorePage() {
 								size="sm"
 								className={cn(
 									"shrink-0 h-7 text-xs",
-									activeRegion === region.id
-										? "bg-white text-slate-900 hover:bg-white/90"
-										: "border-border/40 hover:bg-secondary/50"
+									activeRegion === region.id ? "bg-foreground text-background hover:bg-foreground/90" : "border-border/40 hover:bg-secondary/50"
 								)}
 								onClick={() => setActiveRegion(region.id)}
 							>
@@ -265,9 +232,9 @@ export default function ExplorePage() {
 					)}
 				</p>
 				<p className="text-xs text-muted-foreground">
-					Sorted by: <span className="font-medium text-foreground">{sortOptions.find(s => s.id === activeSort)?.label}</span>
+					Sorted by: <span className="font-medium text-foreground">{sortOptions.find((s) => s.id === activeSort)?.label}</span>
 					{" • "}
-					<span className="font-medium text-foreground">{timeFilters.find(t => t.id === activeTime)?.label}</span>
+					<span className="font-medium text-foreground">{timeFilters.find((t) => t.id === activeTime)?.label}</span>
 				</p>
 			</div>
 
@@ -288,13 +255,11 @@ export default function ExplorePage() {
 
 			{/* Empty State */}
 			{feedItems.length === 0 && (
-				<Card className="bg-[#1a1f26] border-border/30">
+				<Card className="bg-card border-border/30">
 					<CardContent className="flex flex-col items-center justify-center py-12 text-center">
 						<Search className="h-12 w-12 text-muted-foreground mb-4" />
 						<p className="text-lg font-medium text-muted-foreground mb-2">No results found</p>
-						<p className="text-sm text-muted-foreground mb-4">
-							Try adjusting your search or filters
-						</p>
+						<p className="text-sm text-muted-foreground mb-4">Try adjusting your search or filters</p>
 						<Button
 							variant="outline"
 							onClick={() => {

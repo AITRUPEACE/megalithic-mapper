@@ -71,24 +71,15 @@ export function AuthCtas({ variant = "default" }: AuthCtasProps) {
 			<div className="flex flex-col items-center gap-3 sm:flex-row">
 				<Button
 					size="lg"
-					className="gap-2 bg-white text-slate-900 hover:bg-white/90"
+					className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90"
 					onClick={handleGoogleSignIn}
 					disabled={isOAuthLoading}
 				>
-					{isOAuthLoading ? (
-						<Loader2 className="h-4 w-4 animate-spin" />
-					) : (
-						<GoogleIcon className="h-4 w-4" />
-					)}
+					{isOAuthLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <GoogleIcon className="h-4 w-4" />}
 					{isOAuthLoading ? "Connecting..." : "Jump in with Google"}
 				</Button>
 				<span className="text-sm text-muted-foreground">or</span>
-				<Button
-					asChild
-					variant="ghost"
-					size="lg"
-					className="text-muted-foreground hover:text-foreground"
-				>
+				<Button asChild variant="ghost" size="lg" className="text-muted-foreground hover:text-foreground">
 					<Link href="/map">
 						just browse around
 						<ArrowRight className="ml-1 h-4 w-4" />
@@ -107,26 +98,16 @@ export function AuthCtas({ variant = "default" }: AuthCtasProps) {
 				onClick={handleGoogleSignIn}
 				disabled={isOAuthLoading}
 			>
-				{isOAuthLoading ? (
-					<Loader2 className="h-5 w-5 animate-spin" />
-				) : (
-					<GoogleIcon className="h-5 w-5" />
-				)}
+				{isOAuthLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <GoogleIcon className="h-5 w-5" />}
 				{isOAuthLoading ? "Connecting..." : "Join with Google"}
 			</Button>
-			
+
 			<div className="flex items-center gap-4 text-sm">
-				<Link 
-					href="/login" 
-					className="text-muted-foreground transition-colors hover:text-foreground"
-				>
+				<Link href="/login" className="text-muted-foreground transition-colors hover:text-foreground">
 					Sign in with email
 				</Link>
 				<span className="text-muted-foreground/40">·</span>
-				<Link 
-					href="/map" 
-					className="text-muted-foreground transition-colors hover:text-foreground"
-				>
+				<Link href="/map" className="text-muted-foreground transition-colors hover:text-foreground">
 					Explore as guest
 				</Link>
 			</div>

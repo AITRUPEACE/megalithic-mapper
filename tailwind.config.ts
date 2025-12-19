@@ -54,6 +54,7 @@ export default {
   				DEFAULT: 'hsl(var(--destructive) / <alpha-value>)',
   				foreground: 'hsl(var(--destructive-foreground) / <alpha-value>)'
   			},
+  			sidebar: 'hsl(var(--sidebar) / <alpha-value>)',
   			border: 'hsl(var(--border) / <alpha-value>)',
   			input: 'hsl(var(--input) / <alpha-value>)',
   			ring: 'hsl(var(--ring) / <alpha-value>)',
@@ -64,6 +65,12 @@ export default {
   				'4': 'hsl(var(--chart-4) / <alpha-value>)',
   				'5': 'hsl(var(--chart-5) / <alpha-value>)'
   			}
+  		},
+  		boxShadow: {
+  			'theme-sm': 'var(--shadow-sm)',
+  			'theme-md': 'var(--shadow-md)',
+  			'theme-lg': 'var(--shadow-lg)',
+  			'theme-xl': 'var(--shadow-xl)',
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

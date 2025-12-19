@@ -472,56 +472,55 @@ export function HomeFeed({ sites, onFocusSite, className }: HomeFeedProps) {
 
 	return (
 		<div className={cn("flex flex-col h-full", className)}>
-			{/* Header */}
-			<div className="flex flex-col gap-2 px-4 py-3 border-b border-border/30">
-				<div className="flex items-center justify-between">
-					<div className="flex items-center gap-2">
-						<Sparkles className="h-5 w-5 text-primary" />
-						<h2 className="font-semibold">Activity Feed</h2>
+			{/* Header - Single compact row */}
+			<div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border/30">
+				<div className="flex items-center gap-1.5">
+					<Sparkles className="h-4 w-4 text-primary" />
+					<h2 className="font-medium text-sm">Activity</h2>
+				</div>
+
+				{/* Combined controls */}
+				<div className="flex items-center gap-1.5">
+					{/* Source filter - compact */}
+					<div className="flex p-0.5 bg-secondary/30 rounded-md">
+						{sourceOptions.map((opt) => (
+							<button
+								key={opt.key}
+								onClick={() => setSourceFilter(opt.key)}
+								className={cn(
+									"px-1.5 py-0.5 rounded text-[10px] font-medium transition-colors",
+									sourceFilter === opt.key
+										? opt.key === "official"
+											? "bg-blue-500/20 text-blue-400"
+											: opt.key === "community"
+											? "bg-emerald-500/20 text-emerald-400"
+											: "bg-foreground text-background"
+										: "text-muted-foreground hover:text-foreground"
+								)}
+							>
+								{opt.key === "official" ? "Off" : opt.key === "community" ? "Com" : opt.label}
+							</button>
+						))}
 					</div>
-					{/* Sort toggle */}
-					<div className="flex items-center gap-1 p-0.5 bg-secondary/50 rounded-lg">
+
+					{/* Sort toggle - icon only */}
+					<div className="flex p-0.5 bg-secondary/50 rounded-md">
 						{sortOptions.map((opt) => {
 							const Icon = opt.icon;
 							return (
 								<button
 									key={opt.key}
 									onClick={() => setSortMode(opt.key)}
+									title={opt.label}
 									className={cn(
-										"flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors",
-										sortMode === opt.key ? "bg-white text-slate-900 shadow-sm" : "text-muted-foreground hover:text-foreground"
+										"p-1 rounded transition-colors",
+										sortMode === opt.key ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"
 									)}
 								>
-									<Icon className="h-3.5 w-3.5" />
-									{opt.label}
+									<Icon className="h-3 w-3" />
 								</button>
 							);
 						})}
-					</div>
-				</div>
-
-				{/* Source filter toggle (Official / Community) */}
-				<div className="flex items-center justify-between">
-					<span className="text-xs text-muted-foreground">Show activity from:</span>
-					<div className="flex items-center gap-1 p-0.5 bg-secondary/30 rounded-lg">
-						{sourceOptions.map((opt) => (
-							<button
-								key={opt.key}
-								onClick={() => setSourceFilter(opt.key)}
-								className={cn(
-									"px-2.5 py-1 rounded-md text-xs font-medium transition-colors",
-									sourceFilter === opt.key
-										? opt.key === "official"
-											? "bg-blue-500/20 text-blue-400 shadow-sm"
-											: opt.key === "community"
-											? "bg-emerald-500/20 text-emerald-400 shadow-sm"
-											: "bg-white text-slate-900 shadow-sm"
-										: "text-muted-foreground hover:text-foreground"
-								)}
-							>
-								{opt.label}
-							</button>
-						))}
 					</div>
 				</div>
 			</div>
@@ -588,7 +587,7 @@ function FeedCard({
 
 	return (
 		<Card
-			className="overflow-hidden border-border/40 bg-[#1a1f26] hover:bg-[#1e232b] transition-colors cursor-pointer group"
+			className="overflow-hidden border-border/40 bg-card hover:bg-muted/50 transition-colors cursor-pointer group"
 			onClick={() => onOpenDetail(item)}
 		>
 			<CardHeader className="p-3 pb-2">

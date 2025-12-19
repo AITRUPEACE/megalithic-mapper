@@ -1,0 +1,1740 @@
+{
+  "sites": [
+    {
+      "wikidata_id": "Q1750788",
+      "slug": "moel-ty-uchaf-stone-circle",
+      "name": "Moel Tŷ Uchaf stone circle",
+      "summary": "stone circle in Wales",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -3.4056343,
+        "lat": 52.923175
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Stone%20circle%20on%20Moel%20Ty-uchaf%20-%20geograph.org.uk%20-%20387679.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Moel_T%C5%B7_Uchaf",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q3138772",
+      "slug": "haltadans",
+      "name": "Haltadans",
+      "summary": "stone circle and cairn on Fetlar, Shetland Islands, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -0.86555427,
+        "lat": 60.610226
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Hjaltadans.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Haltadans",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q7619059",
+      "slug": "stone-circles-of-junapani",
+      "name": "Stone circles of Junapani",
+      "summary": "historic site in Dist. Nagpur, Maharashtra",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": 78.99967083,
+        "lat": 21.19856271
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Stone%20circles%20of%20Junapani%20-%20panoramio.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Stone_circles_of_Junapani",
+      "country": "India"
+    },
+    {
+      "wikidata_id": "Q14949372",
+      "slug": "greycroft-stone-circle",
+      "name": "Greycroft stone circle",
+      "summary": "stone circle in Seascale, Copeland, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -3.49079,
+        "lat": 54.4076
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 0,
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Grey_Croft_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q939931",
+      "slug": "torhouse",
+      "name": "Torhouse",
+      "summary": "archaeological site in Dumfries and Galloway, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -4.52264,
+        "lat": 54.8775
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Torhouse%20Stone%20Circle%2020080423.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Torhouse",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q1584280",
+      "slug": "sunhoney",
+      "name": "Sunhoney",
+      "summary": "stone circle in Aberdeenshire, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.471108,
+        "lat": 57.14132
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Sunhoney%2CRecumbent%20Stone%20Circle%20-%20geograph.org.uk%20-%201056436.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Sunhoney",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q848901",
+      "slug": "machrie-moor-stone-circles",
+      "name": "Machrie Moor Stone Circles",
+      "summary": "archaeological site in North Ayrshire, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -5.31326,
+        "lat": 55.54089
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Machrie%20Stone%20Circle%204%202012.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Machrie_Moor_Stone_Circles",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q132745289",
+      "slug": "yubunezawa-stone-circle",
+      "name": "Yubunezawa Stone Circle",
+      "summary": "archaeological site in Takizawa, Iwate, Japan",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": 141.097526,
+        "lat": 39.781165
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/%E6%B9%AF%E8%88%9F%E6%B2%A2%E7%92%B0%E7%8A%B6%E5%88%97%E7%9F%B3%E5%85%A8%E6%99%AF.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Yubunezawa_Stone_Circle",
+      "country": "Japan"
+    },
+    {
+      "wikidata_id": "Q2341252",
+      "slug": "duddo-five-stones",
+      "name": "Duddo Five Stones",
+      "summary": "stone circle in Duddo, Northumberland, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.11198,
+        "lat": 55.6868
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Duddo%20Stone%20Circle%20Haze.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Duddo_Five_Stones",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q15133411",
+      "slug": "cromeleque-de-vale-de-maria-do-meio",
+      "name": "Cromeleque de Vale de Maria do Meio",
+      "summary": "stone circle in Nossa Senhora de Guadalupe, Portugal",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -8.008355,
+        "lat": 38.622527
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Cromeleque%20de%20Vale%20Maria%20do%20Meio%20%2831728650760%29.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Vale_Maria_do_Meio_Cromlech",
+      "country": "Portugal"
+    },
+    {
+      "wikidata_id": "Q14949367",
+      "slug": "barbrook-one",
+      "name": "Barbrook One",
+      "summary": "stone circle in Derbyshire, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -1.5837,
+        "lat": 53.2765
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Stone%20circle%20and%20cairn%20-%20geograph.org.uk%20-%201214808.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Barbrook_One",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q85759630",
+      "slug": "esperance-stonehenge",
+      "name": "Esperance Stonehenge",
+      "summary": "stonehenge replica in Australia",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": 122.0296,
+        "lat": -33.7879
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 0,
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Esperance_Stonehenge",
+      "country": "Australia"
+    },
+    {
+      "wikidata_id": "Q11378977",
+      "slug": "isedotai-site",
+      "name": "Isedōtai Site",
+      "summary": "archeological site in Kitaakita, Akita, Japan",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": 140.348056,
+        "lat": 40.201111
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Isedotai%20Site%202021b.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Ised%C5%8Dtai_Ruins",
+      "country": "Japan"
+    },
+    {
+      "wikidata_id": "Q19585688",
+      "slug": "girdle-stanes",
+      "name": "Girdle Stanes",
+      "summary": "stone circle in Dumfries and Galloway, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -3.1759771,
+        "lat": 55.253888
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Girdle%20Stanes%20stone%20circle%20-%20geograph.org.uk%20-%20819407.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Girdle_Stanes",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q1939531",
+      "slug": "mitchell-s-fold",
+      "name": "Mitchell's Fold",
+      "summary": "Bronze Age stone circle in South-West Shropshire",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -3.0261,
+        "lat": 52.5787
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Mitchell%27s%20Fold%205.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Mitchell%27s_Fold",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q10678428",
+      "slug": "stenehed",
+      "name": "Stenehed",
+      "summary": "archaeological site in Munkedal, Sweden",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": 11.516666666,
+        "lat": 58.577222222
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 0,
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Stenehed",
+      "country": "Sweden"
+    },
+    {
+      "wikidata_id": "Q56666207",
+      "slug": "dunnideer-stone-circle-450m-nw-of-dunnideer-tower",
+      "name": "Dunnideer stone circle, 450m NW of Dunnideer Tower",
+      "summary": "stone circle in Aberdeenshire, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.6519132,
+        "lat": 57.344921
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Dunnideer%20Remnants%20of%20Recumbent%20Stone%20Circle.JPG",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Dunnideer_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q1140859",
+      "slug": "msoura-stone-circle",
+      "name": "Msoura Stone Circle",
+      "summary": "historic site in M'soura",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -5.944,
+        "lat": 35.404
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Morocco%20Mzoura%20Stone%20Circle%20%282%29.JPG",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Msoura",
+      "country": "Morocco"
+    },
+    {
+      "wikidata_id": "Q16258034",
+      "slug": "ninestane-rig",
+      "name": "Ninestane Rig",
+      "summary": "stone circle in Castleton, Scottish Borders, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.7608841,
+        "lat": 55.267543
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Nine%20Stones%20Stone%20Circle%20-%20geograph.org.uk%20-%20378417.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Ninestane_Rig",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q7038443",
+      "slug": "nine-stones",
+      "name": "Nine Stones",
+      "summary": "Bronze Age stone circle near Altarnun, Cornwall, England, United Kingdom",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -4.49258,
+        "lat": 50.5763
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Nine%20Stones%20stone%20circle%2C%20East%20Moor%20-%20geograph.org.uk%20-%20526315.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Nine_Stones,_Altarnun",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q20713726",
+      "slug": "kirkton-of-bourtie-stone-circle",
+      "name": "Kirkton of Bourtie stone circle",
+      "summary": "archaeological site in Aberdeenshire, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.3321229,
+        "lat": 57.314085
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Kirkton%20of%20Bourtie%20stone%20circle.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Kirkton_of_Bourtie_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q2341284",
+      "slug": "strichen-stone-circle",
+      "name": "Strichen Stone Circle",
+      "summary": "stone circle in Aberdeenshire, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.1074,
+        "lat": 57.5804
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Strichen%20Stone%20Circle.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Strichen_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q1533466",
+      "slug": "the-goatstones",
+      "name": "The Goatstones",
+      "summary": "stone circle near Ravensheugh Crags in Northumberland, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.26876,
+        "lat": 55.0666
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Goatstones%20-%20geograph.org.uk%20-%201138462.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/The_Goatstones",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q4916500",
+      "slug": "birkrigg-stone-circle",
+      "name": "Birkrigg stone circle",
+      "summary": "archaeological site in Ulverston, South Lakeland, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -3.08564,
+        "lat": 54.156
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Birkrigg%20stone%20circle.JPG",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Birkrigg_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q5608259",
+      "slug": "grey-wethers",
+      "name": "Grey Wethers",
+      "summary": "prehistoric stone circles in Dartmoor",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -3.92577,
+        "lat": 50.6317
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Grey%20Wethers%2014%281%29.JPG",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Grey_Wethers",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q15277091",
+      "slug": "sheldon-stone-circle",
+      "name": "Sheldon Stone Circle",
+      "summary": "stone circle in Aberdeenshire, Scotland, UK, south of Oldmeldrum",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.295627,
+        "lat": 57.314737
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Sheldon%20Stone%20Circle%20-%20geograph.org.uk%20-%20257888.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Sheldon_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q11462859",
+      "slug": "komakino-site",
+      "name": "Komakino Site",
+      "summary": "archaeological site in Aomori, Japan",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": 140.728167,
+        "lat": 40.7375
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/%E5%B0%8F%E7%89%A7%E9%87%8E%E9%81%BA%E8%B7%A11.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Komakino_Site",
+      "country": "Japan"
+    },
+    {
+      "wikidata_id": "Q2479712",
+      "slug": "zorats-karer",
+      "name": "Zorats Karer",
+      "summary": "prehistoric archaeological site",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": 46.0286,
+        "lat": 39.5507
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Aerial%20view%20of%20Zorats%20Karer%2C%20June%202022%20cropped.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Carahunge",
+      "country": "Armenia"
+    },
+    {
+      "wikidata_id": "Q404905",
+      "slug": "aikey-brae",
+      "name": "Aikey Brae",
+      "summary": "stone circle in Aberdeenshire, Scotland, UK, west-south-west of Old Deer",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.070416666,
+        "lat": 57.513972222
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Aikey%20Brae%20Stone%20Circle%20-%20geograph.org.uk%20-%201774962.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Aikey_Brae_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q17676378",
+      "slug": "the-kingston-russell-stone-circle-750m-north-east-of-gorwell-farm",
+      "name": "The Kingston Russell stone circle 750m north east of Gorwell Farm",
+      "summary": "stone circle in Dorset, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.59899,
+        "lat": 50.6885
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/KingstonRussellStoneCircleC.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Kingston_Russell_Stone_Circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q65044187",
+      "slug": "fir-clump-stone-circle",
+      "name": "Fir Clump Stone Circle",
+      "summary": "destroyed prehistoric sandstone megalith circle",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -1.766388888,
+        "lat": 51.5325
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 0,
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Fir_Clump_Stone_Circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q7857581",
+      "slug": "twelve-apostles-stone-circle",
+      "name": "Twelve Apostles Stone Circle",
+      "summary": "stone circle at Newbridge, Dumfries and Galloway, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -3.6516759,
+        "lat": 55.09785
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Twelve%20Apostles%20Stone%20Circle%202017-05-16%20-%201.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Twelve_Apostles_Stone_Circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q14949375",
+      "slug": "nine-stones-close",
+      "name": "Nine Stones Close",
+      "summary": "bronze age stone circle in Derbyshire, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -1.6644407,
+        "lat": 53.1604574
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Nine%20Stones%20Close%2C%20Derbyshire%2C%20showing%20the%20four%20stones%20that%20remain.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Nine_Stones_Close",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q5874573",
+      "slug": "hoarstones",
+      "name": "Hoarstones",
+      "summary": "archaeological site in Chirbury with Brompton, Shropshire, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.9993,
+        "lat": 52.5929
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Hoarstones%20stone%20circle%20with%20Corndon%20Hill%20in%20the%20background%20-%20geograph.org.uk%20-%20209189.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Hoarstones",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q56666473",
+      "slug": "easthill-stone-circle",
+      "name": "Easthill stone circle",
+      "summary": "stone circle in Dumfries and Galloway, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -3.6929982,
+        "lat": 55.047636
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Easthill%20stone%20circle%2005.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Easthill_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q5289184",
+      "slug": "doll-tor",
+      "name": "Doll Tor",
+      "summary": "Stone circle in Derbyshire, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -1.64501,
+        "lat": 53.1625
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Doll%20tor%20stone%20circle.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Doll_Tor",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q19586401",
+      "slug": "whitcastles-stone-circle",
+      "name": "Whitcastles stone circle",
+      "summary": "stone circle in Dumfries and Galloway, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -3.22004,
+        "lat": 55.1808
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Whitcastles%20Stone%20Circle%20-%20geograph.org.uk%20-%202165337.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Whitcastles_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q1260144",
+      "slug": "drombeg-stone-circle",
+      "name": "Drombeg stone circle",
+      "summary": "stone circle",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -9.08702,
+        "lat": 51.564553
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/DrombegStoneCircle%202004.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Drombeg_stone_circle",
+      "country": "Ireland"
+    },
+    {
+      "wikidata_id": "Q11437550",
+      "slug": "oyu-stone-circles",
+      "name": "Ōyu Stone Circles",
+      "summary": "Japanese late Jōmon period archaeological site",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": 140.803889,
+        "lat": 40.271667
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Oyu%20stone%20circles%2020180916a.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/%C5%8Cyu_Stone_Circles",
+      "country": "Japan"
+    },
+    {
+      "wikidata_id": "Q48733884",
+      "slug": "omori-katsuyama-site",
+      "name": "Ōmori Katsuyama Site",
+      "summary": "Ōmori Katsuyama Site - a stone circle.",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": 140.358333333,
+        "lat": 40.698888888
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Omori-Katsuyama%20Stone%20Circle.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/%C5%8Cmori_Katsuyama_Site",
+      "country": "Japan"
+    },
+    {
+      "wikidata_id": "Q1140864",
+      "slug": "conjunto-megalitico-da-herdade-do-xerez",
+      "name": "Conjunto megalítico da Herdade do Xerez",
+      "summary": "stone circle in Monsaraz, Portugal",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -7.370988,
+        "lat": 38.45341
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Cromeleque%20do%20Xerez%20-%20Monsaraz%20-%20Portugal%20%2852505947741%29.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Xerez_Cromlech",
+      "country": "Portugal"
+    },
+    {
+      "wikidata_id": "Q56666218",
+      "slug": "hill-of-fiddes-stone-circle",
+      "name": "Hill of Fiddes, stone circle",
+      "summary": "stone circle in Aberdeenshire, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.1095042,
+        "lat": 57.309446
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Hill%20of%20Fiddes%20Recumbent%20Stone%20Circle%20%285%29%20-%20geograph.org.uk%20-%205014027.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Hill_of_Fiddes_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q1436702",
+      "slug": "twelve-apostles-of-ilkley-moor",
+      "name": "Twelve Apostles of Ilkley Moor",
+      "summary": "Stone circle in West Yorkshire, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -1.80957,
+        "lat": 53.901555
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Twelve%20Apostles%20of%20Ilkley%20Moor%20Stone%20Circle%20-%20geograph.org.uk%20-%2012971.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Twelve_Apostles,_West_Yorkshire",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q5267216",
+      "slug": "devil-s-quoits",
+      "name": "Devil's Quoits",
+      "summary": "henge and stone circle in Stanton Harcourt, Oxfordshire, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -1.40587,
+        "lat": 51.7399
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Devils%20quoits%20aerial.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Devil%27s_Quoits",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q816192",
+      "slug": "beltany-stone-circle",
+      "name": "Beltany stone circle",
+      "summary": "bronze Age stone circle",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -7.59962222,
+        "lat": 54.85091944
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Beltany%20Stone%20Circle.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Beltany_stone_circle",
+      "country": "Ireland"
+    },
+    {
+      "wikidata_id": "Q14949370",
+      "slug": "brisworthy-stone-circle",
+      "name": "Brisworthy stone circle",
+      "summary": "stone circle on Dartmoor, Devon, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -4.02401,
+        "lat": 50.4716
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Stone%20Circle%20at%20Brisworthy%20-%20geograph.org.uk%20-%209820.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Brisworthy_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q5147747",
+      "slug": "colmeallie-stone-circle",
+      "name": "Colmeallie stone circle",
+      "summary": "stone circle in Angus, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.7144745,
+        "lat": 56.892378
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Colmeallie.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Colmeallie_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q2196648",
+      "slug": "tomnaverie-stone-circle",
+      "name": "Tomnaverie, stone circle",
+      "summary": "stone circle in Aberdeenshire, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.849553997,
+        "lat": 57.119411098
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Tomnaverie%20Stone%20Circle%20view%20Lochnagar.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Tomnaverie_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q56666420",
+      "slug": "yonder-bognie-stone-circle",
+      "name": "Yonder Bognie stone circle",
+      "summary": "stone circle in Aberdeenshire, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.6680325,
+        "lat": 57.500411
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 0,
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Yonder_Bognie",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q17664993",
+      "slug": "stone-circle-and-stone-alignment-370m-west-of-threestoneburn-house",
+      "name": "Stone circle and stone alignment 370m west of Threestoneburn House",
+      "summary": "archaeological site in Northumberland, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.04692,
+        "lat": 55.4783
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Threestone%20Burn%20stone%20circle%20-%20geograph.org.uk%20-%20384800.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Threestoneburn_Stone_Circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q1541897",
+      "slug": "boskednan-stone-circle",
+      "name": "Boskednan stone circle",
+      "summary": "stone circle in Cornwall, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -5.59374,
+        "lat": 50.1606
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Boskednan%20stones%20at%20sunset%20penwith.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Boskednan_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q5089468",
+      "slug": "cheetham-close",
+      "name": "Cheetham Close",
+      "summary": "megalithic site and scheduled ancient monument in North Turton, Lancashire, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.43015,
+        "lat": 53.6385
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Not%20the%20most%20impressive%20of%20stone%20circles%20-%20geograph.org.uk%20-%202385288.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Cheetham_Close",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q1430202",
+      "slug": "yellowmead-down",
+      "name": "Yellowmead Down",
+      "summary": "stone circle",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -4.01055556,
+        "lat": 50.49297222
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Yellowmead%20circles%20-%20Dartmoor%20-%20geograph.org.uk%20-%2021344.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Yellowmead_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q1673104",
+      "slug": "loanhead-of-daviot-stone-circle",
+      "name": "Loanhead of Daviot stone circle",
+      "summary": "stone circle near Daviot in Aberdeenshire, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.421045225,
+        "lat": 57.349444911
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Loanhead%20of%20Daviot.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Loanhead_of_Daviot_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q17649952",
+      "slug": "cairnfield-including-a-prehistoric-enclosure-5-stone-circles-10-funerary-cairns-6-stone-banks-2-ston",
+      "name": "Cairnfield including a prehistoric enclosure, 5 stone circles, 10 funerary cairns, 6 stone banks, 2 stone walls, a lynchet and a",
+      "summary": "group of stone circles in Cumbria, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -3.27408,
+        "lat": 54.4118
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Stone%20Circles%20-%20geograph.org.uk%20-%201174579.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Burnmoor_stone_circles",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q2341289",
+      "slug": "tregeseal-east-stone-circle",
+      "name": "Tregeseal East stone circle",
+      "summary": "Tregeseal East is a prehistoric stone circle near the town of St Just in Cornwall, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -5.65852,
+        "lat": 50.1337
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Tregeseal%20east%20towards%20carn%20kenidjack.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Tregeseal_East_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q202134",
+      "slug": "cullerlie-stone-circle",
+      "name": "Cullerlie stone circle",
+      "summary": "stone circle in Aberdeenshire, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.35661,
+        "lat": 57.12892
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Cullerlie-Circle.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Cullerlie_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q120836",
+      "slug": "hurlers-stone-circles",
+      "name": "Hurlers Stone Circles",
+      "summary": "group of three stone circles in Cornwall, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -4.4582182,
+        "lat": 50.5163239
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Hurlers%2004.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/The_Hurlers_(stone_circles)",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q1484937",
+      "slug": "istrehagan",
+      "name": "Istrehågan",
+      "summary": "archaeological site in Norway",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": 10.174228,
+        "lat": 59.096846
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Istrehaagan.JPG",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Istreh%C3%A5gan",
+      "country": "Norway"
+    },
+    {
+      "wikidata_id": "Q2186226",
+      "slug": "moss-farm-road-stone-circle",
+      "name": "Moss Farm Road Stone Circle",
+      "summary": "archaeological site in North Ayrshire, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -5.32924,
+        "lat": 55.54225
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Burial%20cairn%20or%20stone%20circle%20-%20geograph.org.uk%20-%203557148.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Moss_Farm_Road_Stone_Circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q17642112",
+      "slug": "porlock-stone-circle",
+      "name": "Porlock Stone Circle",
+      "summary": "stone circle in Porlock, Somerset West and Taunton, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -3.65385,
+        "lat": 51.1894
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Detail%20of%20Porlock%20Stone%20Circle%20II.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Porlock_Stone_Circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q17678478",
+      "slug": "stone-circle-on-withypool-hill-670m-ese-of-portford-bridge",
+      "name": "Stone circle on Withypool Hill 670m ESE of Portford Bridge",
+      "summary": "stone circle located on Exmoor",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -3.66041,
+        "lat": 51.0963
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Withypool%20Stone%20Circle%2C%20May%202014.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Withypool_Stone_Circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q2341241",
+      "slug": "aboyne-stone-circle",
+      "name": "Aboyne Stone Circle",
+      "summary": "stone circle in the UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.78716389,
+        "lat": 57.08014167
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Aboyne%20Stone%20Circle%20-%20geograph.org.uk%20-%20295331.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Aboyne_Stone_Circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q3402065",
+      "slug": "bryn-gwyn-stones",
+      "name": "Bryn Gwyn stones",
+      "summary": "two remaining stones of an original circle of eight stones",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -4.30213,
+        "lat": 53.1772
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Bryn%20Gwyn%20slab%20stone%20with%20small%20adult%2011102009.JPG",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Bryn_Gwyn_stones",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q7083509",
+      "slug": "old-bourtreebush",
+      "name": "Old Bourtreebush",
+      "summary": "stone circle in Aberdeenshire, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.1605362,
+        "lat": 57.055775
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Bourtreebush%20Stone%20Circle%2C%20Kincardineshire%20-%20geograph.org.uk%20-%20536640.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Auld_Bourtreebush",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q1786692",
+      "slug": "scorhill",
+      "name": "Scorhill",
+      "summary": "stone circle in Dartmoor",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -3.90542,
+        "lat": 50.6706
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Scorhill.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Scorhill",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q17646731",
+      "slug": "falkner-s-circle",
+      "name": "Falkner's Circle",
+      "summary": "stone circle in Avebury, Wiltshire, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -1.84354,
+        "lat": 51.4227
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Falkner%27s%20Circle%20from%20Trackway.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Falkner%27s_Circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q844037",
+      "slug": "xag-ra-stone-circle",
+      "name": "Xagħra Stone Circle",
+      "summary": "archaeological site",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": 14.264722222,
+        "lat": 36.046388888
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Aquarelle%20de%20Charles%20de%20Brochtorff%20de%201825.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Xag%C4%A7ra_Stone_Circle",
+      "country": "Malta"
+    },
+    {
+      "wikidata_id": "Q4852511",
+      "slug": "balquhain-stone-circle",
+      "name": "Balquhain stone circle",
+      "summary": "stone circle in Aberdeenshire, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.4415016,
+        "lat": 57.30658
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Balquhain%20Stone%20Circle%20-%20geograph.org.uk%20-%20613456.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Balquhain",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q7361310",
+      "slug": "rollright-stones",
+      "name": "Rollright Stones",
+      "summary": "Neolithic stone complex in Oxfordshire, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -1.570833333,
+        "lat": 51.975555555
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20King%27s%20Men%20stone%20circle%2C%20Rollright%20Stones.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Rollright_Stones",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q14949376",
+      "slug": "rempstone-stone-circle",
+      "name": "Rempstone Stone Circle",
+      "summary": "stone circle in Corfe Castle, Dorset, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.00897,
+        "lat": 50.6384
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Part%20of%20the%20Rempstone%20stone%20circle%20in%20birch%20woodland%2C%20Purbeck%20-%20geograph.org.uk%20-%2025149.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Rempstone_Stone_Circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q15122892",
+      "slug": "nine-stones-1",
+      "name": "Nine Stones",
+      "summary": "Bronze Age stone circle near Winterbourne Abbas, Dorset, England, United Kingdom",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.55263,
+        "lat": 50.7122
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Winterbourne%20Abbas%20Nine%20Stones%20-%20geograph.org.uk%20-%20862715.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Nine_Stones,_Winterbourne_Abbas",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q17643598",
+      "slug": "winterbourne-bassett-stone-circle",
+      "name": "Winterbourne Bassett Stone Circle",
+      "summary": "Neolithic stone circle in Wiltshire, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -1.86649,
+        "lat": 51.4785
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 0,
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Winterbourne_Bassett_Stone_Circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q2463322",
+      "slug": "tyrebagger",
+      "name": "Tyrebagger",
+      "summary": "stone circle in Aberdeen, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.234208,
+        "lat": 57.20953
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Tyrebagger%20Stone%20Circle%20-%20geograph.org.uk%20-%20257895.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Tyrebagger_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q17674528",
+      "slug": "hordron-edge-stone-circle",
+      "name": "Hordron Edge stone circle",
+      "summary": "Stone circle in the parish of Derwent, Derbyshire, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -1.67791,
+        "lat": 53.3781
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Hordron%20Edge%20stone%20circle%20-%20geograph.org.uk%20-%201365438.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Hordron_Edge_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q1922063",
+      "slug": "the-merry-maidens",
+      "name": "The Merry Maidens",
+      "summary": "stone circle in St Buryan, St Buryan, Lamorna and Paul, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -5.5887748,
+        "lat": 50.0651283
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Cornwall-MerryMaidens-1.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/The_Merry_Maidens",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q19585973",
+      "slug": "loupin-stanes",
+      "name": "Loupin Stanes",
+      "summary": "stone circle in Dumfries and Galloway, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -3.1705054,
+        "lat": 55.258281
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/The%20Loupin%27%20Stanes%20stone%20circle%20-%20geograph.org.uk%20-%20811307.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Loupin_Stanes",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q894360",
+      "slug": "boscawen-un",
+      "name": "Boscawen-Un",
+      "summary": "stone circle in Cornwall",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -5.619322,
+        "lat": 50.0898332
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/01%20Boscawen-un.JPG",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Boscawen-Un",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q19585693",
+      "slug": "glenquicken-stone-circle",
+      "name": "Glenquicken stone circle",
+      "summary": "stone circle in Dumfries and Galloway, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -4.325443,
+        "lat": 54.896339
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Stone%20Circle%20south%20of%20Old%20Military%20Road%20-%20geograph.org.uk%20-%201290115.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Glenquicken_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q1969432",
+      "slug": "almendres-cromlech",
+      "name": "Almendres Cromlech",
+      "summary": "stone circle in Évora, Portugal",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -8.061077,
+        "lat": 38.557497
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Cromeleque%20dos%20Almendres1341.JPG",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Almendres_Cromlech",
+      "country": "Portugal"
+    },
+    {
+      "wikidata_id": "Q661855",
+      "slug": "avebury",
+      "name": "Avebury",
+      "summary": "Neolithic henge monument in Wiltshire, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -1.854166666,
+        "lat": 51.428611111
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Wiltshire-Avebury.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Avebury",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q17663742",
+      "slug": "day-house-lane-stone-circle",
+      "name": "Day House Lane Stone Circle",
+      "summary": "stone circle in South Swindon, Wiltshire, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -1.73978,
+        "lat": 51.54
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 0,
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Day_House_Lane_Stone_Circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q2933566",
+      "slug": "callanish-iv",
+      "name": "Callanish IV",
+      "summary": "stone circle on Lewis, Outer Hebrides, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -6.7136027,
+        "lat": 58.175589
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Cal4m.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Callanish_IV",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q14949371",
+      "slug": "gamelands-stone-circle",
+      "name": "Gamelands stone circle",
+      "summary": "stone circle in Orton, Cumbria, England, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.5569,
+        "lat": 54.4676
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Gamelands%20stone%20circle%202.JPG",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Gamelands_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q11664291",
+      "slug": "otoe-stone-circle",
+      "name": "Otoe Stone Circle",
+      "summary": "archaeological site in Japan",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": 142.033639,
+        "lat": 43.674028
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 0,
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Otoe_Stone_Circle",
+      "country": "Japan"
+    },
+    {
+      "wikidata_id": "Q56666210",
+      "slug": "inschfield-stone-circle",
+      "name": "Inschfield stone circle",
+      "summary": "stone circle in Aberdeenshire, Scotland, UK",
+      "site_type": "stone circle",
+      "category": "site",
+      "coordinates": {
+        "lng": -2.6277447,
+        "lat": 57.35312
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Inschfield%20Stone%20Circle%20with%20Dunnideer%20behind%20-%20geograph.org.uk%20-%20929294.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Inschfield_stone_circle",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q4783335",
+      "slug": "arabella-station",
+      "name": "Arabella Station",
+      "summary": "historic streetcar barn in New Orleans, Louisiana, USA",
+      "site_type": "dolmen",
+      "category": "site",
+      "coordinates": {
+        "lng": -90.1175,
+        "lat": 29.920556
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Arabella%20Station%20NOLA%20Exterior%202009.JPG",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Arabella_Station",
+      "country": "United States"
+    },
+    {
+      "wikidata_id": "Q27087086",
+      "slug": "matthiae-s-cafe-and-bakery",
+      "name": "Matthiae's Cafe And Bakery",
+      "summary": "former café in Richmond upon Thames, London, England, UK",
+      "site_type": "dolmen",
+      "category": "site",
+      "coordinates": {
+        "lng": -0.298434,
+        "lat": 51.465676
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/London%20Borough%20of%20Richmond%20upon%20Thames%20-%20Matthiae%27s%20Cafe%20And%20Bakery%20-%2020220509201526.jpg",
+      "country": "United Kingdom"
+    },
+    {
+      "wikidata_id": "Q106950037",
+      "slug": "dom-zgromadzenia-majstrow-tkackich-w-odzi",
+      "name": "Dom Zgromadzenia Majstrów Tkackich w Łodzi",
+      "summary": "Dom Zgromadzenia Majstrów Tkackich w Łodzi - a dolmen.",
+      "site_type": "dolmen",
+      "category": "site",
+      "coordinates": {
+        "lng": 19.4582,
+        "lat": 51.7655
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Nowy%20Dom%20Zgromadzenia%20Majstr%C3%B3w%20Tkackich%2C%20ul.%20Tuwima%203%2C%20%C5%81%C3%B3d%C5%BA.jpg",
+      "country": "Poland"
+    },
+    {
+      "wikidata_id": "Q33545739",
+      "slug": "west-hall",
+      "name": "West Hall",
+      "summary": "West Hall - a dolmen.",
+      "site_type": "dolmen",
+      "category": "site",
+      "coordinates": {
+        "lng": 20.997389,
+        "lat": 52.238833
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Mirow%20Halle%20Warschau%20IMG%202826.JPG",
+      "country": "Poland"
+    },
+    {
+      "wikidata_id": "Q110220399",
+      "slug": "companhia-agricola-do-sanguinhal",
+      "name": "Companhia Agrícola do Sanguinhal",
+      "summary": "Companhia Agrícola do Sanguinhal - a dolmen.",
+      "site_type": "dolmen",
+      "category": "site",
+      "coordinates": {
+        "lng": -9.154456,
+        "lat": 39.264793
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Fachada%20principal%20da%20Companhia%20Agr%C3%ADcola%20do%20Sanguinhal.jpg",
+      "country": "Portugal"
+    },
+    {
+      "wikidata_id": "Q12060526",
+      "slug": "hoover-building",
+      "name": "Hoover Building",
+      "summary": "in London, England originally a Hoover Company factory",
+      "site_type": "dolmen",
+      "category": "site",
+      "coordinates": {
+        "lng": -0.318889,
+        "lat": 51.5336
+      },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 1,
+      "image_url": "http://commons.wikimedia.org/wiki/Special:FilePath/Hoover%20Building.jpg",
+      "wikipedia_url": "https://en.wikipedia.org/wiki/Hoover_Building",
+      "country": "United Kingdom"
+    }
+  ]
+}

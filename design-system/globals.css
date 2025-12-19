@@ -1,0 +1,286 @@
+/**
+ * Megalithic Mapper Design System
+ * 
+ * Light theme: Google Maps-inspired with warm accents
+ * Dark theme: daily.dev-inspired immersive experience
+ * 
+ * Usage: Import this file in your main CSS/layout
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* ============================================
+     Light Theme - Cartographic & Clean
+     ============================================ */
+  :root {
+    /* Core surfaces */
+    --background: 0 0% 98%;
+    --foreground: 220 20% 15%;
+    
+    /* Card & Popover */
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 15%;
+    
+    /* Primary - Warm Orange (exploration/discovery) */
+    --primary: 23 94% 52%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary - Neutral gray */
+    --secondary: 220 10% 94%;
+    --secondary-foreground: 220 20% 25%;
+    
+    /* Muted - Subtle backgrounds */
+    --muted: 220 10% 94%;
+    --muted-foreground: 220 10% 45%;
+    
+    /* Accent - Golden amber (highlights) */
+    --accent: 45 100% 50%;
+    --accent-foreground: 220 20% 10%;
+    
+    /* Destructive - Error states */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Borders & Inputs */
+    --border: 220 15% 88%;
+    --input: 220 15% 88%;
+    --ring: 23 94% 52%;
+    
+    /* Border radius */
+    --radius: 0.75rem;
+    
+    /* Chart colors (optional) */
+    --chart-1: 23 94% 52%;
+    --chart-2: 45 100% 50%;
+    --chart-3: 142 76% 36%;
+    --chart-4: 199 89% 48%;
+    --chart-5: 280 65% 60%;
+  }
+
+  /* ============================================
+     Dark Theme - Immersive & Content-focused
+     ============================================ */
+  .dark {
+    /* Core surfaces - deep, rich blacks */
+    --background: 220 20% 4%;
+    --foreground: 210 20% 93%;
+    
+    /* Card & Popover - slightly elevated */
+    --card: 220 18% 9%;
+    --card-foreground: 210 20% 93%;
+    --popover: 220 18% 9%;
+    --popover-foreground: 210 20% 93%;
+    
+    /* Primary - Brighter orange for dark bg */
+    --primary: 23 94% 58%;
+    --primary-foreground: 26 100% 96%;
+    
+    /* Secondary - Dark gray surfaces */
+    --secondary: 220 15% 15%;
+    --secondary-foreground: 210 20% 93%;
+    
+    /* Muted - Subtle dark surfaces */
+    --muted: 220 15% 15%;
+    --muted-foreground: 215 15% 55%;
+    
+    /* Accent - Light gold for dark bg */
+    --accent: 45 100% 65%;
+    --accent-foreground: 220 20% 4%;
+    
+    /* Destructive */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+    
+    /* Borders & Inputs - subtle edges */
+    --border: 220 15% 18%;
+    --input: 220 15% 18%;
+    --ring: 23 94% 58%;
+    
+    /* Chart colors (adjusted for dark) */
+    --chart-1: 23 94% 58%;
+    --chart-2: 45 100% 65%;
+    --chart-3: 142 76% 46%;
+    --chart-4: 199 89% 58%;
+    --chart-5: 280 65% 70%;
+  }
+
+  /* ============================================
+     Base Element Styles
+     ============================================ */
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply min-h-screen bg-background text-foreground antialiased;
+    font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  /* Headings use serif font for elegance */
+  h1, h2, h3, h4 {
+    font-family: var(--font-serif), "Playfair Display", Georgia, serif;
+    @apply text-foreground;
+  }
+}
+
+@layer components {
+  /* ============================================
+     Glass Panel Effect
+     ============================================ */
+  .glass-panel {
+    @apply rounded-xl border border-border/60 bg-card/70 
+           shadow-lg shadow-black/20 backdrop-blur;
+  }
+
+  /* ============================================
+     Gradient Text
+     ============================================ */
+  .gradient-text {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 50%, hsl(var(--primary)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ============================================
+     Topographic Pattern Background
+     ============================================ */
+  .topo-pattern {
+    background-image: 
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 40px,
+        hsl(var(--primary) / 0.02) 40px,
+        hsl(var(--primary) / 0.02) 41px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 40px,
+        hsl(var(--primary) / 0.02) 40px,
+        hsl(var(--primary) / 0.02) 41px
+      );
+  }
+
+  /* ============================================
+     Custom Scrollbar
+     ============================================ */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+
+  /* ============================================
+     Touch Target (Accessibility)
+     ============================================ */
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* ============================================
+     Safe Area Padding (Mobile)
+     ============================================ */
+  .pb-safe {
+    padding-bottom: max(2rem, env(safe-area-inset-bottom));
+  }
+
+  .pt-safe {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+
+  /* ============================================
+     Overscroll Behavior
+     ============================================ */
+  .overscroll-contain {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .no-pull-refresh {
+    overscroll-behavior-y: contain;
+  }
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    hsl(var(--primary) / 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ============================================
+   Backdrop Filter Support
+   ============================================ */
+@supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+  .glass-backdrop {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+

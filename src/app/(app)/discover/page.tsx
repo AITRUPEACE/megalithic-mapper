@@ -6,32 +6,11 @@ import { ActivityFeedCard } from "@/components/feed/activity-feed-card";
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
 import { Card, CardContent } from "@/shared/ui/card";
-import {
-	Sparkles,
-	TrendingUp,
-	Clock,
-	Users,
-	LayoutGrid,
-	List,
-	ChevronRight,
-	Map,
-	MessageSquare,
-	Flame,
-	Bell,
-	Settings2,
-	Filter,
-} from "lucide-react";
+import { Sparkles, TrendingUp, Clock, Users, LayoutGrid, List, ChevronRight, Map, MessageSquare, Flame, Bell, Settings2, Filter } from "lucide-react";
 
 // Feed algorithm and mock data
-import {
-	mockFeedItems,
-	mockUserPreferences,
-	getActivityLabel,
-} from "@/lib/feed/mock-feed-data";
-import {
-	generateFeed,
-	calculateMyFeedScore,
-} from "@/lib/feed/feed-algorithm";
+import { mockFeedItems, mockUserPreferences, getActivityLabel } from "@/lib/feed/mock-feed-data";
+import { generateFeed, calculateMyFeedScore } from "@/lib/feed/feed-algorithm";
 import type { FeedFilters, FeedSortOption, ActivityType } from "@/lib/feed/feed-types";
 
 // Feed tabs for My Feed
@@ -59,22 +38,15 @@ export default function DiscoverPage() {
 	// Generate personalized feed using the algorithm
 	const feedItems = useMemo(() => {
 		let sortOption: FeedSortOption = "trending";
-		
+
 		// Different sorting based on tab
 		if (activeTab === "following") {
 			// Filter to only show content from followed users
 			const followedUserIds = mockUserPreferences.followedUsers;
-			const followedItems = mockFeedItems.filter(
-				(item) => followedUserIds.includes(item.author.id)
-			);
-			return generateFeed(
-				followedItems,
-				"new",
-				{},
-				mockUserPreferences
-			);
+			const followedItems = mockFeedItems.filter((item) => followedUserIds.includes(item.author.id));
+			return generateFeed(followedItems, "new", {}, mockUserPreferences);
 		}
-		
+
 		if (activeTab === "latest") {
 			sortOption = "new";
 		}
@@ -91,9 +63,7 @@ export default function DiscoverPage() {
 	const newMediaCount = mockFeedItems.filter((i) => i.type === "new_media").length;
 	const expertPostCount = mockFeedItems.filter((i) => i.type === "expert_post").length;
 	const hotDiscussions = mockFeedItems.filter((i) => i.type === "discussion_reply").length;
-	const followedUsersActive = mockUserPreferences.followedUsers.filter((userId) =>
-		mockFeedItems.some((item) => item.author.id === userId)
-	).length;
+	const followedUsersActive = mockUserPreferences.followedUsers.filter((userId) => mockFeedItems.some((item) => item.author.id === userId)).length;
 
 	return (
 		<div className="mx-auto max-w-[1400px] space-y-6 p-3 pb-20 sm:p-4 md:p-6 md:pb-6">
@@ -135,9 +105,8 @@ export default function DiscoverPage() {
 							<div>
 								<h3 className="font-semibold text-sm">Your feed is personalized</h3>
 								<p className="text-xs text-muted-foreground mt-0.5">
-									Content is ranked based on your followed sites ({mockUserPreferences.followedSites.length}), 
-									users ({mockUserPreferences.followedUsers.length}), and interests. 
-									Expert posts and new media get priority.
+									Content is ranked based on your followed sites ({mockUserPreferences.followedSites.length}), users (
+									{mockUserPreferences.followedUsers.length}), and interests. Expert posts and new media get priority.
 								</p>
 							</div>
 						</div>
@@ -157,7 +126,10 @@ export default function DiscoverPage() {
 
 			{/* Quick Stats Row */}
 			<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-				<Card className="bg-[#1a1f26] border-border/30 cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setActiveFilter("new_media")}>
+				<Card
+					className="bg-card border-border/30 cursor-pointer hover:border-primary/50 transition-colors"
+					onClick={() => setActiveFilter("new_media")}
+				>
 					<CardContent className="p-4 flex items-center gap-3">
 						<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-pink-500/10">
 							<TrendingUp className="h-5 w-5 text-pink-400" />
@@ -168,7 +140,10 @@ export default function DiscoverPage() {
 						</div>
 					</CardContent>
 				</Card>
-				<Card className="bg-[#1a1f26] border-border/30 cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setActiveFilter("expert_post")}>
+				<Card
+					className="bg-card border-border/30 cursor-pointer hover:border-primary/50 transition-colors"
+					onClick={() => setActiveFilter("expert_post")}
+				>
 					<CardContent className="p-4 flex items-center gap-3">
 						<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10">
 							<Users className="h-5 w-5 text-blue-400" />
@@ -179,7 +154,10 @@ export default function DiscoverPage() {
 						</div>
 					</CardContent>
 				</Card>
-				<Card className="bg-[#1a1f26] border-border/30 cursor-pointer hover:border-primary/50 transition-colors" onClick={() => setActiveFilter("discussion_reply")}>
+				<Card
+					className="bg-card border-border/30 cursor-pointer hover:border-primary/50 transition-colors"
+					onClick={() => setActiveFilter("discussion_reply")}
+				>
 					<CardContent className="p-4 flex items-center gap-3">
 						<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-500/10">
 							<MessageSquare className="h-5 w-5 text-orange-400" />
@@ -190,7 +168,7 @@ export default function DiscoverPage() {
 						</div>
 					</CardContent>
 				</Card>
-				<Card className="bg-[#1a1f26] border-border/30">
+				<Card className="bg-card border-border/30">
 					<CardContent className="p-4 flex items-center gap-3">
 						<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
 							<Map className="h-5 w-5 text-emerald-400" />
@@ -211,7 +189,7 @@ export default function DiscoverPage() {
 							key={tab.id}
 							variant={activeTab === tab.id ? "secondary" : "ghost"}
 							size="sm"
-							className={activeTab === tab.id ? "bg-white text-slate-900 hover:bg-white/90" : ""}
+							className={activeTab === tab.id ? "bg-foreground text-background hover:bg-foreground/90" : ""}
 							onClick={() => setActiveTab(tab.id)}
 						>
 							{tab.label}
@@ -222,20 +200,10 @@ export default function DiscoverPage() {
 				<div className="flex items-center gap-2">
 					{/* View Mode Toggle */}
 					<div className="flex items-center gap-1">
-						<Button
-							variant={viewMode === "grid" ? "secondary" : "ghost"}
-							size="icon"
-							className="h-8 w-8"
-							onClick={() => setViewMode("grid")}
-						>
+						<Button variant={viewMode === "grid" ? "secondary" : "ghost"} size="icon" className="h-8 w-8" onClick={() => setViewMode("grid")}>
 							<LayoutGrid className="h-4 w-4" />
 						</Button>
-						<Button
-							variant={viewMode === "list" ? "secondary" : "ghost"}
-							size="icon"
-							className="h-8 w-8"
-							onClick={() => setViewMode("list")}
-						>
+						<Button variant={viewMode === "list" ? "secondary" : "ghost"} size="icon" className="h-8 w-8" onClick={() => setViewMode("list")}>
 							<List className="h-4 w-4" />
 						</Button>
 					</div>
@@ -251,7 +219,7 @@ export default function DiscoverPage() {
 						size="sm"
 						className={
 							activeFilter === filter.id
-								? "bg-white text-slate-900 hover:bg-white/90 shrink-0"
+								? "bg-foreground text-background hover:bg-foreground/90 shrink-0"
 								: "border-border/40 hover:bg-secondary/50 shrink-0"
 						}
 						onClick={() => setActiveFilter(filter.id)}
@@ -267,7 +235,7 @@ export default function DiscoverPage() {
 					{activeTab === "for-you" && "Content ranked by your interests and followed topics"}
 					{activeTab === "following" && "Latest from users you follow"}
 					{activeTab === "latest" && "Most recent activity across all content"}
-					{activeFilter !== "all" && ` • Filtered to ${activityFilters.find(f => f.id === activeFilter)?.label}`}
+					{activeFilter !== "all" && ` • Filtered to ${activityFilters.find((f) => f.id === activeFilter)?.label}`}
 				</p>
 				<Badge variant="secondary" className="text-xs">
 					{feedItems.length} items
@@ -291,7 +259,7 @@ export default function DiscoverPage() {
 
 			{/* Empty State */}
 			{feedItems.length === 0 && (
-				<Card className="bg-[#1a1f26] border-border/30">
+				<Card className="bg-card border-border/30">
 					<CardContent className="flex flex-col items-center justify-center py-12 text-center">
 						<Sparkles className="h-12 w-12 text-muted-foreground mb-4" />
 						<p className="text-lg font-medium text-muted-foreground mb-2">No activity yet</p>

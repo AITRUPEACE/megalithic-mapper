@@ -30,12 +30,7 @@ import {
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/ui/avatar";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/shared/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/shared/ui/dropdown-menu";
 import { cn } from "@/shared/lib/utils";
 import type { FeedableContent, ActivityType } from "@/lib/feed/feed-types";
 import { getActivityIcon, getActivityLabel } from "@/lib/feed/mock-feed-data";
@@ -73,7 +68,7 @@ function formatNumber(num: number): string {
 
 function timeAgo(date: Date): string {
 	const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-	
+
 	if (seconds < 60) return "just now";
 	if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
 	if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
@@ -81,12 +76,7 @@ function timeAgo(date: Date): string {
 	return date.toLocaleDateString();
 }
 
-export function ActivityFeedCard({
-	item,
-	variant = "default",
-	onUpvote,
-	onBookmark,
-}: ActivityFeedCardProps) {
+export function ActivityFeedCard({ item, variant = "default", onUpvote, onBookmark }: ActivityFeedCardProps) {
 	const [isUpvoted, setIsUpvoted] = useState(false);
 	const [isBookmarked, setIsBookmarked] = useState(false);
 	const [upvotes, setUpvotes] = useState(item.engagement.upvotes);
@@ -124,7 +114,7 @@ export function ActivityFeedCard({
 
 	if (variant === "compact") {
 		return (
-			<article className="group relative flex gap-3 rounded-2xl border border-border/30 bg-[#1a1f26] p-3 transition-all hover:border-border/50 hover:bg-[#1e2430]">
+			<article className="group relative flex gap-3 rounded-2xl border border-border/30 bg-card p-3 transition-all hover:border-border/50 hover:bg-muted/50">
 				{/* Activity indicator */}
 				<div className={cn("shrink-0 flex h-10 w-10 items-center justify-center rounded-lg", config.bgColor)}>
 					<ActivityIcon className={cn("h-5 w-5", config.color)} />
@@ -137,16 +127,15 @@ export function ActivityFeedCard({
 						<Link href={`/profile/${item.author.username}`} className="flex items-center gap-1.5">
 							<Avatar className="h-5 w-5">
 								{item.author.avatar && <AvatarImage src={item.author.avatar} />}
-								<AvatarFallback className="text-[9px]">
-									{item.author.name.slice(0, 2).toUpperCase()}
-								</AvatarFallback>
+								<AvatarFallback className="text-[9px]">{item.author.name.slice(0, 2).toUpperCase()}</AvatarFallback>
 							</Avatar>
 							<span className="text-xs font-medium text-foreground">{item.author.name}</span>
-							{item.author.isVerified && (
-								<CheckCircle2 className="h-3 w-3 text-blue-400 fill-blue-400" />
-							)}
+							{item.author.isVerified && <CheckCircle2 className="h-3 w-3 text-blue-400 fill-blue-400" />}
 							{item.author.isNotable && (
-								<Badge variant="secondary" className="h-4 px-1 text-[9px] bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-400 border-0">
+								<Badge
+									variant="secondary"
+									className="h-4 px-1 text-[9px] bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-400 border-0"
+								>
 									{item.author.badges[0] || "Notable"}
 								</Badge>
 							)}
@@ -166,11 +155,7 @@ export function ActivityFeedCard({
 					{item.tags.length > 0 && (
 						<div className="flex items-center gap-1.5 mt-2">
 							{item.tags.slice(0, 3).map((tag) => (
-								<Link
-									key={tag}
-									href={`/tags/${tag}`}
-									className="text-[10px] text-muted-foreground hover:text-primary transition-colors"
-								>
+								<Link key={tag} href={`/tags/${tag}`} className="text-[10px] text-muted-foreground hover:text-primary transition-colors">
 									#{tag}
 								</Link>
 							))}
@@ -189,12 +174,7 @@ export function ActivityFeedCard({
 							)}
 						</div>
 						<div className="flex items-center gap-0.5">
-							<Button
-								variant="ghost"
-								size="sm"
-								className={cn("h-6 px-1.5 gap-1 text-[11px]", isUpvoted && "text-primary")}
-								onClick={handleUpvote}
-							>
+							<Button variant="ghost" size="sm" className={cn("h-6 px-1.5 gap-1 text-[11px]", isUpvoted && "text-primary")} onClick={handleUpvote}>
 								<ArrowUp className={cn("h-3 w-3", isUpvoted && "fill-current")} />
 								{formatNumber(upvotes)}
 							</Button>
@@ -202,12 +182,7 @@ export function ActivityFeedCard({
 								<MessageSquare className="h-3 w-3" />
 								{formatNumber(item.engagement.comments)}
 							</Button>
-							<Button
-								variant="ghost"
-								size="icon"
-								className={cn("h-6 w-6", isBookmarked && "text-primary")}
-								onClick={handleBookmark}
-							>
+							<Button variant="ghost" size="icon" className={cn("h-6 w-6", isBookmarked && "text-primary")} onClick={handleBookmark}>
 								<Bookmark className={cn("h-3 w-3", isBookmarked && "fill-current")} />
 							</Button>
 						</div>
@@ -235,12 +210,12 @@ export function ActivityFeedCard({
 
 	// Default variant
 	return (
-		<article className="group relative overflow-hidden rounded-2xl border border-border/30 bg-[#1a1f26] transition-all hover:border-border/50 hover:bg-[#1e2430]">
+		<article className="group relative overflow-hidden rounded-2xl border border-border/30 bg-card transition-all hover:border-border/50 hover:bg-muted/50">
 			{/* Thumbnail */}
 			{item.thumbnail && (
 				<Link href={href} className="block relative aspect-[16/9] overflow-hidden bg-secondary/30">
 					<div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/20" />
-					
+
 					{/* Activity badge */}
 					<div className="absolute top-3 left-3 z-10">
 						<Badge className={cn("gap-1.5 backdrop-blur-sm border-0", config.bgColor, config.color)}>
@@ -277,21 +252,20 @@ export function ActivityFeedCard({
 					<Link href={`/profile/${item.author.username}`} className="flex items-center gap-2">
 						<Avatar className="h-8 w-8 border border-border/40">
 							{item.author.avatar && <AvatarImage src={item.author.avatar} />}
-							<AvatarFallback className="text-xs">
-								{item.author.name.slice(0, 2).toUpperCase()}
-							</AvatarFallback>
+							<AvatarFallback className="text-xs">{item.author.name.slice(0, 2).toUpperCase()}</AvatarFallback>
 						</Avatar>
 						<div className="flex flex-col">
 							<div className="flex items-center gap-1.5">
 								<span className="text-sm font-medium text-foreground">{item.author.name}</span>
-								{item.author.isVerified && (
-									<CheckCircle2 className="h-3.5 w-3.5 text-blue-400 fill-blue-400" />
-								)}
+								{item.author.isVerified && <CheckCircle2 className="h-3.5 w-3.5 text-blue-400 fill-blue-400" />}
 							</div>
 							<div className="flex items-center gap-1.5">
 								<span className="text-xs text-muted-foreground">@{item.author.username}</span>
 								{item.author.isNotable && (
-									<Badge variant="secondary" className="h-4 px-1.5 text-[9px] bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-400 border-0">
+									<Badge
+										variant="secondary"
+										className="h-4 px-1.5 text-[9px] bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-400 border-0"
+									>
 										{item.author.badges[0] || "Notable"}
 									</Badge>
 								)}
@@ -306,15 +280,11 @@ export function ActivityFeedCard({
 
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
-							<Button
-								variant="ghost"
-								size="icon"
-								className="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
-							>
+							<Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
 								<MoreHorizontal className="h-4 w-4" />
 							</Button>
 						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="bg-[#1a1f26] border-border/40">
+						<DropdownMenuContent align="end" className="bg-card border-border/40">
 							<DropdownMenuItem>
 								<Share2 className="mr-2 h-4 w-4" />
 								Share
@@ -335,11 +305,7 @@ export function ActivityFeedCard({
 				</Link>
 
 				{/* Excerpt */}
-				{item.excerpt && (
-					<p className="mt-2 text-sm text-muted-foreground line-clamp-2">
-						{item.excerpt}
-					</p>
-				)}
+				{item.excerpt && <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{item.excerpt}</p>}
 
 				{/* Related sites */}
 				{item.relatedSites.length > 0 && (
@@ -347,19 +313,11 @@ export function ActivityFeedCard({
 						<Map className="h-3.5 w-3.5 text-muted-foreground" />
 						<div className="flex items-center gap-1.5 flex-wrap">
 							{item.relatedSites.slice(0, 2).map((siteId) => (
-								<Link
-									key={siteId}
-									href={`/map?focus=${siteId}`}
-									className="text-xs text-primary hover:underline"
-								>
+								<Link key={siteId} href={`/map?focus=${siteId}`} className="text-xs text-primary hover:underline">
 									{siteId.replace(/-/g, " ")}
 								</Link>
 							))}
-							{item.relatedSites.length > 2 && (
-								<span className="text-xs text-muted-foreground">
-									+{item.relatedSites.length - 2} more
-								</span>
-							)}
+							{item.relatedSites.length > 2 && <span className="text-xs text-muted-foreground">+{item.relatedSites.length - 2} more</span>}
 						</div>
 					</div>
 				)}
@@ -391,8 +349,7 @@ export function ActivityFeedCard({
 						)}
 						{item.recentEngagement.upvotesLast24h > 50 && (
 							<span className="flex items-center gap-1 text-primary">
-								<TrendingUp className="h-3 w-3" />
-								+{formatNumber(item.recentEngagement.upvotesLast24h)} today
+								<TrendingUp className="h-3 w-3" />+{formatNumber(item.recentEngagement.upvotesLast24h)} today
 							</span>
 						)}
 					</div>
@@ -403,21 +360,14 @@ export function ActivityFeedCard({
 							size="sm"
 							className={cn(
 								"h-8 px-2.5 gap-1.5 text-xs font-medium rounded-lg",
-								isUpvoted
-									? "bg-primary/10 text-primary hover:bg-primary/20"
-									: "hover:bg-secondary/50"
+								isUpvoted ? "bg-primary/10 text-primary hover:bg-primary/20" : "hover:bg-secondary/50"
 							)}
 							onClick={handleUpvote}
 						>
 							<ArrowUp className={cn("h-4 w-4", isUpvoted && "fill-current")} />
 							{formatNumber(upvotes)}
 						</Button>
-						<Button
-							variant="ghost"
-							size="sm"
-							className="h-8 px-2.5 gap-1.5 text-xs font-medium rounded-lg hover:bg-secondary/50"
-							asChild
-						>
+						<Button variant="ghost" size="sm" className="h-8 px-2.5 gap-1.5 text-xs font-medium rounded-lg hover:bg-secondary/50" asChild>
 							<Link href={`${href}#comments`}>
 								<MessageSquare className="h-4 w-4" />
 								{formatNumber(item.engagement.comments)}
@@ -426,21 +376,12 @@ export function ActivityFeedCard({
 						<Button
 							variant="ghost"
 							size="icon"
-							className={cn(
-								"h-8 w-8 rounded-lg",
-								isBookmarked
-									? "bg-primary/10 text-primary hover:bg-primary/20"
-									: "hover:bg-secondary/50"
-							)}
+							className={cn("h-8 w-8 rounded-lg", isBookmarked ? "bg-primary/10 text-primary hover:bg-primary/20" : "hover:bg-secondary/50")}
 							onClick={handleBookmark}
 						>
 							<Bookmark className={cn("h-4 w-4", isBookmarked && "fill-current")} />
 						</Button>
-						<Button
-							variant="ghost"
-							size="icon"
-							className="h-8 w-8 rounded-lg hover:bg-secondary/50"
-						>
+						<Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-secondary/50">
 							<Share2 className="h-4 w-4" />
 						</Button>
 					</div>
@@ -449,4 +390,3 @@ export function ActivityFeedCard({
 		</article>
 	);
 }
-

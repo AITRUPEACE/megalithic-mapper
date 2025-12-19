@@ -1,478 +1,490 @@
 /**
  * Custom SVG icons for archaeological site types
- * Style: Minimalist line art with consistent stroke width
- * Colors are applied via CSS currentColor
+ * Style: Bold filled shapes, optimized for small sizes on maps
+ * Designed to be recognizable at 24-36px
  */
 
 import { cn } from "@/shared/lib/utils";
 
 interface IconProps {
-  className?: string;
-  size?: number;
+	className?: string;
+	size?: number;
+	color?: string;
 }
 
-// Pyramid - stepped/triangular structure
+// =============================================================================
+// REACT COMPONENTS - For use in UI components
+// =============================================================================
+
+// Pyramid - Classic stepped pyramid silhouette
 export const PyramidIcon = ({ className, size = 24 }: IconProps) => (
-  <svg
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={cn("site-type-icon", className)}
-  >
-    <path d="M12 3L2 21h20L12 3z" />
-    <path d="M12 3v18" opacity="0.5" />
-    <path d="M7 12h10" opacity="0.5" />
-  </svg>
+	<svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={cn("site-type-icon", className)}>
+		<path d="M12 2L2 20h20L12 2z" />
+	</svg>
 );
 
-// Temple - columned structure
+// Temple - Greek/Roman columned structure with pediment
 export const TempleIcon = ({ className, size = 24 }: IconProps) => (
-  <svg
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={cn("site-type-icon", className)}
-  >
-    <path d="M3 21h18" />
-    <path d="M5 21V10" />
-    <path d="M19 21V10" />
-    <path d="M9 21V10" />
-    <path d="M15 21V10" />
-    <path d="M3 10l9-7 9 7" />
-    <rect x="3" y="8" width="18" height="2" fill="currentColor" opacity="0.3" />
-  </svg>
+	<svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={cn("site-type-icon", className)}>
+		<path d="M12 2L3 8h18L12 2z" />
+		<rect x="3" y="8" width="18" height="2" />
+		<rect x="5" y="10" width="2" height="10" />
+		<rect x="9" y="10" width="2" height="10" />
+		<rect x="13" y="10" width="2" height="10" />
+		<rect x="17" y="10" width="2" height="10" />
+		<rect x="3" y="20" width="18" height="2" />
+	</svg>
 );
 
-// Stone Circle - ring of standing stones
+// Stone Circle - Ring of standing stones (Stonehenge-inspired)
 export const StoneCircleIcon = ({ className, size = 24 }: IconProps) => (
-  <svg
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={cn("site-type-icon", className)}
-  >
-    <circle cx="12" cy="12" r="8" opacity="0.3" strokeDasharray="2 2" />
-    {/* Standing stones around the circle */}
-    <rect x="11" y="2" width="2" height="4" rx="0.5" fill="currentColor" />
-    <rect x="11" y="18" width="2" height="4" rx="0.5" fill="currentColor" />
-    <rect x="2" y="11" width="4" height="2" rx="0.5" fill="currentColor" />
-    <rect x="18" y="11" width="4" height="2" rx="0.5" fill="currentColor" />
-    <rect x="4.5" y="4.5" width="2" height="3" rx="0.5" fill="currentColor" transform="rotate(-45 5.5 6)" />
-    <rect x="17" y="4.5" width="2" height="3" rx="0.5" fill="currentColor" transform="rotate(45 18 6)" />
-    <rect x="4.5" y="16.5" width="2" height="3" rx="0.5" fill="currentColor" transform="rotate(45 5.5 18)" />
-    <rect x="17" y="16.5" width="2" height="3" rx="0.5" fill="currentColor" transform="rotate(-45 18 18)" />
-  </svg>
+	<svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={cn("site-type-icon", className)}>
+		{/* Stones arranged in a circle */}
+		<rect x="10" y="2" width="4" height="6" rx="1" />
+		<rect x="10" y="16" width="4" height="6" rx="1" />
+		<rect x="2" y="10" width="6" height="4" rx="1" />
+		<rect x="16" y="10" width="6" height="4" rx="1" />
+		{/* Diagonal stones */}
+		<rect x="3.5" y="3.5" width="4" height="5" rx="1" transform="rotate(-45 5.5 6)" />
+		<rect x="16.5" y="3.5" width="4" height="5" rx="1" transform="rotate(45 18.5 6)" />
+		<rect x="3.5" y="15.5" width="4" height="5" rx="1" transform="rotate(45 5.5 18)" />
+		<rect x="16.5" y="15.5" width="4" height="5" rx="1" transform="rotate(-45 18.5 18)" />
+	</svg>
 );
 
-// Mound / Tumulus - burial mound
-export const MoundIcon = ({ className, size = 24 }: IconProps) => (
-  <svg
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={cn("site-type-icon", className)}
-  >
-    <path d="M2 20c0-8 4-12 10-12s10 4 10 12" />
-    <path d="M2 20h20" />
-    <ellipse cx="12" cy="20" rx="10" ry="2" opacity="0.3" />
-  </svg>
-);
-
-// Wall / Fortification
-export const WallIcon = ({ className, size = 24 }: IconProps) => (
-  <svg
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={cn("site-type-icon", className)}
-  >
-    <path d="M2 20V8h4v12" />
-    <path d="M6 20V6h4v14" />
-    <path d="M10 20V4h4v16" />
-    <path d="M14 20V6h4v14" />
-    <path d="M18 20V8h4v12" />
-    <path d="M2 20h20" />
-    {/* Battlements */}
-    <rect x="3" y="5" width="2" height="3" fill="currentColor" opacity="0.5" />
-    <rect x="7" y="3" width="2" height="3" fill="currentColor" opacity="0.5" />
-    <rect x="11" y="1" width="2" height="3" fill="currentColor" opacity="0.5" />
-    <rect x="15" y="3" width="2" height="3" fill="currentColor" opacity="0.5" />
-    <rect x="19" y="5" width="2" height="3" fill="currentColor" opacity="0.5" />
-  </svg>
-);
-
-// Megalith - Standing stone / Dolmen
+// Megalith / Dolmen - Portal dolmen with capstone
 export const MegalithIcon = ({ className, size = 24 }: IconProps) => (
-  <svg
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={cn("site-type-icon", className)}
-  >
-    {/* Dolmen structure - two uprights with capstone */}
-    <path d="M4 21V9" />
-    <path d="M20 21V9" />
-    <path d="M2 9h20" strokeWidth="2" />
-    <rect x="3" y="9" width="3" height="12" fill="currentColor" opacity="0.2" />
-    <rect x="18" y="9" width="3" height="12" fill="currentColor" opacity="0.2" />
-    <path d="M2 21h20" />
-  </svg>
+	<svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={cn("site-type-icon", className)}>
+		{/* Capstone */}
+		<path d="M1 6h22l-2 4H3L1 6z" />
+		{/* Left upright */}
+		<rect x="3" y="10" width="5" height="12" rx="1" />
+		{/* Right upright */}
+		<rect x="16" y="10" width="5" height="12" rx="1" />
+	</svg>
 );
 
-// Ruins - broken columns
+// Mound / Tumulus - Burial mound shape
+export const MoundIcon = ({ className, size = 24 }: IconProps) => (
+	<svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={cn("site-type-icon", className)}>
+		<path d="M2 22C2 22 4 8 12 8s10 14 10 14H2z" />
+	</svg>
+);
+
+// Tomb - Passage tomb / burial chamber entrance
+export const TombIcon = ({ className, size = 24 }: IconProps) => (
+	<svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={cn("site-type-icon", className)}>
+		{/* Mound with entrance */}
+		<path d="M2 22C2 14 6 6 12 6s10 8 10 16H2z" />
+		{/* Dark entrance - cut out */}
+		<path d="M9 22v-8a3 3 0 016 0v8H9z" fill="rgba(0,0,0,0.4)" />
+	</svg>
+);
+
+// Fortress / Wall - Crenellated fortification
+export const WallIcon = ({ className, size = 24 }: IconProps) => (
+	<svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={cn("site-type-icon", className)}>
+		{/* Main wall with battlements */}
+		<path d="M2 22V10h3V6h4V3h6v3h4v4h3v12H2z" />
+		{/* Gate cutout */}
+		<path d="M9 22v-6h6v6H9z" fill="rgba(0,0,0,0.3)" />
+	</svg>
+);
+
+// City / Ancient Settlement - Skyline of buildings
+export const CityIcon = ({ className, size = 24 }: IconProps) => (
+	<svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={cn("site-type-icon", className)}>
+		<rect x="2" y="12" width="5" height="10" />
+		<rect x="8" y="8" width="4" height="14" />
+		<rect x="13" y="4" width="4" height="18" />
+		<rect x="18" y="10" width="4" height="12" />
+	</svg>
+);
+
+// Ruins - Broken columns
 export const RuinsIcon = ({ className, size = 24 }: IconProps) => (
-  <svg
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={cn("site-type-icon", className)}
-  >
-    <path d="M3 21h18" />
-    <path d="M5 21V14l1-2V9" />
-    <path d="M9 21V11" />
-    <path d="M13 21V8l-1-3" />
-    <path d="M17 21V12l1-1V8" />
-    <path d="M19 21V15" />
-    {/* Fallen blocks */}
-    <rect x="7" y="18" width="3" height="2" rx="0.3" fill="currentColor" opacity="0.4" transform="rotate(-15 8.5 19)" />
-    <rect x="14" y="17" width="2" height="1.5" rx="0.3" fill="currentColor" opacity="0.4" transform="rotate(10 15 17.75)" />
-  </svg>
+	<svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={cn("site-type-icon", className)}>
+		<rect x="3" y="8" width="3" height="14" rx="0.5" />
+		<rect x="8" y="12" width="3" height="10" rx="0.5" />
+		<rect x="13" y="6" width="3" height="16" rx="0.5" />
+		<rect x="18" y="10" width="3" height="12" rx="0.5" />
+		{/* Fallen stone */}
+		<rect x="6" y="18" width="5" height="3" rx="0.5" transform="rotate(-15 8.5 19.5)" />
+	</svg>
 );
 
-// Cave
+// Cave - Mountain with arch opening
 export const CaveIcon = ({ className, size = 24 }: IconProps) => (
-  <svg
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={cn("site-type-icon", className)}
-  >
-    <path d="M2 20C2 12 6 4 12 4s10 8 10 16" />
-    <path d="M6 20c0-4 2-8 6-8s6 4 6 8" fill="currentColor" opacity="0.2" />
-    <path d="M2 20h20" />
-  </svg>
+	<svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={cn("site-type-icon", className)}>
+		{/* Mountain shape */}
+		<path d="M12 2L2 22h20L12 2z" />
+		{/* Cave entrance - darker */}
+		<path d="M8 22c0-4 2-7 4-7s4 3 4 7H8z" fill="rgba(0,0,0,0.4)" />
+	</svg>
 );
 
-// Observatory - astronomical site
+// Observatory - Standing stone with celestial alignment
 export const ObservatoryIcon = ({ className, size = 24 }: IconProps) => (
-  <svg
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={cn("site-type-icon", className)}
-  >
-    {/* Horizon line */}
-    <path d="M2 18h20" />
-    {/* Standing stone/marker */}
-    <rect x="10" y="10" width="4" height="8" rx="0.5" />
-    {/* Sun/star rays */}
-    <circle cx="12" cy="5" r="2" />
-    <path d="M12 1v1" />
-    <path d="M8 5h-1" />
-    <path d="M17 5h-1" />
-    <path d="M9.5 2.5l-.7.7" />
-    <path d="M15.2 2.5l.7.7" />
-    {/* Alignment lines */}
-    <path d="M4 18l8-8" opacity="0.4" strokeDasharray="2 2" />
-    <path d="M20 18l-8-8" opacity="0.4" strokeDasharray="2 2" />
-  </svg>
+	<svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={cn("site-type-icon", className)}>
+		{/* Sun/star */}
+		<circle cx="12" cy="5" r="4" />
+		{/* Rays */}
+		<rect x="11" y="0" width="2" height="2" />
+		<rect x="17" y="4" width="2" height="2" />
+		<rect x="5" y="4" width="2" height="2" />
+		{/* Standing stone */}
+		<rect x="9" y="11" width="6" height="11" rx="1" />
+	</svg>
 );
 
-// Underwater site
+// Underwater - Waves with submerged structure
 export const UnderwaterIcon = ({ className, size = 24 }: IconProps) => (
-  <svg
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={cn("site-type-icon", className)}
-  >
-    {/* Water surface */}
-    <path d="M2 8c2-2 4-2 6 0s4 2 6 0 4-2 6 0" />
-    {/* Submerged structure */}
-    <path d="M8 14l4-4 4 4" />
-    <path d="M8 14v6" />
-    <path d="M16 14v6" />
-    <path d="M6 20h12" />
-    {/* Bubbles */}
-    <circle cx="5" cy="12" r="1" fill="currentColor" opacity="0.4" />
-    <circle cx="19" cy="14" r="0.7" fill="currentColor" opacity="0.4" />
-    <circle cx="18" cy="11" r="0.5" fill="currentColor" opacity="0.4" />
-  </svg>
+	<svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={cn("site-type-icon", className)}>
+		{/* Waves */}
+		<path d="M1 6c2-3 4-3 6 0s4 3 6 0 4-3 6 0 3 3 4 1l1 3c-2 2-4 2-6 0s-4-2-6 0-4 2-6 0-4-2-5 0L1 6z" />
+		{/* Submerged pyramid */}
+		<path d="M12 11L6 22h12L12 11z" opacity="0.7" />
+	</svg>
 );
 
-// Henge - earthwork monument
-export const HengeIcon = ({ className, size = 24 }: IconProps) => (
-  <svg
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={cn("site-type-icon", className)}
-  >
-    {/* Outer bank */}
-    <ellipse cx="12" cy="14" rx="10" ry="5" />
-    {/* Inner ditch */}
-    <ellipse cx="12" cy="14" rx="7" ry="3.5" opacity="0.5" strokeDasharray="3 2" />
-    {/* Standing stones in center */}
-    <rect x="10" y="11" width="1.5" height="4" rx="0.3" fill="currentColor" />
-    <rect x="12.5" y="11" width="1.5" height="4" rx="0.3" fill="currentColor" />
-    {/* Entrance causeway */}
-    <path d="M12 19v2" />
-    <path d="M12 9v-2" />
-  </svg>
-);
-
-// Artifact location - pottery, tools, etc.
-export const ArtifactIcon = ({ className, size = 24 }: IconProps) => (
-  <svg
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={cn("site-type-icon", className)}
-  >
-    {/* Pottery vessel */}
-    <path d="M7 8c0-2 2-4 5-4s5 2 5 4" />
-    <path d="M7 8c-1 0-2 1-2 3 0 4 2 8 7 9 5-1 7-5 7-9 0-2-1-3-2-3" />
-    <ellipse cx="12" cy="8" rx="5" ry="1.5" />
-    {/* Decorative pattern */}
-    <path d="M8 12h8" opacity="0.5" />
-    <path d="M9 15h6" opacity="0.5" />
-  </svg>
-);
-
-// Geoglyph - Nazca lines style
+// Geoglyph - Nazca-style ground figure (hummingbird)
 export const GeoglyphIcon = ({ className, size = 24 }: IconProps) => (
-  <svg
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={cn("site-type-icon", className)}
-  >
-    {/* Stylized bird/figure */}
-    <path d="M4 16l4-4 2 2 4-6 2 2 4-4" />
-    <circle cx="18" cy="6" r="2" />
-    <path d="M2 20h20" opacity="0.3" />
-    {/* Lines radiating */}
-    <path d="M4 20l4-4" opacity="0.5" />
-    <path d="M10 20l4-6" opacity="0.5" />
-    <path d="M16 20l2-6" opacity="0.5" />
-  </svg>
+	<svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={cn("site-type-icon", className)}>
+		{/* Stylized bird */}
+		<circle cx="19" cy="6" r="3" />
+		<path d="M16 6L12 10l-8 2 2 3 6-1 4 6 3-2-3-6 4-4-4-2z" />
+	</svg>
 );
 
-// Generic archaeological site
-export const GenericSiteIcon = ({ className, size = 24 }: IconProps) => (
-  <svg
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={cn("site-type-icon", className)}
-  >
-    <circle cx="12" cy="10" r="6" />
-    <path d="M12 16v5" />
-    <circle cx="12" cy="10" r="2" fill="currentColor" opacity="0.3" />
-  </svg>
+// Statue - Moai-style figure
+export const StatueIcon = ({ className, size = 24 }: IconProps) => (
+	<svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={cn("site-type-icon", className)}>
+		{/* Head */}
+		<path d="M8 2h8l1 10H7L8 2z" />
+		{/* Face features */}
+		<rect x="9" y="5" width="2" height="3" fill="rgba(0,0,0,0.2)" />
+		<rect x="13" y="5" width="2" height="3" fill="rgba(0,0,0,0.2)" />
+		{/* Nose/mouth area */}
+		<rect x="11" y="8" width="2" height="3" fill="rgba(0,0,0,0.2)" />
+		{/* Body/torso */}
+		<path d="M7 12h10l1 10H6l1-10z" />
+	</svg>
 );
+
+// Generic / Unknown site
+export const GenericSiteIcon = ({ className, size = 24 }: IconProps) => (
+	<svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={cn("site-type-icon", className)}>
+		{/* Map pin shape */}
+		<path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z" />
+		{/* Question mark */}
+		<text x="12" y="12" textAnchor="middle" fontSize="8" fill="rgba(0,0,0,0.4)" fontWeight="bold">
+			?
+		</text>
+	</svg>
+);
+
+// =============================================================================
+// ICON MAPPINGS
+// =============================================================================
 
 // Map of site type keywords to icons
 export const siteTypeIcons: Record<string, React.FC<IconProps>> = {
-  // Pyramids
-  pyramid: PyramidIcon,
-  pyramids: PyramidIcon,
-  ziggurat: PyramidIcon,
-  step_pyramid: PyramidIcon,
-  
-  // Temples
-  temple: TempleIcon,
-  temples: TempleIcon,
-  shrine: TempleIcon,
-  sanctuary: TempleIcon,
-  
-  // Stone circles & henges
-  stone_circle: StoneCircleIcon,
-  "stone circle": StoneCircleIcon,
-  circle: StoneCircleIcon,
-  henge: HengeIcon,
-  timber_circle: StoneCircleIcon,
-  
-  // Mounds
-  mound: MoundIcon,
-  tumulus: MoundIcon,
-  barrow: MoundIcon,
-  burial_mound: MoundIcon,
-  "burial mound": MoundIcon,
-  earthwork: MoundIcon,
-  effigy_mound: MoundIcon,
-  
-  // Walls & fortifications
-  wall: WallIcon,
-  walls: WallIcon,
-  fortification: WallIcon,
-  fortress: WallIcon,
-  hillfort: WallIcon,
-  
-  // Megaliths
-  megalith: MegalithIcon,
-  dolmen: MegalithIcon,
-  menhir: MegalithIcon,
-  standing_stone: MegalithIcon,
-  "standing stone": MegalithIcon,
-  passage_tomb: MegalithIcon,
-  "passage tomb": MegalithIcon,
-  
-  // Ruins
-  ruins: RuinsIcon,
-  ruin: RuinsIcon,
-  city: RuinsIcon,
-  settlement: RuinsIcon,
-  
-  // Caves
-  cave: CaveIcon,
-  caves: CaveIcon,
-  rock_shelter: CaveIcon,
-  
-  // Observatories
-  observatory: ObservatoryIcon,
-  astronomical: ObservatoryIcon,
-  alignment: ObservatoryIcon,
-  
-  // Underwater
-  underwater: UnderwaterIcon,
-  submerged: UnderwaterIcon,
-  
-  // Geoglyphs
-  geoglyph: GeoglyphIcon,
-  nazca: GeoglyphIcon,
-  ground_drawing: GeoglyphIcon,
-  
-  // Artifacts
-  artifact: ArtifactIcon,
-  artifacts: ArtifactIcon,
-  
-  // Default
-  default: GenericSiteIcon,
+	// Pyramids
+	pyramid: PyramidIcon,
+	pyramids: PyramidIcon,
+	ziggurat: PyramidIcon,
+	step_pyramid: PyramidIcon,
+
+	// Temples
+	temple: TempleIcon,
+	temples: TempleIcon,
+	shrine: TempleIcon,
+	sanctuary: TempleIcon,
+
+	// Stone circles
+	stone_circle: StoneCircleIcon,
+	"stone circle": StoneCircleIcon,
+	circle: StoneCircleIcon,
+	henge: StoneCircleIcon,
+	timber_circle: StoneCircleIcon,
+
+	// Megaliths
+	megalith: MegalithIcon,
+	dolmen: MegalithIcon,
+	menhir: MegalithIcon,
+	standing_stone: MegalithIcon,
+	"standing stone": MegalithIcon,
+	passage_tomb: TombIcon,
+	"passage tomb": TombIcon,
+
+	// Mounds
+	mound: MoundIcon,
+	tumulus: MoundIcon,
+	barrow: MoundIcon,
+	burial_mound: MoundIcon,
+	"burial mound": MoundIcon,
+	earthwork: MoundIcon,
+	effigy_mound: MoundIcon,
+	cairn: MoundIcon,
+
+	// Tombs
+	tomb: TombIcon,
+	burial: TombIcon,
+	crypt: TombIcon,
+	necropolis: TombIcon,
+
+	// Walls & fortifications
+	wall: WallIcon,
+	walls: WallIcon,
+	fortification: WallIcon,
+	fortress: WallIcon,
+	hillfort: WallIcon,
+	castle: WallIcon,
+
+	// Cities & settlements
+	city: CityIcon,
+	settlement: CityIcon,
+	complex: CityIcon,
+	acropolis: CityIcon,
+
+	// Ruins
+	ruins: RuinsIcon,
+	ruin: RuinsIcon,
+
+	// Caves
+	cave: CaveIcon,
+	caves: CaveIcon,
+	rock_shelter: CaveIcon,
+	grotto: CaveIcon,
+
+	// Observatories
+	observatory: ObservatoryIcon,
+	astronomical: ObservatoryIcon,
+	alignment: ObservatoryIcon,
+	solar: ObservatoryIcon,
+
+	// Underwater
+	underwater: UnderwaterIcon,
+	submerged: UnderwaterIcon,
+	sunken: UnderwaterIcon,
+
+	// Geoglyphs
+	geoglyph: GeoglyphIcon,
+	nazca: GeoglyphIcon,
+	ground_drawing: GeoglyphIcon,
+	effigy: GeoglyphIcon,
+	lines: GeoglyphIcon,
+
+	// Statues
+	statue: StatueIcon,
+	moai: StatueIcon,
+	sculpture: StatueIcon,
+	colossus: StatueIcon,
+
+	// Default
+	default: GenericSiteIcon,
+	unknown: GenericSiteIcon,
 };
 
-// Helper function to get icon for a site type
+// Helper function to get icon component for a site type
 export const getSiteTypeIcon = (siteType: string): React.FC<IconProps> => {
-  const normalizedType = siteType.toLowerCase().replace(/[- ]/g, "_");
-  
-  // Try exact match first
-  if (siteTypeIcons[normalizedType]) {
-    return siteTypeIcons[normalizedType];
-  }
-  
-  // Try to find partial match
-  for (const [key, icon] of Object.entries(siteTypeIcons)) {
-    if (normalizedType.includes(key) || key.includes(normalizedType)) {
-      return icon;
-    }
-  }
-  
-  return siteTypeIcons.default;
+	const normalizedType = siteType.toLowerCase().replace(/[- ]/g, "_");
+
+	// Try exact match first
+	if (siteTypeIcons[normalizedType]) {
+		return siteTypeIcons[normalizedType];
+	}
+
+	// Try to find partial match
+	for (const [key, icon] of Object.entries(siteTypeIcons)) {
+		if (normalizedType.includes(key) || key.includes(normalizedType)) {
+			return icon;
+		}
+	}
+
+	return siteTypeIcons.default;
 };
 
-// Get icon as SVG string for Leaflet markers
-export const getSiteTypeIconSvg = (siteType: string, color: string = "currentColor", size: number = 16): string => {
-  const normalizedType = siteType.toLowerCase().replace(/[- ]/g, "_");
-  
-  const iconSvgs: Record<string, string> = {
-    pyramid: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${color}" stroke-width="2"><path d="M12 3L2 21h20L12 3z"/></svg>`,
-    temple: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${color}" stroke-width="2"><path d="M3 21h18M5 21V10M19 21V10M9 21V10M15 21V10M3 10l9-7 9 7"/></svg>`,
-    stone_circle: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${color}" stroke-width="2"><circle cx="12" cy="12" r="8" stroke-dasharray="2 2" opacity="0.5"/><rect x="11" y="3" width="2" height="3" fill="${color}"/><rect x="11" y="18" width="2" height="3" fill="${color}"/><rect x="3" y="11" width="3" height="2" fill="${color}"/><rect x="18" y="11" width="3" height="2" fill="${color}"/></svg>`,
-    mound: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${color}" stroke-width="2"><path d="M2 20c0-8 4-12 10-12s10 4 10 12"/><path d="M2 20h20"/></svg>`,
-    wall: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${color}" stroke-width="2"><path d="M2 20V8h4v12M6 20V6h4v14M10 20V4h4v16M14 20V6h4v14M18 20V8h4v12M2 20h20"/></svg>`,
-    megalith: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${color}" stroke-width="2"><path d="M4 21V9M20 21V9M2 9h20"/><path d="M2 21h20"/></svg>`,
-    ruins: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${color}" stroke-width="2"><path d="M3 21h18M5 21V14l1-2V9M9 21V11M13 21V8l-1-3M17 21V12l1-1V8M19 21V15"/></svg>`,
-    cave: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${color}" stroke-width="2"><path d="M2 20C2 12 6 4 12 4s10 8 10 16"/><path d="M2 20h20"/></svg>`,
-    observatory: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${color}" stroke-width="2"><path d="M2 18h20"/><rect x="10" y="10" width="4" height="8"/><circle cx="12" cy="5" r="2"/></svg>`,
-    underwater: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${color}" stroke-width="2"><path d="M2 8c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M8 14l4-4 4 4M8 14v6M16 14v6M6 20h12"/></svg>`,
-    default: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="${color}" stroke-width="2"><circle cx="12" cy="10" r="6"/><path d="M12 16v5"/></svg>`,
-  };
-  
-  // Try exact match
-  if (iconSvgs[normalizedType]) {
-    return iconSvgs[normalizedType];
-  }
-  
-  // Try partial match
-  for (const [key, svg] of Object.entries(iconSvgs)) {
-    if (normalizedType.includes(key) || key.includes(normalizedType)) {
-      return svg;
-    }
-  }
-  
-  return iconSvgs.default;
+// =============================================================================
+// SVG STRINGS - For Leaflet markers (can't use React components)
+// =============================================================================
+
+// Get icon as raw SVG string for Leaflet markers
+export const getSiteTypeIconSvg = (siteType: string, color: string = "currentColor", size: number = 24): string => {
+	const normalizedType = siteType.toLowerCase().replace(/[- ]/g, "_");
+
+	// Bold filled icons optimized for map markers
+	const iconSvgs: Record<string, string> = {
+		// Pyramid - simple bold triangle
+		pyramid: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="${color}">
+			<path d="M12 2L2 20h20L12 2z"/>
+		</svg>`,
+
+		// Temple - columned structure
+		temple: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="${color}">
+			<path d="M12 2L3 8h18L12 2z"/>
+			<rect x="3" y="8" width="18" height="2"/>
+			<rect x="5" y="10" width="2" height="10"/>
+			<rect x="9" y="10" width="2" height="10"/>
+			<rect x="13" y="10" width="2" height="10"/>
+			<rect x="17" y="10" width="2" height="10"/>
+			<rect x="3" y="20" width="18" height="2"/>
+		</svg>`,
+
+		// Stone circle - ring of stones
+		stone_circle: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="${color}">
+			<rect x="10" y="2" width="4" height="5" rx="1"/>
+			<rect x="10" y="17" width="4" height="5" rx="1"/>
+			<rect x="2" y="10" width="5" height="4" rx="1"/>
+			<rect x="17" y="10" width="5" height="4" rx="1"/>
+			<rect x="4" y="4" width="3" height="4" rx="1" transform="rotate(-45 5.5 6)"/>
+			<rect x="17" y="4" width="3" height="4" rx="1" transform="rotate(45 18.5 6)"/>
+			<rect x="4" y="16" width="3" height="4" rx="1" transform="rotate(45 5.5 18)"/>
+			<rect x="17" y="16" width="3" height="4" rx="1" transform="rotate(-45 18.5 18)"/>
+		</svg>`,
+
+		// Megalith - dolmen shape
+		megalith: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="${color}">
+			<path d="M1 6h22l-2 4H3L1 6z"/>
+			<rect x="3" y="10" width="5" height="12" rx="1"/>
+			<rect x="16" y="10" width="5" height="12" rx="1"/>
+		</svg>`,
+
+		// Mound - burial mound
+		mound: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="${color}">
+			<path d="M2 22C2 22 4 8 12 8s10 14 10 14H2z"/>
+		</svg>`,
+
+		// Tomb - mound with entrance
+		tomb: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="${color}">
+			<path d="M2 22C2 14 6 6 12 6s10 8 10 16H2z"/>
+			<path d="M9 22v-7a3 3 0 016 0v7H9z" fill="rgba(0,0,0,0.35)"/>
+		</svg>`,
+
+		// Fortress - crenellated wall
+		wall: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="${color}">
+			<path d="M2 22V10h3V6h4V3h6v3h4v4h3v12H2z"/>
+			<path d="M9 22v-5h6v5H9z" fill="rgba(0,0,0,0.25)"/>
+		</svg>`,
+
+		// City - building skyline
+		city: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="${color}">
+			<rect x="2" y="12" width="5" height="10"/>
+			<rect x="8" y="8" width="4" height="14"/>
+			<rect x="13" y="4" width="4" height="18"/>
+			<rect x="18" y="10" width="4" height="12"/>
+		</svg>`,
+
+		// Ruins - broken columns
+		ruins: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="${color}">
+			<rect x="3" y="8" width="3" height="14" rx="0.5"/>
+			<rect x="8" y="12" width="3" height="10" rx="0.5"/>
+			<rect x="13" y="6" width="3" height="16" rx="0.5"/>
+			<rect x="18" y="10" width="3" height="12" rx="0.5"/>
+		</svg>`,
+
+		// Cave - mountain with opening
+		cave: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="${color}">
+			<path d="M12 2L2 22h20L12 2z"/>
+			<path d="M8 22c0-4 2-7 4-7s4 3 4 7H8z" fill="rgba(0,0,0,0.35)"/>
+		</svg>`,
+
+		// Observatory - sun and standing stone
+		observatory: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="${color}">
+			<circle cx="12" cy="5" r="4"/>
+			<rect x="11" y="0" width="2" height="2"/>
+			<rect x="17" y="4" width="2" height="2"/>
+			<rect x="5" y="4" width="2" height="2"/>
+			<rect x="9" y="11" width="6" height="11" rx="1"/>
+		</svg>`,
+
+		// Underwater - waves over structure
+		underwater: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="${color}">
+			<path d="M1 6c2-3 4-3 6 0s4 3 6 0 4-3 6 0 3 3 4 1l1 3c-2 2-4 2-6 0s-4-2-6 0-4 2-6 0-4-2-5 0L1 6z"/>
+			<path d="M12 11L6 22h12L12 11z" opacity="0.7"/>
+		</svg>`,
+
+		// Geoglyph - stylized bird
+		geoglyph: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="${color}">
+			<circle cx="19" cy="6" r="3"/>
+			<path d="M16 6L12 10l-8 2 2 3 6-1 4 6 3-2-3-6 4-4-4-2z"/>
+		</svg>`,
+
+		// Statue - moai-style figure
+		statue: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="${color}">
+			<path d="M8 2h8l1 10H7L8 2z"/>
+			<path d="M7 12h10l1 10H6l1-10z"/>
+		</svg>`,
+
+		// Default - map pin with ?
+		default: `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="${color}">
+			<path d="M12 2C8 2 5 5 5 9c0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/>
+		</svg>`,
+	};
+
+	// Try exact match
+	if (iconSvgs[normalizedType]) {
+		return iconSvgs[normalizedType];
+	}
+
+	// Try partial match with priority order
+	const matchOrder = [
+		"pyramid",
+		"temple",
+		"stone_circle",
+		"megalith",
+		"tomb",
+		"mound",
+		"wall",
+		"city",
+		"ruins",
+		"cave",
+		"observatory",
+		"underwater",
+		"geoglyph",
+		"statue",
+	];
+
+	for (const key of matchOrder) {
+		if (normalizedType.includes(key) || key.includes(normalizedType)) {
+			return iconSvgs[key];
+		}
+	}
+
+	// Additional keyword matching
+	if (normalizedType.includes("circle") || normalizedType.includes("henge") || normalizedType.includes("ring")) {
+		return iconSvgs.stone_circle;
+	}
+	if (normalizedType.includes("dolmen") || normalizedType.includes("menhir") || normalizedType.includes("standing")) {
+		return iconSvgs.megalith;
+	}
+	if (normalizedType.includes("burial") || normalizedType.includes("passage") || normalizedType.includes("crypt")) {
+		return iconSvgs.tomb;
+	}
+	if (normalizedType.includes("barrow") || normalizedType.includes("tumulus") || normalizedType.includes("cairn")) {
+		return iconSvgs.mound;
+	}
+	if (normalizedType.includes("fort") || normalizedType.includes("castle") || normalizedType.includes("citadel")) {
+		return iconSvgs.wall;
+	}
+	if (normalizedType.includes("settlement") || normalizedType.includes("complex") || normalizedType.includes("acropolis")) {
+		return iconSvgs.city;
+	}
+	if (normalizedType.includes("grotto") || normalizedType.includes("shelter")) {
+		return iconSvgs.cave;
+	}
+	if (normalizedType.includes("astro") || normalizedType.includes("solar") || normalizedType.includes("align")) {
+		return iconSvgs.observatory;
+	}
+	if (normalizedType.includes("submerged") || normalizedType.includes("sunken")) {
+		return iconSvgs.underwater;
+	}
+	if (normalizedType.includes("nazca") || normalizedType.includes("lines") || normalizedType.includes("effigy")) {
+		return iconSvgs.geoglyph;
+	}
+	if (normalizedType.includes("moai") || normalizedType.includes("sculpt") || normalizedType.includes("coloss")) {
+		return iconSvgs.statue;
+	}
+
+	return iconSvgs.default;
 };
-
-
-
-

@@ -1,15 +1,24 @@
 "use client";
 
 import { MapContainer, TileLayer, Marker, Tooltip, useMap, useMapEvents, Rectangle } from "react-leaflet";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import L from "leaflet";
 import type { BoundingBox, MapSiteFeature, MapZoneFeature } from "@/entities/map/model/types";
 import { cn } from "@/shared/lib/utils";
 import { getSiteTypeIconSvg } from "@/components/map/site-type-icons";
+import { useTour } from "@/features/onboarding";
 
 const MAP_CENTER: [number, number] = [20, 10];
 const DEFAULT_ZOOM = 3;
+const SITE_FOCUS_ZOOM = 6; // Default zoom level when focusing on a site
+
+// Quick zoom level presets
+const ZOOM_LEVELS = {
+	world: 2, // Fully zoomed out - world view
+	region: 6, // Half zoom - regional view
+	detail: 12, // Fully zoomed in - detail view
+} as const;
 
 // CartoDB Dark Matter tile layer for dark mode aesthetic
 const TILE_LAYERS = {
@@ -34,6 +43,17 @@ interface SiteMapProps {
 	onBoundsChange?: (bounds: L.LatLngBounds) => void;
 	onMapClick?: (lat: number, lng: number) => void;
 	onMapReady?: (map: L.Map) => void;
+	/** Called during map movement (pan/zoom) - useful for focus point tracking */
+	onMapMove?: (map: L.Map) => void;
+	/** Called when zoom level changes - useful for smart loading */
+	onZoomChange?: (zoom: number) => void;
+	/**
+	 * Percentage of viewport height covered by a bottom drawer (0-100).
+	 * When set, the map will center selected sites above the drawer.
+	 */
+	drawerHeightPercent?: number;
+	/** ID of site currently auto-hovered (near screen center) */
+	autoHoveredSiteId?: string | null;
 }
 
 const MapClickHandler = ({ onClick }: { onClick?: (lat: number, lng: number) => void }) => {
@@ -98,7 +118,7 @@ const getSiteTypeColor = (siteType: string): string => {
 	return SITE_TYPES[typeId].color;
 };
 
-// Heat tier size multipliers
+// Heat tier size multipliers (legacy, still used as fallback)
 const heatSizeMultipliers: Record<MapSiteFeature["heatTier"] & string, number> = {
 	hot: 1.2,
 	rising: 1.1,
@@ -107,67 +127,149 @@ const heatSizeMultipliers: Record<MapSiteFeature["heatTier"] & string, number> =
 	low: 0.9,
 };
 
-// Helper function to create clean icon-only marker
-const createCustomPinIcon = (site: MapSiteFeature, isSelected: boolean): L.DivIcon => {
-	const heatTier = site.heatTier ?? "normal";
-	const sizeMultiplier = heatSizeMultipliers[heatTier];
+// Get marker size based on effective score (importance + decayed activity)
+const getMarkerSizeFromScore = (effectiveScore: number, isSelected: boolean, isAutoHovered: boolean): { iconSize: number; svgSize: number } => {
+	if (isSelected) return { iconSize: 36, svgSize: 28 };
 
-	// Icon sizing - slightly larger for visibility
-	const iconSize = isSelected ? 32 : Math.round(24 * sizeMultiplier);
-	const svgSize = isSelected ? 24 : Math.round(18 * sizeMultiplier);
+	// Base sizes by importance tier
+	let baseIconSize: number;
+	let baseSvgSize: number;
+
+	if (effectiveScore >= 80) {
+		// Landmark tier - largest markers
+		baseIconSize = 32;
+		baseSvgSize = 26;
+	} else if (effectiveScore >= 60) {
+		// Major tier
+		baseIconSize = 28;
+		baseSvgSize = 22;
+	} else if (effectiveScore >= 40) {
+		// Notable tier
+		baseIconSize = 24;
+		baseSvgSize = 18;
+	} else {
+		// Minor tier - smallest markers
+		baseIconSize = 20;
+		baseSvgSize = 14;
+	}
+
+	// Auto-hovered gets scale boost
+	if (isAutoHovered) {
+		baseIconSize = Math.round(baseIconSize * 1.25);
+		baseSvgSize = Math.round(baseSvgSize * 1.25);
+	}
+
+	return { iconSize: baseIconSize, svgSize: baseSvgSize };
+};
+
+// Helper function to create clean icon-only marker
+const createCustomPinIcon = (site: MapSiteFeature, isSelected: boolean, isAutoHovered?: boolean): L.DivIcon => {
+	const heatTier = site.heatTier ?? "normal";
+	const effectiveScore = site.effectiveScore ?? site.importanceScore ?? 50;
+	const isTrending = site.isTrending ?? false;
+
+	// Get sizes based on effective score
+	const { iconSize, svgSize } = getMarkerSizeFromScore(effectiveScore, isSelected, isAutoHovered ?? false);
 
 	// Color by site type
 	const iconColor = getSiteTypeColor(site.siteType);
 
-	// Get site type icon SVG with the site type color
+	// Get site type icon SVG - icon will be filled with color
 	const siteTypeIcon = getSiteTypeIconSvg(site.siteType, iconColor, svgSize);
 
-	// Heat indicator (only for hot sites)
-	const heatBadge = heatTier === "hot" ? `<div class="marker-fire">🔥</div>` : "";
+	// Trending indicator (fire emoji for trending sites)
+	const trendingBadge = isTrending ? `<div class="marker-trending-badge">🔥</div>` : "";
+
+	// Heat indicator (legacy, still supported)
+	const heatBadge = !isTrending && heatTier === "hot" ? `<div class="marker-heat-badge hot">🔥</div>` : "";
+
+	// Build class list
+	const classes = ["custom-marker", `heat-${heatTier}`];
+	if (isSelected) classes.push("selected");
+	if (isAutoHovered) classes.push("auto-hovered");
+	if (isTrending) classes.push("trending");
+
+	// Add importance tier class for potential CSS styling
+	if (effectiveScore >= 80) classes.push("tier-landmark");
+	else if (effectiveScore >= 60) classes.push("tier-major");
+	else if (effectiveScore >= 40) classes.push("tier-notable");
+	else classes.push("tier-minor");
 
 	const html = `
-		<div class="site-marker ${isSelected ? "selected" : ""} heat-${heatTier}" style="
-			--bg-color: ${iconColor};
-			--size: ${iconSize}px;
+		<div class="${classes.join(" ")}" style="
+			--marker-color: ${iconColor};
+			--marker-size: ${iconSize}px;
 		">
-			${siteTypeIcon}
+			<div class="marker-icon-container">
+				${siteTypeIcon}
+			</div>
+			${trendingBadge}
 			${heatBadge}
 		</div>
 	`;
 
 	return L.divIcon({
 		html,
-		className: "site-marker-wrapper",
+		className: "custom-marker-wrapper",
 		iconSize: [iconSize, iconSize],
 		iconAnchor: [iconSize / 2, iconSize / 2],
 		popupAnchor: [0, -iconSize / 2],
 	});
 };
 
-const SelectedSiteFocus = ({ site }: { site: MapSiteFeature | null }) => {
+const SelectedSiteFocus = ({ site, drawerHeightPercent = 0 }: { site: MapSiteFeature | null; drawerHeightPercent?: number }) => {
 	const map = useMap();
 
 	useEffect(() => {
 		if (!site) return;
-		map.flyTo([site.coordinates.lat, site.coordinates.lng], 6, { duration: 0.8 });
-	}, [map, site]);
+
+		const targetLatLng: [number, number] = [site.coordinates.lat, site.coordinates.lng];
+
+		// Only zoom in, never zoom out - keep current zoom if already zoomed in more
+		const currentZoom = map.getZoom();
+		const targetZoom = Math.max(currentZoom, SITE_FOCUS_ZOOM);
+
+		// If there's a drawer covering part of the screen, offset the center
+		// so the site appears in the visible area above the drawer
+		if (drawerHeightPercent > 0) {
+			const containerHeight = map.getSize().y;
+			// Calculate visible area: if drawer is 55%, visible is 45%
+			const visibleAreaPercent = (100 - drawerHeightPercent) / 100;
+			// Center of visible area (e.g., for 55% drawer: 45% visible, center at 22.5% from top)
+			const visibleAreaCenter = visibleAreaPercent / 2;
+			// Current center is at 50%, calculate how much to shift
+			const offsetPercent = 0.5 - visibleAreaCenter;
+			const offsetPixels = containerHeight * offsetPercent;
+
+			// Project to pixel space, apply offset, and unproject back
+			const targetPoint = map.project(targetLatLng, targetZoom);
+			targetPoint.y += offsetPixels;
+			const adjustedCenter = map.unproject(targetPoint, targetZoom);
+
+			map.flyTo(adjustedCenter, targetZoom, { duration: 0.8 });
+		} else {
+			map.flyTo(targetLatLng, targetZoom, { duration: 0.8 });
+		}
+	}, [map, site, drawerHeightPercent]);
 
 	return null;
 };
 
-const BoundsWatcher = ({ onChange }: { onChange?: (bounds: L.LatLngBounds) => void }) => {
+const BoundsWatcher = ({ onChange, onZoomChange }: { onChange?: (bounds: L.LatLngBounds) => void; onZoomChange?: (zoom: number) => void }) => {
 	const map = useMapEvents({
 		moveend() {
 			onChange?.(map.getBounds());
 		},
 		zoomend() {
 			onChange?.(map.getBounds());
+			onZoomChange?.(map.getZoom());
 		},
 	});
 
 	useEffect(() => {
 		onChange?.(map.getBounds());
-	}, [map, onChange]);
+		onZoomChange?.(map.getZoom());
+	}, [map, onChange, onZoomChange]);
 
 	return null;
 };
@@ -182,91 +284,232 @@ const MapReadyHandler = ({ onReady }: { onReady?: (map: L.Map) => void }) => {
 	return null;
 };
 
+const MapMoveHandler = ({ onMove }: { onMove?: (map: L.Map) => void }) => {
+	const rafIdRef = useRef<number | null>(null);
+	const isScheduledRef = useRef(false);
+
+	const map = useMapEvents({
+		move() {
+			if (!onMove || isScheduledRef.current) return;
+
+			// RAF-based throttling: max one update per animation frame
+			isScheduledRef.current = true;
+			rafIdRef.current = requestAnimationFrame(() => {
+				isScheduledRef.current = false;
+				onMove(map);
+			});
+		},
+		moveend() {
+			// Always fire immediately on moveend for accuracy
+			onMove?.(map);
+		},
+		zoomend() {
+			// Also fire on zoomend for accuracy
+			onMove?.(map);
+		},
+	});
+
+	// Cleanup on unmount
+	useEffect(() => {
+		return () => {
+			if (rafIdRef.current) {
+				cancelAnimationFrame(rafIdRef.current);
+			}
+		};
+	}, []);
+
+	return null;
+};
+
+// Quick zoom controls component
+const ZoomControls = ({ sites, onSelect }: { sites: MapSiteFeature[]; onSelect: (siteId: string) => void }) => {
+	const map = useMap();
+	const [currentZoom, setCurrentZoom] = useState(map.getZoom());
+
+	// Update current zoom on map zoom changes
+	useMapEvents({
+		zoomend() {
+			setCurrentZoom(map.getZoom());
+		},
+	});
+
+	// Find the nearest site to the current map center
+	const findNearestSite = (): MapSiteFeature | null => {
+		if (sites.length === 0) return null;
+
+		const center = map.getCenter();
+		let nearestSite: MapSiteFeature | null = null;
+		let minDistance = Infinity;
+
+		for (const site of sites) {
+			const siteLatLng = L.latLng(site.coordinates.lat, site.coordinates.lng);
+			const distance = center.distanceTo(siteLatLng);
+			if (distance < minDistance) {
+				minDistance = distance;
+				nearestSite = site;
+			}
+		}
+
+		return nearestSite;
+	};
+
+	const handleZoomWorld = () => {
+		// Fly to world view, keeping current center
+		map.flyTo(map.getCenter(), ZOOM_LEVELS.world, { duration: 0.8 });
+	};
+
+	const handleZoomRegion = () => {
+		// Fly to region view, keeping current center
+		map.flyTo(map.getCenter(), ZOOM_LEVELS.region, { duration: 0.6 });
+	};
+
+	const handleZoomDetail = () => {
+		// Find nearest site and fly to it
+		const nearestSite = findNearestSite();
+		if (nearestSite) {
+			const targetLatLng: [number, number] = [nearestSite.coordinates.lat, nearestSite.coordinates.lng];
+			map.flyTo(targetLatLng, ZOOM_LEVELS.detail, { duration: 0.8 });
+			// Select the site so user sees what they're zooming to
+			onSelect(nearestSite.id);
+		} else {
+			// No sites, just zoom in on current center
+			map.flyTo(map.getCenter(), ZOOM_LEVELS.detail, { duration: 0.8 });
+		}
+	};
+
+	const isActive = (level: number) => {
+		// Consider "active" if within 1 zoom level of the preset
+		return Math.abs(currentZoom - level) < 1;
+	};
+
+	return (
+		<div className="zoom-controls">
+			<button
+				className={cn("zoom-control-btn", isActive(ZOOM_LEVELS.world) && "active")}
+				onClick={handleZoomWorld}
+				title="World View (zoom out)"
+				aria-label="Zoom to world view"
+			>
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+					<circle cx="12" cy="12" r="10" />
+					<path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+				</svg>
+			</button>
+			<button
+				className={cn("zoom-control-btn", isActive(ZOOM_LEVELS.region) && "active")}
+				onClick={handleZoomRegion}
+				title="Region View"
+				aria-label="Zoom to region view"
+			>
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+					<rect x="3" y="3" width="18" height="18" rx="2" />
+					<path d="M3 9h18M9 3v18" />
+				</svg>
+			</button>
+			<button
+				className={cn("zoom-control-btn", isActive(ZOOM_LEVELS.detail) && "active")}
+				onClick={handleZoomDetail}
+				title="Zoom to nearest site"
+				aria-label="Zoom to nearest site"
+			>
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+					<circle cx="11" cy="11" r="8" />
+					<path d="m21 21-4.35-4.35M11 8v6M8 11h6" />
+				</svg>
+			</button>
+		</div>
+	);
+};
+
 const toLeafletBounds = (bounds: BoundingBox): L.LatLngBoundsExpression => [
 	[bounds.minLat, bounds.minLng],
 	[bounds.maxLat, bounds.maxLng],
 ];
 
-// Sample thumbnails for demo (in production, this would come from site.thumbnailUrl)
-const sampleThumbnails: Record<string, string> = {
-	avebury: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/Avebury_henge_and_village_UK.jpg/320px-Avebury_henge_and_village_UK.jpg",
-	stonehenge: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Stonehenge2007_07_30.jpg/320px-Stonehenge2007_07_30.jpg",
-	giza: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/320px-Kheops-Pyramid.jpg",
-	pyramid: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Kheops-Pyramid.jpg/320px-Kheops-Pyramid.jpg",
-	machu: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Machu_Picchu%2C_Peru.jpg/320px-Machu_Picchu%2C_Peru.jpg",
-	nazca: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Nazca_Lines_-_Hands.jpg/320px-Nazca_Lines_-_Hands.jpg",
-	petra: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/The_Treasury_in_Petra.jpg/240px-The_Treasury_in_Petra.jpg",
-	angkor: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Angkor_Wat.jpg/320px-Angkor_Wat.jpg",
-	easter: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Moai_Rano_raraku.jpg/320px-Moai_Rano_raraku.jpg",
-	göbekli: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/G%C3%B6bekli_Tepe%2C_Urfa.jpg/320px-G%C3%B6bekli_Tepe%2C_Urfa.jpg",
-	gobekli: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/G%C3%B6bekli_Tepe%2C_Urfa.jpg/320px-G%C3%B6bekli_Tepe%2C_Urfa.jpg",
-};
-
-// Get thumbnail URL for a site (demo implementation)
+// Get thumbnail URL for a site (uses thumbnailUrl from API/database)
 const getThumbnailUrl = (site: MapSiteFeature): string | null => {
-	// In production, use site.thumbnailUrl directly
-	// For demo, check if site name matches known sites
-	const nameLower = site.name.toLowerCase();
-	for (const [key, url] of Object.entries(sampleThumbnails)) {
-		if (nameLower.includes(key)) {
-			return url;
-		}
-	}
-	// Only show thumbnails for verified official sites (they'd have images in production)
-	return null;
+	return site.thumbnailUrl || null;
 };
 
 // Custom marker component with enhanced tooltip
-const SiteMarker = ({ site, isSelected, onSelect }: { site: MapSiteFeature; isSelected: boolean; onSelect: (id: string) => void }) => {
-	const icon = useMemo(() => createCustomPinIcon(site, isSelected), [site, isSelected]);
+const SiteMarker = ({
+	site,
+	isSelected,
+	isAutoHovered,
+	onSelect,
+	suppressTooltip,
+}: {
+	site: MapSiteFeature;
+	isSelected: boolean;
+	isAutoHovered?: boolean;
+	onSelect: (id: string) => void;
+	suppressTooltip?: boolean;
+}) => {
+	const icon = useMemo(() => createCustomPinIcon(site, isSelected, isAutoHovered), [site, isSelected, isAutoHovered]);
 	const thumbnailUrl = useMemo(() => getThumbnailUrl(site), [site]);
 	const isVerified = site.layer === "official" && site.verificationStatus === "verified";
 
+	// Don't show Leaflet tooltip when:
+	// - Auto-hover focus tooltip is active (suppressTooltip=true when any site is auto-hovered)
+	// - This specific marker is being auto-hovered (our focus tooltip shows instead)
+	const showTooltip = !suppressTooltip && !isAutoHovered;
+
 	return (
 		<Marker position={[site.coordinates.lat, site.coordinates.lng]} icon={icon} eventHandlers={{ click: () => onSelect(site.id) }}>
-			<Tooltip direction="top" offset={[0, -16]} opacity={1} className="site-tooltip">
-				<div className="site-tooltip-content">
-					{/* Thumbnail for verified sites */}
-					{thumbnailUrl && isVerified && (
-						<div className="site-tooltip-thumbnail">
-							<img src={thumbnailUrl} alt={site.name} loading="lazy" />
-						</div>
-					)}
-					<div className="site-tooltip-info">
-						<div className="site-tooltip-header">
+			{showTooltip && (
+				<Tooltip direction="top" offset={[0, -20]} opacity={1} className="site-tooltip">
+					<div className="site-tooltip-content">
+						{/* Thumbnail with badge overlay */}
+						{thumbnailUrl && (
+							<div className="site-tooltip-thumbnail">
+								<img src={thumbnailUrl} alt={site.name} loading="lazy" />
+								{/* Badge overlay on thumbnail */}
+								<div className="site-tooltip-badge-overlay">
+									{site.layer === "official" ? (
+										<span className="site-tooltip-badge official">Official</span>
+									) : (
+										<span className={`site-tooltip-badge ${site.trustTier ?? "bronze"}`}>{site.trustTier ?? "bronze"}</span>
+									)}
+								</div>
+							</div>
+						)}
+						<div className="site-tooltip-info">
 							<p className="site-tooltip-name">{site.name}</p>
-							{isVerified && (
-								<span className="site-tooltip-verified" title="Verified Site">
-									✓
-								</span>
-							)}
-						</div>
-						<p className="site-tooltip-type">{site.siteType}</p>
-						{site.tags.cultures.length > 0 && <p className="site-tooltip-culture">{site.tags.cultures.slice(0, 2).join(", ")}</p>}
-						<div className="site-tooltip-meta">
-							{site.layer === "official" ? (
-								<span className="site-tooltip-badge official">Official</span>
-							) : (
-								<span className={`site-tooltip-badge ${site.trustTier ?? "bronze"}`}>{site.trustTier ?? "bronze"}</span>
-							)}
-							{site.mediaCount > 0 && <span className="site-tooltip-media">📷 {site.mediaCount}</span>}
+							<div className="site-tooltip-row">
+								<span className="site-tooltip-type">{site.siteType}</span>
+								{site.mediaCount > 0 && <span className="site-tooltip-media">📷 {site.mediaCount}</span>}
+							</div>
 						</div>
 					</div>
-				</div>
-			</Tooltip>
+				</Tooltip>
+			)}
 		</Marker>
 	);
 };
 
-export const SiteMap = ({ sites, zones, selectedSiteId, onSelect, className, onBoundsChange, onMapClick, onMapReady }: SiteMapProps) => {
+export const SiteMap = ({
+	sites,
+	zones,
+	selectedSiteId,
+	onSelect,
+	className,
+	onBoundsChange,
+	onMapClick,
+	onMapReady,
+	onMapMove,
+	onZoomChange,
+	drawerHeightPercent = 0,
+	autoHoveredSiteId,
+}: SiteMapProps) => {
 	const { resolvedTheme } = useTheme();
+	const { startTour } = useTour();
 	const selectedSite = useMemo(() => sites.find((site) => site.id === selectedSiteId) ?? null, [sites, selectedSiteId]);
 
 	// Use appropriate tile layer based on theme
 	const tileLayer = resolvedTheme === "light" ? TILE_LAYERS.light : TILE_LAYERS.dark;
 
 	return (
-		<div className={cn("overflow-hidden h-full w-full", className)}>
+		<div className={cn("overflow-hidden h-full w-full", autoHoveredSiteId && "suppress-leaflet-tooltips", className)}>
 			<style jsx global>{`
 				.custom-marker-wrapper {
 					background: transparent;
@@ -287,49 +530,34 @@ export const SiteMap = ({ sites, zones, selectedSiteId, onSelect, className, onB
 					filter: drop-shadow(0 0 12px var(--marker-color));
 					z-index: 1000 !important;
 				}
+				/* Auto-hover state: scale up with glow when marker is near screen center */
+				.custom-marker.auto-hovered {
+					transform: scale(1.35);
+					z-index: 100 !important;
+				}
+				.custom-marker.auto-hovered .marker-icon-container svg {
+					filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 4px rgba(59, 130, 246, 0.5));
+				}
 				.marker-icon-container {
 					position: absolute;
 					width: 100%;
 					height: 100%;
-					background: var(--marker-color);
-					border: 2px solid rgba(255, 255, 255, 0.95);
-					border-radius: 50%;
-					box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+					background: transparent;
 					display: flex;
 					align-items: center;
 					justify-content: center;
-					overflow: hidden;
 				}
 				.custom-marker.official .marker-icon-container {
-					border-color: rgba(255, 255, 255, 1);
-					box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+					/* Official markers get a subtle glow */
 				}
 				.custom-marker.selected .marker-icon-container {
-					border-width: 3px;
-					box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+					/* Selected state handled by parent filter */
 				}
 				.marker-icon-container svg {
-					width: 60%;
-					height: 60%;
-					filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
-				}
-				.marker-verified-badge {
-					position: absolute;
-					bottom: -2px;
-					right: -2px;
-					width: 14px;
-					height: 14px;
-					background: #22c55e;
-					border: 2px solid white;
-					border-radius: 50%;
-					display: flex;
-					align-items: center;
-					justify-content: center;
-					box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-				}
-				.marker-verified-badge svg {
-					width: 8px !important;
-					height: 8px !important;
+					width: 100%;
+					height: 100%;
+					/* Subtle shadow for visibility - keep it sharp */
+					filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
 				}
 
 				/* Heat tier indicators */
@@ -357,45 +585,86 @@ export const SiteMap = ({ sites, zones, selectedSiteId, onSelect, className, onB
 					}
 				}
 
+				/* Trending indicator badge */
+				.marker-trending-badge {
+					position: absolute;
+					top: -8px;
+					right: -8px;
+					font-size: 12px;
+					line-height: 1;
+					z-index: 10;
+					animation: trending-pulse 1.5s ease-in-out infinite;
+				}
+				@keyframes trending-pulse {
+					0%,
+					100% {
+						transform: scale(1);
+						filter: drop-shadow(0 0 1px rgba(255, 165, 0, 0.4));
+					}
+					50% {
+						transform: scale(1.3);
+						filter: drop-shadow(0 0 3px rgba(255, 165, 0, 0.5));
+					}
+				}
+
+				/* Trending marker glow */
+				.custom-marker.trending .marker-icon-container svg {
+					filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 3px rgba(255, 165, 0, 0.4));
+				}
+
+				/* Importance tier styling */
+				.custom-marker.tier-landmark .marker-icon-container svg {
+					filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+				}
+				.custom-marker.tier-major .marker-icon-container svg {
+					filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
+				}
+				.custom-marker.tier-minor {
+					opacity: 0.85;
+				}
+				.custom-marker.tier-minor .marker-icon-container svg {
+					filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+				}
+
 				/* Hot tier - pulsing glow */
-				.custom-marker.heat-hot .marker-icon-container {
+				.custom-marker.heat-hot .marker-icon-container svg {
 					animation: hot-glow 1.5s ease-in-out infinite;
 				}
 				@keyframes hot-glow {
 					0%,
 					100% {
-						box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 12px rgba(255, 107, 53, 0.6);
+						filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 3px rgba(255, 107, 53, 0.5));
 					}
 					50% {
-						box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 24px rgba(255, 107, 53, 0.9), 0 0 36px rgba(255, 107, 53, 0.4);
+						filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 5px rgba(255, 107, 53, 0.6));
 					}
 				}
 
 				/* Rising tier - subtle pulse */
-				.custom-marker.heat-rising .marker-icon-container {
+				.custom-marker.heat-rising .marker-icon-container svg {
 					animation: rising-pulse 2s ease-in-out infinite;
 				}
 				@keyframes rising-pulse {
 					0%,
 					100% {
-						box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 8px rgba(255, 165, 0, 0.3);
+						filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 2px rgba(255, 165, 0, 0.4));
 					}
 					50% {
-						box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 16px rgba(255, 165, 0, 0.6);
+						filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 4px rgba(255, 165, 0, 0.5));
 					}
 				}
 
 				/* Active tier - slight glow */
-				.custom-marker.heat-active .marker-icon-container {
-					box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5), 0 0 6px rgba(100, 200, 255, 0.3);
+				.custom-marker.heat-active .marker-icon-container svg {
+					filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 2px rgba(100, 200, 255, 0.3));
 				}
 
 				/* Low tier - muted */
 				.custom-marker.heat-low {
 					opacity: 0.65;
 				}
-				.custom-marker.heat-low .marker-icon-container {
-					filter: saturate(0.7);
+				.custom-marker.heat-low .marker-icon-container svg {
+					filter: saturate(0.7) drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
 				}
 
 				/* Enhanced Tooltip Styles */
@@ -414,15 +683,16 @@ export const SiteMap = ({ sites, zones, selectedSiteId, onSelect, className, onB
 				.site-tooltip-content {
 					background: #1a1f26;
 					border: 1px solid rgba(255, 255, 255, 0.1);
-					border-radius: 10px;
+					border-radius: 8px;
 					overflow: hidden;
 					box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-					min-width: 180px;
-					max-width: 240px;
+					min-width: 160px;
+					max-width: 200px;
 				}
 				.site-tooltip-thumbnail {
+					position: relative;
 					width: 100%;
-					height: 100px;
+					height: 72px;
 					overflow: hidden;
 					background: #0a0c10;
 				}
@@ -430,86 +700,68 @@ export const SiteMap = ({ sites, zones, selectedSiteId, onSelect, className, onB
 					width: 100%;
 					height: 100%;
 					object-fit: cover;
-					transition: transform 0.3s ease;
 				}
-				.site-tooltip-content:hover .site-tooltip-thumbnail img {
-					transform: scale(1.05);
+				.site-tooltip-badge-overlay {
+					position: absolute;
+					top: 5px;
+					left: 5px;
 				}
 				.site-tooltip-info {
-					padding: 10px 12px;
-				}
-				.site-tooltip-header {
-					display: flex;
-					align-items: center;
-					gap: 6px;
-					margin-bottom: 4px;
+					padding: 6px 8px;
 				}
 				.site-tooltip-name {
 					font-weight: 600;
-					font-size: 13px;
+					font-size: 12px;
 					color: #fff;
-					margin: 0;
+					margin: 0 0 2px 0;
 					line-height: 1.2;
-					flex: 1;
+					white-space: nowrap;
+					overflow: hidden;
+					text-overflow: ellipsis;
 				}
-				.site-tooltip-verified {
-					background: #22c55e;
-					color: white;
-					font-size: 9px;
-					width: 14px;
-					height: 14px;
-					border-radius: 50%;
+				.site-tooltip-row {
 					display: flex;
 					align-items: center;
-					justify-content: center;
-					flex-shrink: 0;
+					justify-content: space-between;
+					gap: 6px;
 				}
 				.site-tooltip-type {
-					font-size: 11px;
+					font-size: 10px;
 					color: #94a3b8;
-					margin: 0 0 2px 0;
+					margin: 0;
 					text-transform: capitalize;
 				}
-				.site-tooltip-culture {
-					font-size: 10px;
-					color: #64748b;
-					margin: 0 0 8px 0;
-				}
-				.site-tooltip-meta {
-					display: flex;
-					align-items: center;
-					gap: 8px;
-				}
 				.site-tooltip-badge {
-					font-size: 9px;
+					font-size: 8px;
 					font-weight: 600;
 					text-transform: uppercase;
-					padding: 2px 6px;
-					border-radius: 4px;
-					letter-spacing: 0.5px;
+					padding: 2px 5px;
+					border-radius: 3px;
+					letter-spacing: 0.3px;
+					backdrop-filter: blur(4px);
 				}
 				.site-tooltip-badge.official {
-					background: rgba(34, 197, 94, 0.2);
-					color: #22c55e;
+					background: rgba(34, 197, 94, 0.85);
+					color: #fff;
 				}
 				.site-tooltip-badge.bronze {
-					background: rgba(251, 146, 60, 0.2);
-					color: #fb923c;
+					background: rgba(251, 146, 60, 0.85);
+					color: #fff;
 				}
 				.site-tooltip-badge.silver {
-					background: rgba(148, 163, 184, 0.2);
-					color: #94a3b8;
+					background: rgba(148, 163, 184, 0.85);
+					color: #fff;
 				}
 				.site-tooltip-badge.gold {
-					background: rgba(250, 204, 21, 0.2);
-					color: #facc15;
+					background: rgba(250, 204, 21, 0.85);
+					color: #1a1f26;
 				}
 				.site-tooltip-badge.promoted {
-					background: rgba(34, 197, 94, 0.2);
-					color: #34d399;
+					background: rgba(34, 197, 94, 0.85);
+					color: #fff;
 				}
 				.site-tooltip-media {
-					font-size: 10px;
+					font-size: 9px;
 					color: #64748b;
 				}
 
@@ -517,7 +769,145 @@ export const SiteMap = ({ sites, zones, selectedSiteId, onSelect, className, onB
 				.site-tooltip::before {
 					border-top-color: #1a1f26 !important;
 				}
+
+				/* Quick Zoom Controls */
+				.zoom-controls {
+					position: absolute;
+					bottom: 24px;
+					right: 12px;
+					z-index: 1000;
+					display: flex;
+					flex-direction: column;
+					gap: 2px;
+					background: rgba(26, 31, 38, 0.95);
+					border: 1px solid rgba(255, 255, 255, 0.1);
+					border-radius: 10px;
+					padding: 4px;
+					box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+					backdrop-filter: blur(8px);
+				}
+				/* Mobile: position at top-right */
+				@media (max-width: 768px) {
+					.zoom-controls {
+						top: 12px;
+						bottom: auto;
+						right: 12px;
+						flex-direction: row;
+					}
+				}
+				.zoom-control-btn {
+					width: 36px;
+					height: 36px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					border: none;
+					background: transparent;
+					color: #94a3b8;
+					cursor: pointer;
+					border-radius: 6px;
+					transition: all 0.15s ease;
+				}
+				.zoom-control-btn:hover {
+					background: rgba(255, 255, 255, 0.1);
+					color: #fff;
+				}
+				.zoom-control-btn:active {
+					transform: scale(0.95);
+				}
+				.zoom-control-btn.active {
+					background: rgba(99, 102, 241, 0.3);
+					color: #a5b4fc;
+				}
+				.zoom-control-btn svg {
+					width: 18px;
+					height: 18px;
+				}
+
+				/* Light mode adjustments */
+				:root[data-theme="light"] .zoom-controls,
+				.light .zoom-controls {
+					background: rgba(255, 255, 255, 0.95);
+					border-color: rgba(0, 0, 0, 0.1);
+					box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+				}
+				:root[data-theme="light"] .zoom-control-btn,
+				.light .zoom-control-btn {
+					color: #64748b;
+				}
+				:root[data-theme="light"] .zoom-control-btn:hover,
+				.light .zoom-control-btn:hover {
+					background: rgba(0, 0, 0, 0.05);
+					color: #1e293b;
+				}
+				:root[data-theme="light"] .zoom-control-btn.active,
+				.light .zoom-control-btn.active {
+					background: rgba(99, 102, 241, 0.15);
+					color: #6366f1;
+				}
+
+				/* Hide Leaflet tooltips when focus tooltip is active */
+				.suppress-leaflet-tooltips .leaflet-tooltip,
+				.suppress-leaflet-tooltips .site-tooltip {
+					display: none !important;
+					opacity: 0 !important;
+					pointer-events: none !important;
+				}
+
+				/* Tour FAB Button */
+				.tour-fab {
+					position: absolute;
+					bottom: 24px;
+					left: 12px;
+					z-index: 1000;
+					display: flex;
+					align-items: center;
+					gap: 8px;
+					padding: 10px 16px;
+					background: rgba(99, 102, 241, 0.95);
+					border: 1px solid rgba(255, 255, 255, 0.2);
+					border-radius: 24px;
+					color: #fff;
+					font-size: 13px;
+					font-weight: 600;
+					cursor: pointer;
+					box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+					backdrop-filter: blur(8px);
+					transition: all 0.2s ease;
+				}
+				.tour-fab:hover {
+					background: rgba(99, 102, 241, 1);
+					transform: translateY(-2px);
+					box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+				}
+				.tour-fab:active {
+					transform: translateY(0);
+				}
+				.tour-fab svg {
+					width: 18px;
+					height: 18px;
+				}
+				/* Mobile: smaller and more compact */
+				@media (max-width: 768px) {
+					.tour-fab {
+						bottom: auto;
+						top: 12px;
+						left: 12px;
+						padding: 8px 12px;
+						font-size: 12px;
+					}
+				}
 			`}</style>
+
+			{/* Tour FAB Button */}
+			<button className="tour-fab" onClick={startTour} title="Start guided tour">
+				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+					<circle cx="12" cy="12" r="10" />
+					<path d="M12 16v-4M12 8h.01" />
+				</svg>
+				<span>Tour</span>
+			</button>
+
 			<MapContainer
 				center={selectedSite ? [selectedSite.coordinates.lat, selectedSite.coordinates.lng] : MAP_CENTER}
 				zoom={selectedSite ? 6 : DEFAULT_ZOOM}
@@ -525,10 +915,12 @@ export const SiteMap = ({ sites, zones, selectedSiteId, onSelect, className, onB
 				className="h-full w-full"
 			>
 				<TileLayer url={tileLayer.url} attribution={tileLayer.attribution} />
-				<BoundsWatcher onChange={onBoundsChange} />
+				<BoundsWatcher onChange={onBoundsChange} onZoomChange={onZoomChange} />
 				<MapClickHandler onClick={onMapClick} />
 				<MapReadyHandler onReady={onMapReady} />
-				<SelectedSiteFocus site={selectedSite} />
+				<MapMoveHandler onMove={onMapMove} />
+				<ZoomControls sites={sites} onSelect={onSelect} />
+				<SelectedSiteFocus site={selectedSite} drawerHeightPercent={drawerHeightPercent} />
 				{zones.map((zone) => (
 					<Rectangle key={zone.id} bounds={toLeafletBounds(zone.bounds)} pathOptions={{ color: zone.color, weight: 1.5, fillOpacity: 0.08 }}>
 						<Tooltip direction="center" opacity={0.9} className="text-xs">
@@ -540,7 +932,14 @@ export const SiteMap = ({ sites, zones, selectedSiteId, onSelect, className, onB
 					</Rectangle>
 				))}
 				{sites.map((site) => (
-					<SiteMarker key={site.id} site={site} isSelected={site.id === selectedSiteId} onSelect={onSelect} />
+					<SiteMarker
+						key={site.id}
+						site={site}
+						isSelected={site.id === selectedSiteId}
+						isAutoHovered={site.id === autoHoveredSiteId}
+						onSelect={onSelect}
+						suppressTooltip={!!autoHoveredSiteId}
+					/>
 				))}
 			</MapContainer>
 		</div>

@@ -77,6 +77,38 @@ const buildZoneMemberships = (
   return site.zone_ids.map((zoneId) => zoneMap.get(zoneId)).filter(Boolean).map((zone) => toZoneSummary(zone!));
 };
 
+// Calculate importance score for a site (higher = more important)
+// This is used for sorting sites by "most recognizable"
+const calculateImportanceScoreFromRaw = (
+  site: SiteRow,
+  mediaCount: number,
+  researchCount: number
+): number => {
+  let score = 0;
+  
+  // Verification status contribution (verified sites are more recognizable)
+  if (site.verification_status === "verified") score += 40;
+  else if (site.verification_status === "under_review") score += 15;
+  
+  // Layer contribution (official sites are more important)
+  if (site.layer === "official") score += 25;
+  
+  // Media count contribution (sites with photos are more interesting to browse)
+  // Give significant weight to having at least one photo
+  if (mediaCount > 0) score += 20;
+  score += Math.min(mediaCount * 2, 20); // Up to 20 more points for multiple photos
+  
+  // Research links contribution
+  score += Math.min(researchCount * 5, 15);
+  
+  // Trust tier contribution
+  if (site.trust_tier === "gold") score += 10;
+  else if (site.trust_tier === "silver") score += 6;
+  else if (site.trust_tier === "bronze") score += 3;
+  
+  return score;
+};
+
 export const normalizeMapData = (records: MapRecordSet = mapRecords) => {
   const zoneMap = new Map<string, MapZoneFeature>();
   records.zones.forEach((zone) => {
@@ -98,6 +130,13 @@ export const normalizeMapData = (records: MapRecordSet = mapRecords) => {
     tags.themes = normalizeStringArray(tags.themes);
 
     const zoneMemberships = buildZoneMemberships(site, zoneMap, records.siteZones);
+    
+    // Calculate importance score for client-side sorting
+    const importanceScore = calculateImportanceScoreFromRaw(
+      site,
+      site.media_count,
+      site.related_research_ids.length
+    );
 
     return {
       id: site.id,
@@ -115,9 +154,12 @@ export const normalizeMapData = (records: MapRecordSet = mapRecords) => {
       mediaCount: site.media_count,
       relatedResearchIds: site.related_research_ids,
       evidenceLinks: [],
+      thumbnailUrl: site.thumbnail_url,
       updatedAt: site.updated_at,
       updatedBy: site.updated_by,
       searchText: buildSearchText(site, tags),
+      importanceScore, // Include importance score for client-side sorting
+      effectiveScore: importanceScore, // Use same score for now (can add activity boost later)
     } satisfies MapSiteFeature;
   });
 
@@ -154,7 +196,51 @@ export interface MapQueryFilters {
   verification?: VerificationStatus[];
   zoneIds?: string[];
   tags?: string[];
+  zoom?: number;
+  limit?: number;
 }
+
+// Calculate importance score for a MapSiteFeature (used for API-level sorting)
+const calculateImportanceScore = (site: MapSiteFeature): number => {
+  // Use the pre-calculated score if available
+  if (site.importanceScore !== undefined) {
+    return site.importanceScore;
+  }
+  
+  // Fallback calculation (same logic as calculateImportanceScoreFromRaw)
+  let score = 0;
+  
+  if (site.verificationStatus === "verified") score += 40;
+  else if (site.verificationStatus === "under_review") score += 15;
+  
+  if (site.layer === "official") score += 25;
+  
+  if (site.mediaCount > 0) score += 20;
+  score += Math.min(site.mediaCount * 2, 20);
+  
+  score += Math.min(site.relatedResearchIds.length * 5, 15);
+  
+  if (site.trustTier === "gold") score += 10;
+  else if (site.trustTier === "silver") score += 6;
+  else if (site.trustTier === "bronze") score += 3;
+  
+  return score;
+};
+
+// Get limit based on zoom level
+const getLimitForZoom = (zoom: number | undefined, defaultLimit?: number): number => {
+  if (defaultLimit !== undefined) return defaultLimit;
+  
+  if (zoom === undefined) return 500; // Default
+  
+  // Zoom-based limits:
+  // < 5: Show top 100 (world view)
+  // 5-8: Show top 500 (region view)
+  // > 8: Show all in viewport (detailed view)
+  if (zoom < 5) return 100;
+  if (zoom <= 8) return 500;
+  return 2000; // Effectively unlimited for detailed views
+};
 
 async function fetchRecordsFromSupabase(query: MapQueryFilters): Promise<MapRecordSet | null> {
   let supabase;
@@ -165,13 +251,14 @@ async function fetchRecordsFromSupabase(query: MapQueryFilters): Promise<MapReco
     return null;
   }
 
-  const mapSchema = supabase.schema(SUPABASE_SCHEMA);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mapSchema = (supabase as any).schema(SUPABASE_SCHEMA);
 
   try {
     const sitesQuery = mapSchema
       .from("sites")
       .select(
-        "id, slug, name, summary, site_type, category, coordinates, verification_status, layer, trust_tier, zone_ids, media_count, related_research_ids, updated_at, updated_by, coordinates_lat, coordinates_lng"
+        "id, slug, name, summary, site_type, category, coordinates, verification_status, layer, trust_tier, zone_ids, media_count, related_research_ids, updated_at, updated_by, coordinates_lat, coordinates_lng, thumbnail_url"
       )
       .gte("coordinates_lat", query.bounds.minLat)
       .lte("coordinates_lat", query.bounds.maxLat)
@@ -191,7 +278,8 @@ async function fetchRecordsFromSupabase(query: MapQueryFilters): Promise<MapReco
       return null;
     }
 
-    const siteIds = siteRows.map((site) => site.id as string);
+    const typedSiteRows = siteRows as SiteRow[];
+    const siteIds = typedSiteRows.map((site) => site.id);
 
     const { data: tagRows } = await mapSchema
       .from("site_tags")
@@ -213,19 +301,21 @@ async function fetchRecordsFromSupabase(query: MapQueryFilters): Promise<MapReco
       return null;
     }
 
+    const typedZoneRows = zoneRows as ZoneRow[];
+
     const { data: siteZones } = await mapSchema
       .from("site_zones")
       .select("site_id, zone_id, assigned_by, assigned_at")
       .in("site_id", siteIds.length ? siteIds : [""]); 
 
     const filteredZones = query.zoneIds?.length
-      ? zoneRows.filter((zone) => query.zoneIds!.includes(zone.id as string))
-      : zoneRows;
+      ? typedZoneRows.filter((zone) => query.zoneIds!.includes(zone.id))
+      : typedZoneRows;
 
     return {
-      sites: siteRows as SiteRow[],
+      sites: typedSiteRows,
       siteTags: (tagRows ?? []) as SiteTagRow[],
-      zones: filteredZones as ZoneRow[],
+      zones: filteredZones,
       siteZones: siteZones as SiteZoneRow[] | undefined,
     } satisfies MapRecordSet;
   } catch (error) {
@@ -264,14 +354,36 @@ export const fetchMapEntities = async (query: MapQueryFilters): Promise<MapDataR
   sites = sites.filter((site) => pointInBounds(site.coordinates, query.bounds));
   zones = zones.filter((zone) => boxIntersects(zone.bounds, query.bounds));
 
+  // Smart loading: Sort by importance and limit based on zoom
+  const limit = getLimitForZoom(query.zoom, query.limit);
+  const totalBeforeLimit = sites.length;
+  
+  // Sort sites by importance score (highest first)
+  sites = sites
+    .map(site => ({ site, importance: calculateImportanceScore(site) }))
+    .sort((a, b) => b.importance - a.importance)
+    .slice(0, limit)
+    .map(({ site }) => site);
+
+  // Count sites by layer for the filter UI
+  const layerCounts = {
+    official: normalized.sites.filter(s => s.layer === "official").length,
+    community: normalized.sites.filter(s => s.layer === "community").length,
+    total: normalized.sites.length,
+  };
+
   return {
     sites,
     zones,
     meta: {
       totalSites: sites.length,
+      totalBeforeLimit,
       totalZones: zones.length,
       bounds: query.bounds,
       tagCounts: computeTagCounts(sites),
+      layerCounts,
+      wasLimited: sites.length < totalBeforeLimit,
+      zoom: query.zoom,
     },
   } satisfies MapDataResult;
 };

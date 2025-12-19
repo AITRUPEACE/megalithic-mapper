@@ -1,42 +1,22 @@
 /**
  * Forum Mock Data
- * Structured forum with categories, sections, and threads
+ * Simplified flat board structure with 5 focused boards
  */
 
-export interface ForumCategory {
+export interface ForumBoard {
   id: string;
   slug: string;
   name: string;
   description: string;
   icon: string; // Lucide icon name
   color: string; // Tailwind color class
-  order: number;
-  isResearchZone?: boolean;
-  zoneId?: string; // Link to map zone if applicable
-}
-
-export interface ForumSection {
-  id: string;
-  categoryId: string;
-  slug: string;
-  name: string;
-  description: string;
-  icon: string;
   threadCount: number;
   postCount: number;
-  lastActivity?: {
-    threadId: string;
-    threadTitle: string;
-    author: string;
-    timestamp: string;
-  };
-  isLocked?: boolean;
-  isVerifiedOnly?: boolean;
 }
 
 export interface ForumThread {
   id: string;
-  sectionId: string;
+  boardId: string;
   slug: string;
   title: string;
   excerpt: string;
@@ -56,312 +36,65 @@ export interface ForumThread {
   tags: string[];
   isPinned?: boolean;
   isLocked?: boolean;
-  isVerifiedOnly?: boolean;
   isHot?: boolean;
-  linkedSites?: string[];
-  linkedZones?: string[];
+  linkedSiteId?: string;
+  linkedSiteName?: string;
 }
 
 // ============================================================================
-// Categories
+// Boards - 5 focused discussion areas
 // ============================================================================
 
-export const forumCategories: ForumCategory[] = [
+export const forumBoards: ForumBoard[] = [
   {
-    id: "cat-research",
-    slug: "research",
-    name: "Research & Theories",
-    description: "Academic discussions, hypothesis development, and peer review",
-    icon: "FlaskConical",
-    color: "text-blue-400",
-    order: 1,
-  },
-  {
-    id: "cat-discoveries",
-    slug: "discoveries",
-    name: "Discoveries & News",
-    description: "Breaking findings, excavation updates, and archaeological news",
-    icon: "Sparkles",
-    color: "text-amber-400",
-    order: 2,
-  },
-  {
-    id: "cat-zones",
-    slug: "zones",
-    name: "Research Zones",
-    description: "Discussions organized by geographic research areas",
-    icon: "Map",
+    id: "board-sites",
+    slug: "site-discussions",
+    name: "Site Discussions",
+    description: "Discuss specific megalithic sites on the map",
+    icon: "MapPin",
     color: "text-emerald-400",
-    order: 3,
-    isResearchZone: true,
+    threadCount: 567,
+    postCount: 12456,
   },
   {
-    id: "cat-fieldwork",
+    id: "board-fieldwork",
     slug: "fieldwork",
-    name: "Expeditions & Fieldwork",
-    description: "Trip planning, equipment, logistics, and field reports",
+    name: "Fieldwork",
+    description: "Trip planning, field reports, and equipment",
     icon: "Compass",
     color: "text-orange-400",
-    order: 4,
-  },
-  {
-    id: "cat-community",
-    slug: "community",
-    name: "Community",
-    description: "General discussion, introductions, and off-topic conversations",
-    icon: "Users",
-    color: "text-purple-400",
-    order: 5,
-  },
-];
-
-// ============================================================================
-// Sections
-// ============================================================================
-
-export const forumSections: ForumSection[] = [
-  // Research & Theories
-  {
-    id: "sec-hypotheses",
-    categoryId: "cat-research",
-    slug: "hypotheses",
-    name: "Hypothesis Development",
-    description: "Propose and discuss new theories about ancient civilizations",
-    icon: "Lightbulb",
-    threadCount: 156,
-    postCount: 2341,
-    lastActivity: {
-      threadId: "thread-acoustic-resonance",
-      threadTitle: "Acoustic resonance patterns in megalithic chambers",
-      author: "dr.aminah.s",
-      timestamp: "2024-12-02T14:30:00Z",
-    },
-    isVerifiedOnly: true,
-  },
-  {
-    id: "sec-peer-review",
-    categoryId: "cat-research",
-    slug: "peer-review",
-    name: "Peer Review",
-    description: "Submit research for community review and feedback",
-    icon: "FileCheck",
-    threadCount: 89,
-    postCount: 1567,
-    lastActivity: {
-      threadId: "thread-carbon-dating",
-      threadTitle: "Re-evaluating carbon dating methodology for submerged sites",
-      author: "prof.martinez",
-      timestamp: "2024-12-01T09:15:00Z",
-    },
-    isVerifiedOnly: true,
-  },
-  {
-    id: "sec-texts",
-    categoryId: "cat-research",
-    slug: "texts-translation",
-    name: "Texts & Translation",
-    description: "Ancient texts, inscriptions, and translation discussions",
-    icon: "ScrollText",
     threadCount: 234,
-    postCount: 4521,
-    lastActivity: {
-      threadId: "thread-hieratic",
-      threadTitle: "Hieratic script variations in Middle Kingdom papyri",
-      author: "scribe.elena",
-      timestamp: "2024-12-02T11:45:00Z",
-    },
+    postCount: 4567,
   },
   {
-    id: "sec-methodology",
-    categoryId: "cat-research",
-    slug: "methodology",
-    name: "Research Methodology",
-    description: "Best practices, tools, and techniques for archaeological research",
-    icon: "Microscope",
-    threadCount: 78,
-    postCount: 892,
-  },
-
-  // Discoveries & News
-  {
-    id: "sec-breaking",
-    categoryId: "cat-discoveries",
-    slug: "breaking-news",
-    name: "Breaking Discoveries",
-    description: "Latest findings and excavation announcements",
-    icon: "Newspaper",
+    id: "board-research",
+    slug: "research",
+    name: "Research",
+    description: "Theories, hypotheses, and academic discussions",
+    icon: "FlaskConical",
+    color: "text-blue-400",
     threadCount: 312,
-    postCount: 5678,
-    lastActivity: {
-      threadId: "thread-gobekli-2024",
-      threadTitle: "New enclosure discovered at Göbekli Tepe - December 2024",
-      author: "field.reporter",
-      timestamp: "2024-12-02T16:00:00Z",
-    },
+    postCount: 6789,
   },
   {
-    id: "sec-excavations",
-    categoryId: "cat-discoveries",
-    slug: "excavation-updates",
-    name: "Excavation Updates",
-    description: "Progress reports from ongoing archaeological digs",
-    icon: "Shovel",
+    id: "board-discoveries",
+    slug: "discoveries",
+    name: "Discoveries",
+    description: "Breaking news and new findings",
+    icon: "Sparkles",
+    color: "text-amber-400",
     threadCount: 189,
     postCount: 3456,
   },
   {
-    id: "sec-reinterpretations",
-    categoryId: "cat-discoveries",
-    slug: "reinterpretations",
-    name: "Site Reinterpretations",
-    description: "New perspectives on known sites and artifacts",
-    icon: "RefreshCw",
-    threadCount: 145,
-    postCount: 2890,
-  },
-
-  // Research Zones
-  {
-    id: "sec-zone-egypt",
-    categoryId: "cat-zones",
-    slug: "egypt-nile",
-    name: "Egypt & Nile Valley",
-    description: "Pyramids, temples, and the mysteries of ancient Egypt",
-    icon: "Pyramid",
-    threadCount: 567,
-    postCount: 12456,
-    lastActivity: {
-      threadId: "thread-giza-shafts",
-      threadTitle: "New scan results from the Great Pyramid air shafts",
-      author: "dr.aminah.s",
-      timestamp: "2024-12-02T13:20:00Z",
-    },
-  },
-  {
-    id: "sec-zone-americas",
-    categoryId: "cat-zones",
-    slug: "americas",
-    name: "Americas",
-    description: "Mesoamerican, South American, and North American sites",
-    icon: "Mountain",
-    threadCount: 423,
-    postCount: 8934,
-  },
-  {
-    id: "sec-zone-europe",
-    categoryId: "cat-zones",
-    slug: "europe-megalithic",
-    name: "European Megaliths",
-    description: "Stone circles, dolmens, and passage tombs of Europe",
-    icon: "Milestone",
-    threadCount: 389,
-    postCount: 7234,
-  },
-  {
-    id: "sec-zone-asia",
-    categoryId: "cat-zones",
-    slug: "asia-pacific",
-    name: "Asia & Pacific",
-    description: "Ancient sites across Asia and the Pacific islands",
-    icon: "Waves",
-    threadCount: 234,
-    postCount: 4567,
-  },
-  {
-    id: "sec-zone-submerged",
-    categoryId: "cat-zones",
-    slug: "submerged-sites",
-    name: "Submerged & Coastal Sites",
-    description: "Underwater archaeology and coastal erosion studies",
-    icon: "Anchor",
-    threadCount: 156,
-    postCount: 2890,
-  },
-
-  // Expeditions & Fieldwork
-  {
-    id: "sec-trip-planning",
-    categoryId: "cat-fieldwork",
-    slug: "trip-planning",
-    name: "Trip Planning",
-    description: "Organize visits, share itineraries, and find travel companions",
-    icon: "CalendarDays",
-    threadCount: 234,
-    postCount: 4567,
-  },
-  {
-    id: "sec-equipment",
-    categoryId: "cat-fieldwork",
-    slug: "equipment",
-    name: "Equipment & Gear",
-    description: "Cameras, drones, survey tools, and field equipment discussions",
-    icon: "Wrench",
-    threadCount: 167,
-    postCount: 2345,
-  },
-  {
-    id: "sec-field-reports",
-    categoryId: "cat-fieldwork",
-    slug: "field-reports",
-    name: "Field Reports",
-    description: "Share your experiences and findings from site visits",
-    icon: "FileText",
-    threadCount: 289,
-    postCount: 5678,
-    lastActivity: {
-      threadId: "thread-orkney-2024",
-      threadTitle: "Orkney stone circles - November 2024 visit report",
-      author: "explorer.maya",
-      timestamp: "2024-11-28T19:30:00Z",
-    },
-  },
-
-  // Community
-  {
-    id: "sec-introductions",
-    categoryId: "cat-community",
-    slug: "introductions",
-    name: "Introductions",
-    description: "Welcome new members and share your background",
-    icon: "HandMetal",
-    threadCount: 456,
-    postCount: 2345,
-  },
-  {
-    id: "sec-general",
-    categoryId: "cat-community",
-    slug: "general-discussion",
-    name: "General Discussion",
-    description: "Off-topic conversations and community chat",
+    id: "board-general",
+    slug: "general",
+    name: "General",
+    description: "Community chat and introductions",
     icon: "MessageCircle",
-    threadCount: 567,
+    color: "text-purple-400",
+    threadCount: 456,
     postCount: 8901,
-    lastActivity: {
-      threadId: "thread-book-recs",
-      threadTitle: "Book recommendations for beginners",
-      author: "curious.reader",
-      timestamp: "2024-12-02T15:45:00Z",
-    },
-  },
-  {
-    id: "sec-media-showcase",
-    categoryId: "cat-community",
-    slug: "media-showcase",
-    name: "Media Showcase",
-    description: "Share your photos, videos, and artwork",
-    icon: "Image",
-    threadCount: 345,
-    postCount: 4567,
-  },
-  {
-    id: "sec-feedback",
-    categoryId: "cat-community",
-    slug: "feedback",
-    name: "Site Feedback",
-    description: "Suggestions, bug reports, and platform improvements",
-    icon: "MessageSquarePlus",
-    threadCount: 123,
-    postCount: 890,
   },
 ];
 
@@ -370,10 +103,148 @@ export const forumSections: ForumSection[] = [
 // ============================================================================
 
 export const forumThreads: ForumThread[] = [
-  // Research threads
+  // Site Discussions
+  {
+    id: "thread-giza-shafts",
+    boardId: "board-sites",
+    slug: "great-pyramid-air-shafts-scan",
+    title: "New scan results from the Great Pyramid air shafts",
+    excerpt: "The ScanPyramids project has released new muon tomography data. The void behind the Queen's Chamber shaft shows unexpected geometry.",
+    author: {
+      id: "user-aminah",
+      username: "dr.aminah.s",
+      displayName: "Dr. Aminah Sayed",
+      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=aminah",
+      isVerified: true,
+      role: "Expert",
+    },
+    createdAt: "2024-11-28T14:00:00Z",
+    lastActivity: "2024-12-02T13:20:00Z",
+    replyCount: 89,
+    viewCount: 2345,
+    likeCount: 156,
+    tags: ["giza", "scanning", "pyramids"],
+    isHot: true,
+    linkedSiteId: "site-giza-gp",
+    linkedSiteName: "Great Pyramid of Giza",
+  },
+  {
+    id: "thread-stonehenge-alignment",
+    boardId: "board-sites",
+    slug: "stonehenge-winter-solstice-alignment",
+    title: "Stonehenge winter solstice alignment observations",
+    excerpt: "Documenting the precise alignment during this year's solstice. Comparing with historical records and astronomical calculations.",
+    author: {
+      id: "user-james",
+      username: "stone.circle.james",
+      displayName: "James Wright",
+      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=james",
+      isVerified: false,
+    },
+    createdAt: "2024-12-15T08:00:00Z",
+    lastActivity: "2024-12-18T16:30:00Z",
+    replyCount: 34,
+    viewCount: 892,
+    likeCount: 67,
+    tags: ["stonehenge", "solstice", "alignment"],
+    linkedSiteId: "site-stonehenge",
+    linkedSiteName: "Stonehenge",
+  },
+  {
+    id: "thread-gobekli-pillars",
+    boardId: "board-sites",
+    slug: "gobekli-tepe-pillar-carvings",
+    title: "Cataloging the animal carvings on Göbekli Tepe pillars",
+    excerpt: "Starting a collaborative effort to document and categorize all known animal carvings. Looking for high-res photo contributions.",
+    author: {
+      id: "user-ipek",
+      username: "moderator.ipek",
+      displayName: "Ipek Yilmaz",
+      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=ipek",
+      isVerified: true,
+      role: "Moderator",
+    },
+    createdAt: "2024-11-10T10:00:00Z",
+    lastActivity: "2024-12-17T09:15:00Z",
+    replyCount: 156,
+    viewCount: 3421,
+    likeCount: 234,
+    tags: ["gobekli-tepe", "carvings", "collaboration"],
+    isPinned: true,
+    linkedSiteId: "site-gobekli-tepe",
+    linkedSiteName: "Göbekli Tepe",
+  },
+
+  // Fieldwork
+  {
+    id: "thread-orkney-2024",
+    boardId: "board-fieldwork",
+    slug: "orkney-stone-circles-november-2024",
+    title: "Orkney stone circles - November 2024 visit report",
+    excerpt: "Just returned from a week exploring Brodgar, Stenness, and the lesser-known sites. Sharing photos, observations, and some unexpected discoveries.",
+    author: {
+      id: "user-maya",
+      username: "explorer.maya",
+      displayName: "Maya Chen",
+      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=maya",
+      isVerified: false,
+      role: "Explorer",
+    },
+    createdAt: "2024-11-27T10:00:00Z",
+    lastActivity: "2024-11-28T19:30:00Z",
+    replyCount: 34,
+    viewCount: 678,
+    likeCount: 67,
+    tags: ["orkney", "field-report", "stone-circles"],
+    isHot: true,
+  },
+  {
+    id: "thread-drone-tips",
+    boardId: "board-fieldwork",
+    slug: "drone-photography-megalithic-sites",
+    title: "Drone photography tips for megalithic sites",
+    excerpt: "What settings and techniques work best? Sharing my setup and looking for recommendations on flight patterns for site documentation.",
+    author: {
+      id: "user-carlos",
+      username: "aerial.carlos",
+      displayName: "Carlos Mendez",
+      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=carlos",
+      isVerified: true,
+      role: "Photographer",
+    },
+    createdAt: "2024-12-01T14:00:00Z",
+    lastActivity: "2024-12-16T11:45:00Z",
+    replyCount: 45,
+    viewCount: 1234,
+    likeCount: 89,
+    tags: ["drone", "photography", "equipment"],
+    isPinned: true,
+  },
+  {
+    id: "thread-peru-expedition",
+    boardId: "board-fieldwork",
+    slug: "planning-peru-expedition-2025",
+    title: "Planning Peru expedition - Spring 2025",
+    excerpt: "Looking for travel companions to explore Sacsayhuamán, Ollantaytambo, and lesser-known sites. Tentative dates: March 15-30.",
+    author: {
+      id: "user-sarah",
+      username: "wanderer.sarah",
+      displayName: "Sarah Johnson",
+      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=sarah",
+      isVerified: false,
+    },
+    createdAt: "2024-12-10T09:00:00Z",
+    lastActivity: "2024-12-18T08:20:00Z",
+    replyCount: 23,
+    viewCount: 567,
+    likeCount: 45,
+    tags: ["peru", "expedition", "planning"],
+  },
+
+  // Research
   {
     id: "thread-acoustic-resonance",
-    sectionId: "sec-hypotheses",
+    boardId: "board-research",
     slug: "acoustic-resonance-megalithic-chambers",
     title: "Acoustic resonance patterns in megalithic chambers",
     excerpt: "Cross-referencing infrasound measurements from multiple sites reveals consistent frequency patterns. Could these structures have been designed as acoustic instruments?",
@@ -392,38 +263,55 @@ export const forumThreads: ForumThread[] = [
     likeCount: 89,
     tags: ["acoustics", "megalithic", "hypothesis"],
     isPinned: true,
-    isVerifiedOnly: true,
     isHot: true,
-    linkedSites: ["site-giza-gp", "site-newgrange"],
   },
   {
-    id: "thread-ritual-acoustics",
-    sectionId: "sec-texts",
-    slug: "chant-cadence-bremner-rhind",
-    title: "Chant cadence references in Bremner-Rhind Papyrus",
-    excerpt: "Cross-referencing the papyrus litany with recent acoustic captures from the King's Chamber. Looking for corroborating transliterations.",
+    id: "thread-quipu",
+    boardId: "board-research",
+    slug: "quipu-fiber-resonance",
+    title: "Quipu fiber resonance experiments",
+    excerpt: "Shared slow-motion capture of dyed fiber bundles vibrating in response to flute frequencies. Need insights on knot tension encoding.",
     author: {
-      id: "user-elena",
-      username: "scribe.elena",
-      displayName: "Elena Kowalski",
-      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=elena",
+      id: "user-andes",
+      username: "andes.lab",
+      displayName: "Andean Research Lab",
+      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=andes",
       isVerified: true,
-      role: "Researcher",
+      role: "Institution",
     },
-    createdAt: "2024-10-05T08:15:00Z",
-    lastActivity: "2024-12-02T11:45:00Z",
-    replyCount: 23,
-    viewCount: 567,
-    likeCount: 34,
-    tags: ["old-kingdom", "translation", "acoustics"],
-    isVerifiedOnly: true,
-    linkedSites: ["site-giza-gp"],
+    createdAt: "2024-09-15T12:00:00Z",
+    lastActivity: "2024-11-22T08:40:00Z",
+    replyCount: 32,
+    viewCount: 456,
+    likeCount: 45,
+    tags: ["inca", "quipu", "material-science"],
   },
-  
-  // Discovery threads
+  {
+    id: "thread-carbon-dating",
+    boardId: "board-research",
+    slug: "carbon-dating-methodology-submerged",
+    title: "Re-evaluating carbon dating for submerged sites",
+    excerpt: "Proposing adjustments to standard methodology when dealing with sites that have been underwater. The marine reservoir effect needs better calibration.",
+    author: {
+      id: "user-martinez",
+      username: "prof.martinez",
+      displayName: "Prof. Martinez",
+      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=martinez",
+      isVerified: true,
+      role: "Academic",
+    },
+    createdAt: "2024-10-20T11:00:00Z",
+    lastActivity: "2024-12-01T09:15:00Z",
+    replyCount: 28,
+    viewCount: 789,
+    likeCount: 56,
+    tags: ["dating", "methodology", "underwater"],
+  },
+
+  // Discoveries
   {
     id: "thread-gobekli-2024",
-    sectionId: "sec-breaking",
+    boardId: "board-discoveries",
     slug: "new-enclosure-gobekli-tepe-2024",
     title: "New enclosure discovered at Göbekli Tepe - December 2024",
     excerpt: "Breaking: German Archaeological Institute announces discovery of a previously unknown enclosure with unique T-pillar configurations. Initial dating suggests it may predate known structures.",
@@ -444,62 +332,54 @@ export const forumThreads: ForumThread[] = [
     isPinned: true,
     isHot: true,
   },
-
-  // Zone threads
   {
-    id: "thread-giza-shafts",
-    sectionId: "sec-zone-egypt",
-    slug: "great-pyramid-air-shafts-scan",
-    title: "New scan results from the Great Pyramid air shafts",
-    excerpt: "The ScanPyramids project has released new muon tomography data. The void behind the Queen's Chamber shaft shows unexpected geometry.",
+    id: "thread-underwater-japan",
+    boardId: "board-discoveries",
+    slug: "underwater-structures-yonaguni-update",
+    title: "New underwater survey at Yonaguni Monument",
+    excerpt: "Latest sonar mapping reveals additional geometric features previously obscured by sediment. Debate continues on natural vs. man-made origins.",
     author: {
-      id: "user-aminah",
-      username: "dr.aminah.s",
-      displayName: "Dr. Aminah Sayed",
-      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=aminah",
+      id: "user-tanaka",
+      username: "dr.tanaka",
+      displayName: "Dr. Kenji Tanaka",
+      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=tanaka",
       isVerified: true,
-      role: "Expert",
+      role: "Researcher",
     },
-    createdAt: "2024-11-28T14:00:00Z",
-    lastActivity: "2024-12-02T13:20:00Z",
+    createdAt: "2024-12-05T06:00:00Z",
+    lastActivity: "2024-12-17T14:30:00Z",
+    replyCount: 67,
+    viewCount: 1890,
+    likeCount: 123,
+    tags: ["yonaguni", "underwater", "japan"],
+    isHot: true,
+  },
+  {
+    id: "thread-lidar-amazon",
+    boardId: "board-discoveries",
+    slug: "lidar-reveals-amazon-settlements",
+    title: "LiDAR reveals extensive ancient settlements in Amazon",
+    excerpt: "New aerial survey data shows network of interconnected settlements spanning hundreds of kilometers. Challenges previous assumptions about rainforest habitation.",
+    author: {
+      id: "user-silva",
+      username: "dr.silva",
+      displayName: "Dr. Ana Silva",
+      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=silva",
+      isVerified: true,
+      role: "Archaeologist",
+    },
+    createdAt: "2024-12-12T10:00:00Z",
+    lastActivity: "2024-12-18T11:00:00Z",
     replyCount: 89,
     viewCount: 2345,
-    likeCount: 156,
-    tags: ["giza", "scanning", "voids"],
-    isHot: true,
-    linkedSites: ["site-giza-gp"],
-    linkedZones: ["zone-lower-nile"],
+    likeCount: 178,
+    tags: ["amazon", "lidar", "settlements"],
   },
 
-  // Fieldwork threads
-  {
-    id: "thread-orkney-2024",
-    sectionId: "sec-field-reports",
-    slug: "orkney-stone-circles-november-2024",
-    title: "Orkney stone circles - November 2024 visit report",
-    excerpt: "Just returned from a week exploring Brodgar, Stenness, and the lesser-known sites. Sharing photos, observations, and some unexpected discoveries.",
-    author: {
-      id: "user-maya",
-      username: "explorer.maya",
-      displayName: "Maya Chen",
-      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=maya",
-      isVerified: false,
-      role: "Explorer",
-    },
-    createdAt: "2024-11-27T10:00:00Z",
-    lastActivity: "2024-11-28T19:30:00Z",
-    replyCount: 34,
-    viewCount: 678,
-    likeCount: 67,
-    tags: ["orkney", "field-report", "stone-circles"],
-    linkedSites: ["site-ring-of-brodgar"],
-    linkedZones: ["zone-caledonia"],
-  },
-
-  // Community threads
+  // General
   {
     id: "thread-book-recs",
-    sectionId: "sec-general",
+    boardId: "board-general",
     slug: "book-recommendations-beginners",
     title: "Book recommendations for beginners",
     excerpt: "I'm new to ancient civilizations research. What are the must-read books that helped shape your understanding? Looking for both academic and accessible options.",
@@ -516,37 +396,14 @@ export const forumThreads: ForumThread[] = [
     viewCount: 890,
     likeCount: 23,
     tags: ["books", "beginners", "resources"],
-  },
-
-  // More threads for variety
-  {
-    id: "thread-quipu",
-    sectionId: "sec-hypotheses",
-    slug: "quipu-fiber-resonance",
-    title: "Quipu fiber resonance experiments",
-    excerpt: "Shared slow-motion capture of dyed fiber bundles vibrating in response to flute frequencies. Need insights on knot tension encoding.",
-    author: {
-      id: "user-andes",
-      username: "andes.lab",
-      displayName: "Andean Research Lab",
-      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=andes",
-      isVerified: true,
-      role: "Institution",
-    },
-    createdAt: "2024-09-15T12:00:00Z",
-    lastActivity: "2024-11-22T08:40:00Z",
-    replyCount: 32,
-    viewCount: 456,
-    likeCount: 45,
-    tags: ["inca", "material-science", "quipu"],
-    isVerifiedOnly: true,
+    isPinned: true,
   },
   {
-    id: "thread-derinkuyu",
-    sectionId: "sec-zone-asia",
-    slug: "derinkuyu-ventilation-mapping",
-    title: "Ventilation mapping at Derinkuyu",
-    excerpt: "Requesting volunteers to annotate 2024 tunnel lidar scans with airflow observations; will feed into myth cycle hypothesis.",
+    id: "thread-intro-december",
+    boardId: "board-general",
+    slug: "december-introductions-thread",
+    title: "December Introductions Thread",
+    excerpt: "New to the community? Introduce yourself here! Tell us about your interests and what brought you to ancient civilizations research.",
     author: {
       id: "user-ipek",
       username: "moderator.ipek",
@@ -555,13 +412,33 @@ export const forumThreads: ForumThread[] = [
       isVerified: true,
       role: "Moderator",
     },
-    createdAt: "2024-08-10T14:30:00Z",
-    lastActivity: "2024-11-19T17:16:00Z",
-    replyCount: 11,
-    viewCount: 234,
-    likeCount: 18,
-    tags: ["anatolia", "collaboration", "lidar"],
-    linkedSites: ["site-derinkuyu"],
+    createdAt: "2024-12-01T00:00:00Z",
+    lastActivity: "2024-12-18T17:30:00Z",
+    replyCount: 78,
+    viewCount: 1234,
+    likeCount: 56,
+    tags: ["introductions", "welcome", "community"],
+    isPinned: true,
+  },
+  {
+    id: "thread-documentaries",
+    boardId: "board-general",
+    slug: "best-documentaries-2024",
+    title: "Best documentaries of 2024",
+    excerpt: "What documentaries about ancient sites or civilizations have you watched this year? Looking for recommendations for the holiday break.",
+    author: {
+      id: "user-viewer",
+      username: "doc.watcher",
+      displayName: "Mike Roberts",
+      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=mike",
+      isVerified: false,
+    },
+    createdAt: "2024-12-14T18:00:00Z",
+    lastActivity: "2024-12-18T20:15:00Z",
+    replyCount: 34,
+    viewCount: 567,
+    likeCount: 28,
+    tags: ["documentaries", "media", "recommendations"],
   },
 ];
 
@@ -570,31 +447,34 @@ export const forumThreads: ForumThread[] = [
 // ============================================================================
 
 export const forumStats = {
-  totalThreads: 3456,
-  totalPosts: 78901,
+  totalThreads: 1758,
+  totalPosts: 36169,
   totalMembers: 12345,
   onlineNow: 234,
   newestMember: "curious.reader",
   topContributors: [
     { username: "dr.aminah.s", posts: 567, isVerified: true },
     { username: "explorer.maya", posts: 432, isVerified: false },
-    { username: "scribe.elena", posts: 389, isVerified: true },
+    { username: "moderator.ipek", posts: 389, isVerified: true },
     { username: "andes.lab", posts: 345, isVerified: true },
     { username: "field.reporter", posts: 312, isVerified: true },
   ],
 };
 
+// ============================================================================
 // Helper functions
-export function getCategoryById(id: string): ForumCategory | undefined {
-  return forumCategories.find((c) => c.id === id);
+// ============================================================================
+
+export function getBoardById(id: string): ForumBoard | undefined {
+  return forumBoards.find((b) => b.id === id);
 }
 
-export function getSectionsByCategory(categoryId: string): ForumSection[] {
-  return forumSections.filter((s) => s.categoryId === categoryId);
+export function getBoardBySlug(slug: string): ForumBoard | undefined {
+  return forumBoards.find((b) => b.slug === slug);
 }
 
-export function getThreadsBySection(sectionId: string): ForumThread[] {
-  return forumThreads.filter((t) => t.sectionId === sectionId);
+export function getThreadsByBoard(boardId: string): ForumThread[] {
+  return forumThreads.filter((t) => t.boardId === boardId);
 }
 
 export function getHotThreads(limit: number = 5): ForumThread[] {
@@ -610,14 +490,13 @@ export function getRecentThreads(limit: number = 10): ForumThread[] {
     .slice(0, limit);
 }
 
+export function getPinnedThreads(boardId?: string): ForumThread[] {
+  const threads = boardId ? getThreadsByBoard(boardId) : forumThreads;
+  return threads.filter((t) => t.isPinned);
+}
 
-
-
-
-
-
-
-
-
-
-
+export function getAllThreads(): ForumThread[] {
+  return [...forumThreads].sort(
+    (a, b) => new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime()
+  );
+}

@@ -87,8 +87,7 @@ const mockConnections = [
 		title: "Cyclopean Masonry Worldwide",
 		category: "architecture",
 		sites: ["cusco-sacsayhuaman", "giza-gp", "anatolia-ayanis"],
-		description:
-			"Exploring the shared polygonal stone-fitting techniques found across ancient civilizations from Peru to Egypt to Anatolia.",
+		description: "Exploring the shared polygonal stone-fitting techniques found across ancient civilizations from Peru to Egypt to Anatolia.",
 		contributors: 12,
 		comments: 45,
 		upvotes: 234,
@@ -100,8 +99,7 @@ const mockConnections = [
 		title: "Serpent Symbolism Patterns",
 		category: "symbolism",
 		sites: ["anatolia-gobekli", "giza-sphinx", "andes-machu"],
-		description:
-			"Comparing serpent/dragon motifs across temple complexes and their potential astronomical correlations.",
+		description: "Comparing serpent/dragon motifs across temple complexes and their potential astronomical correlations.",
 		contributors: 8,
 		comments: 32,
 		upvotes: 189,
@@ -113,8 +111,7 @@ const mockConnections = [
 		title: "Flood Narratives in Architecture",
 		category: "scripture",
 		sites: ["anatolia-derinkuyu", "indus-dholavira"],
-		description:
-			"Cross-referencing flood myth texts with hydraulic engineering features at ancient sites.",
+		description: "Cross-referencing flood myth texts with hydraulic engineering features at ancient sites.",
 		contributors: 6,
 		comments: 28,
 		upvotes: 156,
@@ -126,8 +123,7 @@ const mockConnections = [
 		title: "Solstice Alignment Network",
 		category: "astronomy",
 		sites: ["giza-gp", "andes-machu", "anatolia-gobekli"],
-		description:
-			"Mapping structures that demonstrate precise solar alignments during solstices and equinoxes.",
+		description: "Mapping structures that demonstrate precise solar alignments during solstices and equinoxes.",
 		contributors: 15,
 		comments: 67,
 		upvotes: 312,
@@ -139,8 +135,7 @@ const mockConnections = [
 		title: "Acoustic Chamber Resonance",
 		category: "acoustics",
 		sites: ["giza-gp", "cusco-sacsayhuaman"],
-		description:
-			"Studying the acoustic properties of enclosed chambers and their potential ceremonial purposes.",
+		description: "Studying the acoustic properties of enclosed chambers and their potential ceremonial purposes.",
 		contributors: 9,
 		comments: 41,
 		upvotes: 198,
@@ -153,10 +148,7 @@ export default function ConnectionsPage() {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [activeCategory, setActiveCategory] = useState("all");
 
-	const filteredConnections =
-		activeCategory === "all"
-			? mockConnections
-			: mockConnections.filter((conn) => conn.category === activeCategory);
+	const filteredConnections = activeCategory === "all" ? mockConnections : mockConnections.filter((conn) => conn.category === activeCategory);
 
 	const searchedConnections = searchTerm
 		? filteredConnections.filter(
@@ -168,8 +160,7 @@ export default function ConnectionsPage() {
 		: filteredConnections;
 
 	const getSiteById = (id: string) => sampleSites.find((site) => site.id === id);
-	const getCategoryInfo = (categoryId: string) =>
-		connectionCategories.find((cat) => cat.id === categoryId);
+	const getCategoryInfo = (categoryId: string) => connectionCategories.find((cat) => cat.id === categoryId);
 
 	return (
 		<div className="space-y-6">
@@ -188,11 +179,11 @@ export default function ConnectionsPage() {
 						</div>
 					</div>
 					<p className="text-sm text-muted-foreground max-w-xl">
-						Discover and research relationships between ancient sites across civilizations.
-						Explore shared architecture, symbolism, scriptural references, and more.
+						Discover and research relationships between ancient sites across civilizations. Explore shared architecture, symbolism, scriptural
+						references, and more.
 					</p>
 				</div>
-				<Button className="gap-2 bg-white text-slate-900 hover:bg-white/90 shrink-0">
+				<Button className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shrink-0">
 					<Plus className="h-4 w-4" />
 					New Connection
 				</Button>
@@ -205,7 +196,7 @@ export default function ConnectionsPage() {
 					placeholder="Search connections..."
 					value={searchTerm}
 					onChange={(e) => setSearchTerm(e.target.value)}
-					className="pl-9 bg-[#1a1f26] border-border/40"
+					className="pl-9 bg-card border-border/40"
 				/>
 			</div>
 
@@ -215,9 +206,7 @@ export default function ConnectionsPage() {
 					onClick={() => setActiveCategory("all")}
 					className={cn(
 						"flex flex-col items-center gap-2 rounded-xl border p-4 transition-all",
-						activeCategory === "all"
-							? "border-primary bg-primary/10"
-							: "border-border/30 bg-[#1a1f26] hover:border-border/50"
+						activeCategory === "all" ? "border-primary bg-primary/10" : "border-border/30 bg-card hover:border-border/50"
 					)}
 				>
 					<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary/20 to-accent/20">
@@ -233,9 +222,7 @@ export default function ConnectionsPage() {
 							onClick={() => setActiveCategory(category.id)}
 							className={cn(
 								"flex flex-col items-center gap-2 rounded-xl border p-4 transition-all",
-								activeCategory === category.id
-									? "border-primary bg-primary/10"
-									: "border-border/30 bg-[#1a1f26] hover:border-border/50"
+								activeCategory === category.id ? "border-primary bg-primary/10" : "border-border/30 bg-card hover:border-border/50"
 							)}
 						>
 							<div className={cn("flex h-10 w-10 items-center justify-center rounded-lg", category.bgColor)}>
@@ -255,34 +242,21 @@ export default function ConnectionsPage() {
 					const sites = connection.sites.map(getSiteById).filter(Boolean);
 
 					return (
-						<Card
-							key={connection.id}
-							className="group bg-[#1a1f26] border-border/30 hover:border-border/50 transition-all"
-						>
+						<Card key={connection.id} className="group bg-card border-border/30 hover:border-border/50 transition-all">
 							<CardHeader className="pb-3">
 								<div className="flex items-start justify-between gap-3">
 									<div className="flex items-center gap-3">
-										<div
-											className={cn(
-												"flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
-												categoryInfo?.bgColor
-											)}
-										>
+										<div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-lg", categoryInfo?.bgColor)}>
 											<CategoryIcon className={cn("h-5 w-5", categoryInfo?.color)} />
 										</div>
 										<div>
-											<CardTitle className="text-base group-hover:text-primary transition-colors">
-												{connection.title}
-											</CardTitle>
+											<CardTitle className="text-base group-hover:text-primary transition-colors">{connection.title}</CardTitle>
 											<Badge variant="outline" className="mt-1 text-[10px]">
 												{categoryInfo?.label}
 											</Badge>
 										</div>
 									</div>
-									<Badge
-										variant={connection.status === "active" ? "success" : "secondary"}
-										className="shrink-0"
-									>
+									<Badge variant={connection.status === "active" ? "success" : "secondary"} className="shrink-0">
 										{connection.status}
 									</Badge>
 								</div>
@@ -310,10 +284,7 @@ export default function ConnectionsPage() {
 								{/* Tags */}
 								<div className="flex flex-wrap gap-1.5">
 									{connection.tags.map((tag) => (
-										<span
-											key={tag}
-											className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary"
-										>
+										<span key={tag} className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
 											#{tag}
 										</span>
 									))}
@@ -350,13 +321,11 @@ export default function ConnectionsPage() {
 
 			{/* Empty State */}
 			{searchedConnections.length === 0 && (
-				<Card className="bg-[#1a1f26] border-border/30">
+				<Card className="bg-card border-border/30">
 					<CardContent className="flex flex-col items-center justify-center py-12 text-center">
 						<Link2 className="h-12 w-12 text-muted-foreground mb-4" />
 						<p className="text-lg font-medium text-muted-foreground mb-2">No connections found</p>
-						<p className="text-sm text-muted-foreground mb-4">
-							Try adjusting your search or explore a different category
-						</p>
+						<p className="text-sm text-muted-foreground mb-4">Try adjusting your search or explore a different category</p>
 						<Button variant="outline" onClick={() => setActiveCategory("all")}>
 							View all connections
 						</Button>
@@ -365,15 +334,13 @@ export default function ConnectionsPage() {
 			)}
 
 			{/* Call to Action */}
-			<Card className="bg-gradient-to-br from-[#1a1f26] to-[#1e2430] border-primary/30">
+			<Card className="bg-gradient-to-br from-card to-muted/50 border-primary/30">
 				<CardContent className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6">
 					<div className="text-center sm:text-left">
 						<h3 className="text-lg font-semibold mb-1">Discover a new connection?</h3>
-						<p className="text-sm text-muted-foreground">
-							Help the community by documenting relationships between ancient sites
-						</p>
+						<p className="text-sm text-muted-foreground">Help the community by documenting relationships between ancient sites</p>
 					</div>
-					<Button className="gap-2 bg-white text-slate-900 hover:bg-white/90 shrink-0">
+					<Button className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 shrink-0">
 						<Plus className="h-4 w-4" />
 						Propose Connection
 					</Button>
@@ -382,4 +349,3 @@ export default function ConnectionsPage() {
 		</div>
 	);
 }
-

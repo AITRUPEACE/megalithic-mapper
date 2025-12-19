@@ -202,7 +202,7 @@ export const AppSidebar = () => {
 			<div
 				data-expanded={isExpanded}
 				className={cn(
-					"flex h-full flex-col overflow-hidden border-r border-border/40 bg-[#0e1217] transition-[width] duration-300 ease-out",
+					"flex h-full flex-col overflow-hidden border-r border-border/50 bg-sidebar transition-[width] duration-300 ease-out",
 					isMapRoute ? "absolute inset-y-0 left-0" : "",
 					isExpanded ? "w-60" : "w-16"
 				)}

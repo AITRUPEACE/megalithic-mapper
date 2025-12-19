@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useIsMobile } from "@/shared/hooks/use-media-query";
 import {
 	Search,
 	Menu,
@@ -18,11 +19,9 @@ import {
 	Command,
 	Upload,
 	UserCircle,
-	Compass,
 	Microscope,
 	Calendar,
 	Library,
-	Eye,
 	CheckCircle2,
 	AtSign,
 	ShieldCheck,
@@ -30,7 +29,6 @@ import {
 	MessageCircle,
 	ExternalLink,
 } from "lucide-react";
-import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
 import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
 import { Badge } from "@/shared/ui/badge";
@@ -49,6 +47,7 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { Separator } from "@/shared/ui/separator";
 import { ThemeToggle } from "@/shared/ui/theme-toggle";
 import { sampleNotifications } from "@/shared/mocks/sample-notifications";
+import { SearchCommand } from "@/components/search/search-command";
 
 // Notification type icons
 const notificationTypeIcons: Record<string, React.ElementType> = {
@@ -58,10 +57,6 @@ const notificationTypeIcons: Record<string, React.ElementType> = {
 	comment: MessageCircle,
 	system: Bell,
 };
-
-interface AppTopbarProps {
-	onGlobalSearch?: (query: string) => void;
-}
 
 // Mobile navigation items
 const mobileNavItems = [
@@ -75,12 +70,31 @@ const mobileNavItems = [
 	{ href: "/notifications", label: "Notifications", icon: Bell },
 ];
 
-export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
+export const AppTopbar = () => {
 	const pathname = usePathname();
 	const router = useRouter();
+	const isMobile = useIsMobile();
 	const [isSheetOpen, setIsSheetOpen] = useState(false);
 	const [isSigningOut, setIsSigningOut] = useState(false);
+	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	const { profile, user, loading: authLoading, signOut } = useAuth();
+
+	// Handle Ctrl+K / Cmd+K keyboard shortcut to open search
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+				e.preventDefault();
+				setIsSearchOpen(true);
+			}
+		};
+
+		document.addEventListener("keydown", handleKeyDown);
+		return () => document.removeEventListener("keydown", handleKeyDown);
+	}, []);
+
+	// Hide search bar on mobile when on the map page (MobileSiteExplorer has its own)
+	const isMapPage = pathname === "/map" || pathname.startsWith("/map/");
+	const hideSearchBar = isMobile && isMapPage;
 
 	const profileHref = profile?.username ? `/profile/${profile.username}` : "/profile";
 	const initials = useMemo(() => {
@@ -110,7 +124,12 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 	};
 
 	return (
-		<header className={cn("relative flex h-14 shrink-0 items-center gap-3 border-b border-border/40 bg-card px-3 sm:px-4 md:px-5", zClass.topbar)}>
+		<header
+			className={cn(
+				"relative flex h-14 shrink-0 items-center gap-3 border-b border-border/50 bg-card shadow-theme-sm px-3 sm:px-4 md:px-5",
+				zClass.topbar
+			)}
+		>
 			{/* Left Section: Mobile Menu + Search */}
 			<div className="flex flex-1 items-center gap-3">
 				{/* Mobile menu button */}
@@ -121,7 +140,7 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 							<span className="sr-only">Toggle menu</span>
 						</Button>
 					</SheetTrigger>
-					<SheetContent side="left" className="w-[280px] bg-[#0e1217] border-border/40">
+					<SheetContent side="left" className="w-[280px] bg-sidebar border-border/50">
 						<SheetHeader>
 							<SheetTitle className="flex items-center gap-2">
 								<div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-600 to-orange-700">
@@ -178,19 +197,23 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 					</SheetContent>
 				</Sheet>
 
-				{/* Search Bar */}
-				<div className="relative w-full max-w-md">
-					<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-					<Input
-						placeholder="Search sites, media, researchers..."
-						className="h-9 w-full rounded-xl border-border/40 bg-secondary/30 pl-9 pr-12 text-sm placeholder:text-muted-foreground/60 focus:bg-secondary/50 focus:ring-1 focus:ring-primary/30"
-						onChange={(event) => onGlobalSearch?.(event.target.value)}
-					/>
-					<kbd className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-0.5 rounded bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
-						<Command className="h-2.5 w-2.5" />
-						<span>K</span>
-					</kbd>
-				</div>
+				{/* Search Button - opens search command dialog */}
+				{!hideSearchBar && (
+					<>
+						<button
+							onClick={() => setIsSearchOpen(true)}
+							className="relative flex h-9 w-full max-w-md items-center gap-2 rounded-xl border border-border/40 bg-secondary/30 px-3 text-sm text-muted-foreground/60 transition-colors hover:bg-secondary/50 hover:text-muted-foreground"
+						>
+							<Search className="h-4 w-4" />
+							<span className="flex-1 text-left">Search sites, zones, pages...</span>
+							<kbd className="hidden sm:flex items-center gap-0.5 rounded bg-muted/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
+								<Command className="h-2.5 w-2.5" />
+								<span>K</span>
+							</kbd>
+						</button>
+						<SearchCommand open={isSearchOpen} onOpenChange={setIsSearchOpen} />
+					</>
+				)}
 			</div>
 
 			{/* Right Section: Actions */}
@@ -225,7 +248,7 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 							)}
 						</Button>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent className="w-80 bg-[#1a1f26] border-border/40" align="end" forceMount>
+					<DropdownMenuContent className="w-80 bg-card border-border/40" align="end" forceMount>
 						<DropdownMenuLabel className="flex items-center justify-between">
 							<span className="font-semibold">Notifications</span>
 							{unreadNotifications > 0 && (
@@ -287,11 +310,11 @@ export const AppTopbar = ({ onGlobalSearch }: AppTopbarProps) => {
 								<AvatarFallback className="bg-gradient-to-br from-primary/20 to-accent/20 text-xs font-semibold">{initials}</AvatarFallback>
 							</Avatar>
 							{isVerified && (
-								<CheckCircle2 className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 text-blue-400 fill-blue-400 bg-[#0e1217] rounded-full" />
+								<CheckCircle2 className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 text-blue-400 fill-blue-400 bg-background rounded-full" />
 							)}
 						</Button>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent className="w-60 bg-[#1a1f26] border-border/40" align="end" forceMount>
+					<DropdownMenuContent className="w-60 bg-card border-border/40" align="end" forceMount>
 						<DropdownMenuLabel className="font-normal">
 							<div className="flex items-center gap-3">
 								<Avatar className="h-10 w-10 border border-border/40">

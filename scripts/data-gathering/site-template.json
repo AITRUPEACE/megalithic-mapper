@@ -1,0 +1,265 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Template for megalithic site data import",
+  
+  "site_template": {
+    "slug": "site-name-lowercase-dashes",
+    "name": "Full Site Name",
+    "summary": "2-3 sentence archaeological description. Include key features, approximate age, and cultural significance.",
+    "site_type": "stone circle",
+    "category": "site",
+    "coordinates": {
+      "lat": 51.1789,
+      "lng": -1.8262
+    },
+    "layer": "official",
+    "verification_status": "verified",
+    "trust_tier": null,
+    "media_count": 0
+  },
+
+  "site_types": [
+    "stone circle",
+    "henge",
+    "passage tomb",
+    "chambered cairn",
+    "dolmen",
+    "portal dolmen",
+    "menhir",
+    "standing stones",
+    "stone alignment",
+    "stone row",
+    "megalithic cemetery",
+    "cairn",
+    "long barrow",
+    "round barrow",
+    "artificial mound",
+    "pyramid",
+    "step pyramid",
+    "temple complex",
+    "megalithic temple",
+    "rock-cut temple",
+    "subterranean complex",
+    "fortress",
+    "citadel",
+    "city",
+    "city ruins",
+    "settlement",
+    "ceremonial center",
+    "great houses",
+    "earthwork complex",
+    "effigy mound",
+    "mound complex",
+    "nuraghe",
+    "giants tomb",
+    "taula",
+    "naveta",
+    "tholos tomb",
+    "stelae field",
+    "megalithic sculptures",
+    "rock sanctuary",
+    "monolithic statues",
+    "artificial islands",
+    "megalithic jars",
+    "megalithic terraces",
+    "dolmen field",
+    "stone ship",
+    "urban center"
+  ],
+
+  "verification_statuses": [
+    "verified",
+    "under_review",
+    "community"
+  ],
+
+  "layers": [
+    "official",
+    "community"
+  ],
+
+  "trust_tiers": [
+    null,
+    "promoted"
+  ],
+
+  "tag_types": {
+    "culture": [
+      "Neolithic British",
+      "Neolithic Irish",
+      "Neolithic Breton",
+      "Neolithic Maltese",
+      "Neolithic Iberian",
+      "Pre-Pottery Neolithic",
+      "Ancient Egyptian",
+      "Nubian",
+      "Kushite",
+      "Aksumite",
+      "Celtic",
+      "Pictish",
+      "Viking",
+      "Inca",
+      "Pre-Inca",
+      "Tiwanaku",
+      "Maya",
+      "Maya-Toltec",
+      "Aztec",
+      "Teotihuacan",
+      "Olmec",
+      "Zapotec",
+      "Mixtec",
+      "Ancestral Puebloan",
+      "Mississippian",
+      "Rapa Nui",
+      "Khmer",
+      "Nabataean",
+      "Nuragic",
+      "Talayotic"
+    ],
+    "era": [
+      "Paleolithic",
+      "Mesolithic",
+      "Neolithic",
+      "Pre-Pottery Neolithic",
+      "Chalcolithic",
+      "Bronze Age",
+      "Iron Age",
+      "Old Kingdom",
+      "Middle Kingdom",
+      "New Kingdom",
+      "Ptolemaic",
+      "Roman",
+      "Medieval",
+      "Classic Period",
+      "Terminal Classic",
+      "Post-Classic",
+      "Late Horizon",
+      "Middle Horizon"
+    ],
+    "theme": [
+      "UNESCO",
+      "astronomy",
+      "solstice",
+      "equinox",
+      "lunar alignment",
+      "stellar alignment",
+      "engineering",
+      "megalithic art",
+      "petroglyphs",
+      "acoustics",
+      "underground",
+      "water temple",
+      "sun temple",
+      "burial",
+      "ceremonial",
+      "defensive",
+      "agricultural",
+      "terraces",
+      "quarry",
+      "oldest",
+      "largest",
+      "wonder",
+      "precision stonework",
+      "polygonal masonry",
+      "cyclopean walls"
+    ]
+  },
+
+  "example_sites": [
+    {
+      "slug": "men-an-tol",
+      "name": "Men-an-Tol",
+      "summary": "Unique megalithic monument with a distinctive holed stone flanked by two uprights. Local folklore attributes healing properties. Possibly part of a larger destroyed stone circle.",
+      "site_type": "standing stones",
+      "category": "site",
+      "coordinates": { "lat": 50.1517, "lng": -5.6067 },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 0,
+      "tags": {
+        "culture": ["Neolithic British"],
+        "era": ["Neolithic", "Bronze Age"],
+        "theme": ["folklore", "healing stone"]
+      },
+      "external_links": {
+        "wikipedia": "https://en.wikipedia.org/wiki/Men-an-Tol",
+        "wikimedia_commons": "https://commons.wikimedia.org/wiki/Category:Men-an-Tol"
+      }
+    },
+    {
+      "slug": "trevethy-quoit",
+      "name": "Trevethy Quoit",
+      "summary": "Impressive portal dolmen in Cornwall with a large tilted capstone featuring a mysterious hole. Originally covered by an earth mound. One of the best-preserved Neolithic tombs in southwest England.",
+      "site_type": "portal dolmen",
+      "category": "site",
+      "coordinates": { "lat": 50.5142, "lng": -4.5433 },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 0,
+      "tags": {
+        "culture": ["Neolithic British"],
+        "era": ["Neolithic"],
+        "theme": []
+      }
+    },
+    {
+      "slug": "zennor-quoit",
+      "name": "Zennor Quoit",
+      "summary": "Partially collapsed chamber tomb on the moors above Zennor village. The massive capstone has slipped from its original position. Part of a cluster of Neolithic monuments in West Penwith.",
+      "site_type": "chambered cairn",
+      "category": "site",
+      "coordinates": { "lat": 50.1858, "lng": -5.5633 },
+      "layer": "official",
+      "verification_status": "verified",
+      "trust_tier": null,
+      "media_count": 0,
+      "tags": {
+        "culture": ["Neolithic British"],
+        "era": ["Neolithic"],
+        "theme": []
+      }
+    }
+  ],
+
+  "batch_import_format": {
+    "description": "Use this format when importing multiple sites at once",
+    "sites": [
+      {
+        "slug": "site-1",
+        "name": "Site 1",
+        "summary": "Description...",
+        "site_type": "stone circle",
+        "coordinates": { "lat": 0, "lng": 0 }
+      },
+      {
+        "slug": "site-2",
+        "name": "Site 2", 
+        "summary": "Description...",
+        "site_type": "dolmen",
+        "coordinates": { "lat": 0, "lng": 0 }
+      }
+    ],
+    "tags": {
+      "site-1": {
+        "culture": ["Culture A"],
+        "era": ["Era A"],
+        "theme": ["Theme A"]
+      },
+      "site-2": {
+        "culture": ["Culture B"],
+        "era": ["Era B"],
+        "theme": []
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+

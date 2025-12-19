@@ -9,6 +9,7 @@ import { Separator } from "@/shared/ui/separator";
 import { cn, timeAgo } from "@/shared/lib/utils";
 import { CommentThread } from "@/features/discussion/ui/comment-thread";
 import { sampleThreadSnapshot } from "@/shared/mocks/sample-thread";
+import { SiteVoteButtons } from "@/components/voting/site-vote-buttons";
 import Link from "next/link";
 
 interface SiteDetailPanelProps {
@@ -110,6 +111,9 @@ export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetai
 						</p>
 					</div>
 				)}
+
+				{/* Voting Section */}
+				{site.verificationStatus !== "verified" && <SiteVoteButtons siteId={site.id} />}
 
 				<div className="space-y-2">
 					<p className="text-xs uppercase tracking-wide text-muted-foreground">Tags</p>
