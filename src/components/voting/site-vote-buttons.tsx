@@ -228,3 +228,4 @@ export function SiteVoteButtons({ siteId, compact = false, className, onVoteChan
 		</div>
 	);
 }
+

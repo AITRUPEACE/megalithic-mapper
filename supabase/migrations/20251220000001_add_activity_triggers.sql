@@ -227,3 +227,4 @@ CREATE TRIGGER trg_site_edit_activity
 -- Site follow:      +1 point    (interest signal)
 -- Reaction:         +1 point    (low-effort engagement)
 -- ============================================================================
+

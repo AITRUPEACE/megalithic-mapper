@@ -79,32 +79,22 @@ const buildZoneMemberships = (
 
 // Calculate importance score for a site (higher = more important)
 // This is used for sorting sites by "most recognizable"
+// Simple, non-gameable factors only
 const calculateImportanceScoreFromRaw = (
   site: SiteRow,
-  mediaCount: number,
-  researchCount: number
+  hasThumbnail: boolean
 ): number => {
   let score = 0;
   
-  // Verification status contribution (verified sites are more recognizable)
-  if (site.verification_status === "verified") score += 40;
-  else if (site.verification_status === "under_review") score += 15;
+  // THUMBNAIL - sites with a cover image appear first (curated by editors)
+  if (hasThumbnail) score += 50;
   
-  // Layer contribution (official sites are more important)
+  // Verification - indicates editorial review
+  if (site.verification_status === "verified") score += 35;
+  else if (site.verification_status === "under_review") score += 10;
+  
+  // Official layer - well-known/documented sites
   if (site.layer === "official") score += 25;
-  
-  // Media count contribution (sites with photos are more interesting to browse)
-  // Give significant weight to having at least one photo
-  if (mediaCount > 0) score += 20;
-  score += Math.min(mediaCount * 2, 20); // Up to 20 more points for multiple photos
-  
-  // Research links contribution
-  score += Math.min(researchCount * 5, 15);
-  
-  // Trust tier contribution
-  if (site.trust_tier === "gold") score += 10;
-  else if (site.trust_tier === "silver") score += 6;
-  else if (site.trust_tier === "bronze") score += 3;
   
   return score;
 };
@@ -132,10 +122,10 @@ export const normalizeMapData = (records: MapRecordSet = mapRecords) => {
     const zoneMemberships = buildZoneMemberships(site, zoneMap, records.siteZones);
     
     // Calculate importance score for client-side sorting
+    // Prioritize sites with thumbnails and verification (not gameable metrics)
     const importanceScore = calculateImportanceScoreFromRaw(
       site,
-      site.media_count,
-      site.related_research_ids.length
+      !!site.thumbnail_url
     );
 
     return {
@@ -207,22 +197,13 @@ const calculateImportanceScore = (site: MapSiteFeature): number => {
     return site.importanceScore;
   }
   
-  // Fallback calculation (same logic as calculateImportanceScoreFromRaw)
+  // Fallback: simple, non-gameable factors only
   let score = 0;
   
-  if (site.verificationStatus === "verified") score += 40;
-  else if (site.verificationStatus === "under_review") score += 15;
-  
+  if (site.thumbnailUrl) score += 50;
+  if (site.verificationStatus === "verified") score += 35;
+  else if (site.verificationStatus === "under_review") score += 10;
   if (site.layer === "official") score += 25;
-  
-  if (site.mediaCount > 0) score += 20;
-  score += Math.min(site.mediaCount * 2, 20);
-  
-  score += Math.min(site.relatedResearchIds.length * 5, 15);
-  
-  if (site.trustTier === "gold") score += 10;
-  else if (site.trustTier === "silver") score += 6;
-  else if (site.trustTier === "bronze") score += 3;
   
   return score;
 };

@@ -158,3 +158,4 @@ INSERT INTO megalithic.research_categories (slug, name, description, icon, color
   ('3d-scanning', '3D Scanning & Photogrammetry', 'Digital documentation, modeling, and preservation', '📐', '#14b8a6', true),
   ('comparative', 'Comparative Studies', 'Cross-cultural connections, global patterns, and diffusion theories', '🌍', '#8b5cf6', true)
 ON CONFLICT (slug) DO NOTHING;
+

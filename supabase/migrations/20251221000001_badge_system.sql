@@ -180,3 +180,4 @@ SELECT
 FROM megalithic.profiles p
 WHERE p.badge_score > 0
 ORDER BY p.badge_score DESC;
+

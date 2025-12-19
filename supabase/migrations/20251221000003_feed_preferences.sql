@@ -105,3 +105,4 @@ COMMENT ON FUNCTION megalithic.calculate_feed_priority IS
 'Calculates a priority score for feed items based on user preferences.
 Higher scores = higher priority in feed.
 Takes into account: item type priority, official/verified status, engagement, and user preferences.';
+

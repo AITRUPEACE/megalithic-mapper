@@ -127,49 +127,66 @@ const heatSizeMultipliers: Record<MapSiteFeature["heatTier"] & string, number> =
 	low: 0.9,
 };
 
-// Get marker size based on effective score (importance + decayed activity)
-const getMarkerSizeFromScore = (effectiveScore: number, isSelected: boolean, isAutoHovered: boolean): { iconSize: number; svgSize: number } => {
-	if (isSelected) return { iconSize: 36, svgSize: 28 };
+// Get marker size based on effective score
+// With new scoring: max 110 (thumbnail:50 + verified:35 + official:25)
+const getMarkerSizeFromScore = (
+	effectiveScore: number,
+	isSelected: boolean,
+	isAutoHovered: boolean
+): { iconSize: number; svgSize: number; zIndex: number } => {
+	if (isSelected) return { iconSize: 44, svgSize: 34, zIndex: 1000 };
 
-	// Base sizes by importance tier
+	// Base sizes by importance tier - adjusted for new scoring system
 	let baseIconSize: number;
 	let baseSvgSize: number;
+	let zIndex: number;
 
-	if (effectiveScore >= 80) {
-		// Landmark tier - largest markers
+	if (effectiveScore >= 100) {
+		// ICONIC tier - The big famous ones (thumbnail + verified + official)
+		// Giza, Stonehenge, Machu Picchu, etc.
+		baseIconSize = 40;
+		baseSvgSize = 32;
+		zIndex = 500;
+	} else if (effectiveScore >= 80) {
+		// Landmark tier - well-documented verified sites with thumbnails
 		baseIconSize = 32;
 		baseSvgSize = 26;
-	} else if (effectiveScore >= 60) {
-		// Major tier
-		baseIconSize = 28;
-		baseSvgSize = 22;
-	} else if (effectiveScore >= 40) {
-		// Notable tier
-		baseIconSize = 24;
-		baseSvgSize = 18;
+		zIndex = 400;
+	} else if (effectiveScore >= 50) {
+		// Notable tier - has thumbnail OR verified+official
+		baseIconSize = 26;
+		baseSvgSize = 20;
+		zIndex = 300;
+	} else if (effectiveScore >= 25) {
+		// Minor tier - some verification or official status
+		baseIconSize = 22;
+		baseSvgSize = 16;
+		zIndex = 200;
 	} else {
-		// Minor tier - smallest markers
-		baseIconSize = 20;
-		baseSvgSize = 14;
+		// Unverified community submissions
+		baseIconSize = 18;
+		baseSvgSize = 12;
+		zIndex = 100;
 	}
 
-	// Auto-hovered gets scale boost
+	// Auto-hovered gets scale boost and z-index bump
 	if (isAutoHovered) {
 		baseIconSize = Math.round(baseIconSize * 1.25);
 		baseSvgSize = Math.round(baseSvgSize * 1.25);
+		zIndex = 900;
 	}
 
-	return { iconSize: baseIconSize, svgSize: baseSvgSize };
+	return { iconSize: baseIconSize, svgSize: baseSvgSize, zIndex };
 };
 
 // Helper function to create clean icon-only marker
-const createCustomPinIcon = (site: MapSiteFeature, isSelected: boolean, isAutoHovered?: boolean): L.DivIcon => {
+const createCustomPinIcon = (site: MapSiteFeature, isSelected: boolean, isAutoHovered?: boolean): { icon: L.DivIcon; zIndexOffset: number } => {
 	const heatTier = site.heatTier ?? "normal";
 	const effectiveScore = site.effectiveScore ?? site.importanceScore ?? 50;
 	const isTrending = site.isTrending ?? false;
 
-	// Get sizes based on effective score
-	const { iconSize, svgSize } = getMarkerSizeFromScore(effectiveScore, isSelected, isAutoHovered ?? false);
+	// Get sizes and z-index based on effective score
+	const { iconSize, svgSize, zIndex } = getMarkerSizeFromScore(effectiveScore, isSelected, isAutoHovered ?? false);
 
 	// Color by site type
 	const iconColor = getSiteTypeColor(site.siteType);
@@ -189,11 +206,12 @@ const createCustomPinIcon = (site: MapSiteFeature, isSelected: boolean, isAutoHo
 	if (isAutoHovered) classes.push("auto-hovered");
 	if (isTrending) classes.push("trending");
 
-	// Add importance tier class for potential CSS styling
-	if (effectiveScore >= 80) classes.push("tier-landmark");
-	else if (effectiveScore >= 60) classes.push("tier-major");
-	else if (effectiveScore >= 40) classes.push("tier-notable");
-	else classes.push("tier-minor");
+	// Add importance tier class for CSS styling - adjusted for new scoring
+	if (effectiveScore >= 100) classes.push("tier-iconic");
+	else if (effectiveScore >= 80) classes.push("tier-landmark");
+	else if (effectiveScore >= 50) classes.push("tier-notable");
+	else if (effectiveScore >= 25) classes.push("tier-minor");
+	else classes.push("tier-unverified");
 
 	const html = `
 		<div class="${classes.join(" ")}" style="
@@ -208,13 +226,15 @@ const createCustomPinIcon = (site: MapSiteFeature, isSelected: boolean, isAutoHo
 		</div>
 	`;
 
-	return L.divIcon({
+	const icon = L.divIcon({
 		html,
 		className: "custom-marker-wrapper",
 		iconSize: [iconSize, iconSize],
 		iconAnchor: [iconSize / 2, iconSize / 2],
 		popupAnchor: [0, -iconSize / 2],
 	});
+
+	return { icon, zIndexOffset: zIndex };
 };
 
 const SelectedSiteFocus = ({ site, drawerHeightPercent = 0 }: { site: MapSiteFeature | null; drawerHeightPercent?: number }) => {
@@ -445,7 +465,7 @@ const SiteMarker = ({
 	onSelect: (id: string) => void;
 	suppressTooltip?: boolean;
 }) => {
-	const icon = useMemo(() => createCustomPinIcon(site, isSelected, isAutoHovered), [site, isSelected, isAutoHovered]);
+	const { icon, zIndexOffset } = useMemo(() => createCustomPinIcon(site, isSelected, isAutoHovered), [site, isSelected, isAutoHovered]);
 	const thumbnailUrl = useMemo(() => getThumbnailUrl(site), [site]);
 	const isVerified = site.layer === "official" && site.verificationStatus === "verified";
 
@@ -455,7 +475,12 @@ const SiteMarker = ({
 	const showTooltip = !suppressTooltip && !isAutoHovered;
 
 	return (
-		<Marker position={[site.coordinates.lat, site.coordinates.lng]} icon={icon} eventHandlers={{ click: () => onSelect(site.id) }}>
+		<Marker
+			position={[site.coordinates.lat, site.coordinates.lng]}
+			icon={icon}
+			zIndexOffset={zIndexOffset}
+			eventHandlers={{ click: () => onSelect(site.id) }}
+		>
 			{showTooltip && (
 				<Tooltip direction="top" offset={[0, -20]} opacity={1} className="site-tooltip">
 					<div className="site-tooltip-content">
@@ -613,17 +638,27 @@ export const SiteMap = ({
 				}
 
 				/* Importance tier styling */
-				.custom-marker.tier-landmark .marker-icon-container svg {
-					filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+				.custom-marker.tier-iconic .marker-icon-container svg {
+					/* The BIG famous sites - prominent glow */
+					filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 8px var(--marker-color));
 				}
-				.custom-marker.tier-major .marker-icon-container svg {
-					filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
+				.custom-marker.tier-landmark .marker-icon-container svg {
+					filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 4px var(--marker-color));
+				}
+				.custom-marker.tier-notable .marker-icon-container svg {
+					filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
 				}
 				.custom-marker.tier-minor {
 					opacity: 0.85;
 				}
 				.custom-marker.tier-minor .marker-icon-container svg {
 					filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.4));
+				}
+				.custom-marker.tier-unverified {
+					opacity: 0.7;
+				}
+				.custom-marker.tier-unverified .marker-icon-container svg {
+					filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
 				}
 
 				/* Hot tier - pulsing glow */
