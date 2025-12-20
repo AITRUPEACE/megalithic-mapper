@@ -77,25 +77,25 @@ export const TOUR_STEPS: Step[] = [
 	},
 	// Step 2: Giza marker (after flying)
 	{
-		target: ".leaflet-container",
+		target: "body",
 		content:
-			"Here's the Great Pyramid of Giza - one of the Seven Wonders of the Ancient World. Notice how the marker shows the site type. Click any marker to see details.",
-		placement: "bottom",
+			"Here's the Great Pyramid of Giza - one of the Seven Wonders of the Ancient World. Notice the site details on the right panel.",
+		placement: "center",
 		disableBeacon: true,
 		disableOverlayClose: true,
 	},
 	// Step 3: Site details panel
 	{
-		target: "[data-tour='site-panel']",
+		target: "body",
 		content:
-			"The details panel shows site information, photos, and links to research. You can explore related media and contribute your own findings.",
-		placement: "left",
+			"The details panel shows site information, photos, and research links. You can explore related media and contribute your own findings.",
+		placement: "center",
 		disableBeacon: true,
 		disableOverlayClose: true,
 	},
 	// Step 4: Flying to Stonehenge
 	{
-		target: ".leaflet-container",
+		target: "body",
 		content:
 			"Now let's visit Stonehenge in England - a prehistoric stone circle. Notice how different site types have unique icons.",
 		placement: "center",
@@ -104,16 +104,16 @@ export const TOUR_STEPS: Step[] = [
 	},
 	// Step 5: Stonehenge details
 	{
-		target: "[data-tour='site-panel']",
+		target: "body",
 		content:
 			"Each site has its own set of media, research links, and community contributions. You can follow sites to get updates.",
-		placement: "left",
+		placement: "center",
 		disableBeacon: true,
 		disableOverlayClose: true,
 	},
 	// Step 6: Flying to Machu Picchu
 	{
-		target: ".leaflet-container",
+		target: "body",
 		content:
 			"Finally, let's explore Machu Picchu in Peru - showing how Megalithic Mapper covers sites across the globe.",
 		placement: "center",
