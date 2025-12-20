@@ -22,6 +22,7 @@ import {
 	Star,
 	Clock,
 	SortAsc,
+	HelpCircle,
 } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";

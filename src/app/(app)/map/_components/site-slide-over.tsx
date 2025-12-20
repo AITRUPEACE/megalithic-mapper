@@ -116,6 +116,7 @@ export function SiteSlideOver({ site, isOpen, onClose, className }: SiteSlideOve
 					{/* Panel */}
 					<motion.div
 						ref={panelRef}
+						data-tour="site-panel"
 						initial={{ x: "100%" }}
 						animate={{ x: 0 }}
 						exit={{ x: "100%" }}

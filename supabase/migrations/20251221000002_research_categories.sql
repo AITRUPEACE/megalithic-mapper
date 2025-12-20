@@ -159,3 +159,4 @@ INSERT INTO megalithic.research_categories (slug, name, description, icon, color
   ('comparative', 'Comparative Studies', 'Cross-cultural connections, global patterns, and diffusion theories', '🌍', '#8b5cf6', true)
 ON CONFLICT (slug) DO NOTHING;
 
+

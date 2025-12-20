@@ -228,3 +228,4 @@ CREATE TRIGGER trg_site_edit_activity
 -- Reaction:         +1 point    (low-effort engagement)
 -- ============================================================================
 
+

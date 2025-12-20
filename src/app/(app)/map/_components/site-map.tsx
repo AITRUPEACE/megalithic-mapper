@@ -7,7 +7,6 @@ import L from "leaflet";
 import type { BoundingBox, MapSiteFeature, MapZoneFeature } from "@/entities/map/model/types";
 import { cn } from "@/shared/lib/utils";
 import { getSiteTypeIconSvg } from "@/components/map/site-type-icons";
-import { useTour } from "@/features/onboarding";
 
 const MAP_CENTER: [number, number] = [20, 10];
 const DEFAULT_ZOOM = 3;
@@ -527,7 +526,6 @@ export const SiteMap = ({
 	autoHoveredSiteId,
 }: SiteMapProps) => {
 	const { resolvedTheme } = useTheme();
-	const { startTour } = useTour();
 	const selectedSite = useMemo(() => sites.find((site) => site.id === selectedSiteId) ?? null, [sites, selectedSiteId]);
 
 	// Use appropriate tile layer based on theme
@@ -888,60 +886,7 @@ export const SiteMap = ({
 					opacity: 0 !important;
 					pointer-events: none !important;
 				}
-
-				/* Tour FAB Button */
-				.tour-fab {
-					position: absolute;
-					bottom: 24px;
-					left: 12px;
-					z-index: 1000;
-					display: flex;
-					align-items: center;
-					gap: 8px;
-					padding: 10px 16px;
-					background: rgba(99, 102, 241, 0.95);
-					border: 1px solid rgba(255, 255, 255, 0.2);
-					border-radius: 24px;
-					color: #fff;
-					font-size: 13px;
-					font-weight: 600;
-					cursor: pointer;
-					box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
-					backdrop-filter: blur(8px);
-					transition: all 0.2s ease;
-				}
-				.tour-fab:hover {
-					background: rgba(99, 102, 241, 1);
-					transform: translateY(-2px);
-					box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
-				}
-				.tour-fab:active {
-					transform: translateY(0);
-				}
-				.tour-fab svg {
-					width: 18px;
-					height: 18px;
-				}
-				/* Mobile: smaller and more compact */
-				@media (max-width: 768px) {
-					.tour-fab {
-						bottom: auto;
-						top: 12px;
-						left: 12px;
-						padding: 8px 12px;
-						font-size: 12px;
-					}
-				}
 			`}</style>
-
-			{/* Tour FAB Button */}
-			<button className="tour-fab" onClick={startTour} title="Start guided tour">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-					<circle cx="12" cy="12" r="10" />
-					<path d="M12 16v-4M12 8h.01" />
-				</svg>
-				<span>Tour</span>
-			</button>
 
 			<MapContainer
 				center={selectedSite ? [selectedSite.coordinates.lat, selectedSite.coordinates.lng] : MAP_CENTER}

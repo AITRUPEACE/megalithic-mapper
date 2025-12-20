@@ -19,6 +19,8 @@ import { WhatsHotPanel, getSimulatedHeatData } from "./whats-hot-panel";
 import { MapFilterPanel } from "./map-filter-panel";
 import { loadMapData } from "../actions";
 import { useIsMobile } from "@/shared/hooks/use-media-query";
+import { MapTour } from "@/features/onboarding";
+import { HelpCircle } from "lucide-react";
 import type L from "leaflet";
 
 // Dynamically import mobile explorer
@@ -81,6 +83,7 @@ const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 	const [activeQuickFilters, setActiveQuickFilters] = useState<string[]>([]);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
+	const [isTourRunning, setIsTourRunning] = useState(false);
 
 	useEffect(() => {
 		if (activeEditor !== "site") {
@@ -226,6 +229,34 @@ const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 		setActiveQuickFilters((prev) => (prev.includes(filterId) ? prev.filter((f) => f !== filterId) : [...prev, filterId]));
 	};
 
+	// Tour handlers
+	const handleStartTour = useCallback(() => {
+		// Ensure we're in map view for the tour
+		if (viewMode === "feed") {
+			setViewMode("split");
+		}
+		setIsTourRunning(true);
+	}, [viewMode]);
+
+	const handleTourComplete = useCallback(() => {
+		setIsTourRunning(false);
+	}, []);
+
+	const handleTourSkip = useCallback(() => {
+		setIsTourRunning(false);
+	}, []);
+
+	// Format sites for the tour (simple structure for matching)
+	const sitesForTour = useMemo(
+		() =>
+			sites.map((s) => ({
+				id: s.id,
+				name: s.name,
+				coordinates: s.coordinates,
+			})),
+		[sites]
+	);
+
 	// Calculate layout based on view mode
 	// On mobile: show either feed or map (not split)
 	// On desktop: can show split view
@@ -360,6 +391,17 @@ const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 							)}
 							{/* What's Hot Panel */}
 							<WhatsHotPanel sites={filteredSites} onFocusSite={handleFocusSite} />
+							{/* Tour Button */}
+							<Button
+								size="sm"
+								className="h-9 bg-card/95 backdrop-blur shadow-md"
+								variant="secondary"
+								onClick={handleStartTour}
+								title="Start guided tour"
+							>
+								<HelpCircle className="h-4 w-4 sm:mr-1.5" />
+								<span className="hidden sm:inline">Tour</span>
+							</Button>
 							<Button
 								size="sm"
 								className="h-9 bg-card/95 backdrop-blur shadow-md"
@@ -437,6 +479,18 @@ const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 
 			{/* Site Detail Slide-over */}
 			<SiteSlideOver site={selectedSite} isOpen={isSlideOverOpen} onClose={handleCloseSlideOver} />
+
+			{/* Interactive Map Tour */}
+			{isTourRunning && (
+				<MapTour
+					mapRef={mapRef.current}
+					onSelectSite={handleSelectSite}
+					onComplete={handleTourComplete}
+					onSkip={handleTourSkip}
+					sites={sitesForTour}
+					autoStart
+				/>
+			)}
 		</div>
 	);
 };

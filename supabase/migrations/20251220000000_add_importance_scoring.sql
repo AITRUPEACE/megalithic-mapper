@@ -94,3 +94,4 @@ COMMENT ON COLUMN megalithic.sites.activity_score IS
 COMMENT ON COLUMN megalithic.sites.activity_updated_at IS 
   'Last activity timestamp. Used with activity_score for time-weighted decay calculation';
 
+

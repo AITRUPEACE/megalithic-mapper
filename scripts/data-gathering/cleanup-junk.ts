@@ -97,3 +97,4 @@ DELETE FROM megalithic.sites WHERE slug IN (
 
 main().catch(console.error);
 
+

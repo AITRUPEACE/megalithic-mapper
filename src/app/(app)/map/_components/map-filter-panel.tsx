@@ -275,3 +275,4 @@ export const MapFilterPanel = ({ filters, onFiltersChange, onClearFilters, meta,
 	);
 };
 
+

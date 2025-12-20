@@ -86,3 +86,4 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Grant execute permission
 GRANT EXECUTE ON FUNCTION megalithic.clear_bookmark_new_activity TO authenticated;
 
+
