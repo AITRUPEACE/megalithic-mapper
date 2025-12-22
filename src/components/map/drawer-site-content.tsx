@@ -9,11 +9,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import { MapPin, Calendar, Camera, MessageSquare, Users, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { timeAgo } from "@/shared/lib/utils";
+import { SiteFollowButton } from "@/features/sites/site-follow-button";
 
 interface DrawerSiteContentProps {
 	site: MapSiteFeature;
 	allSites?: MapSiteFeature[];
 	onSelectSite?: (siteId: string) => void;
+	isFollowing?: boolean;
 }
 
 const statusVariant: Record<MapSiteFeature["verificationStatus"], "success" | "warning" | "outline"> = {
@@ -49,7 +51,7 @@ function toRad(deg: number): number {
 	return deg * (Math.PI / 180);
 }
 
-export const DrawerSiteContent = ({ site, allSites = [], onSelectSite }: DrawerSiteContentProps) => {
+export const DrawerSiteContent = ({ site, allSites = [], onSelectSite, isFollowing = false }: DrawerSiteContentProps) => {
 	const isCommunity = site.layer === "community";
 	const tierLabel = site.trustTier ? communityTierLabel[site.trustTier] : undefined;
 
@@ -103,6 +105,11 @@ export const DrawerSiteContent = ({ site, allSites = [], onSelectSite }: DrawerS
 							Discuss
 						</Link>
 					</Button>
+					<SiteFollowButton
+						siteId={site.id}
+						initialIsFollowing={isFollowing}
+						variant="icon-only"
+					/>
 				</div>
 			</div>
 

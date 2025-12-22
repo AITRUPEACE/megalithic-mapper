@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import dynamic from "next/dynamic";
-import { Maximize2, Minimize2, Plus, Search, X, Map as MapIcon, List } from "lucide-react";
+import { Maximize2, Minimize2, Plus, Search, X, Map as MapIcon, List, Flame } from "lucide-react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Badge } from "@/shared/ui/badge";
@@ -16,6 +16,7 @@ import { SiteSlideOver } from "./site-slide-over";
 import { SiteEditor } from "./site-editor";
 import { ZoneEditor } from "./zone-editor";
 import { WhatsHotPanel, getSimulatedHeatData } from "./whats-hot-panel";
+import { getSiteTypeIcon } from "@/components/map/site-type-icons";
 import { MapFilterPanel } from "./map-filter-panel";
 import { loadMapData } from "../actions";
 import { useIsMobile } from "@/shared/hooks/use-media-query";
@@ -82,8 +83,10 @@ const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 	const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
 	const [activeQuickFilters, setActiveQuickFilters] = useState<string[]>([]);
 	const [searchQuery, setSearchQuery] = useState("");
+	const [showSearchDropdown, setShowSearchDropdown] = useState(false);
 	const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
 	const [isTourRunning, setIsTourRunning] = useState(false);
+	const searchInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
 		if (activeEditor !== "site") {
@@ -102,6 +105,20 @@ const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 	// Add heat tier data to filtered sites for map display
 	const sitesWithHeat = useMemo(() => getSimulatedHeatData(filteredSites), [filteredSites]);
 	const selectedSite = useMemo(() => sites.find((site) => site.id === selectedSiteId) ?? null, [sites, selectedSiteId]);
+
+	// Search results for autocomplete dropdown
+	const searchResults = useMemo(() => {
+		if (!searchQuery.trim()) return [];
+		const query = searchQuery.toLowerCase();
+		return filteredSites
+			.filter(
+				(site) =>
+					site.name.toLowerCase().includes(query) ||
+					site.siteType.toLowerCase().includes(query) ||
+					site.tags?.cultures?.some((c) => c.toLowerCase().includes(query))
+			)
+			.slice(0, 8);
+	}, [filteredSites, searchQuery]);
 
 	// Open slide-over when site is selected
 	useEffect(() => {
@@ -207,6 +224,28 @@ const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 			}
 		},
 		[sites, selectSite, viewMode]
+	);
+
+	// Handle search result selection
+	const handleSearchSelect = useCallback(
+		(site: MapSiteFeature) => {
+			// Focus on the site and open slide-over
+			if (mapRef.current) {
+				const SITE_FOCUS_ZOOM = 8;
+				const currentZoom = mapRef.current.getZoom();
+				const targetZoom = Math.max(currentZoom, SITE_FOCUS_ZOOM);
+				mapRef.current.flyTo([site.coordinates.lat, site.coordinates.lng], targetZoom, { duration: 0.8 });
+			}
+			selectSite(site.id);
+			setIsSlideOverOpen(true);
+			setSearchQuery("");
+			setShowSearchDropdown(false);
+			// If in feed-only mode, switch to split to show the map
+			if (viewMode === "feed") {
+				setViewMode("split");
+			}
+		},
+		[selectSite, viewMode]
 	);
 
 	// Invalidate map size when view mode changes to ensure tiles fill properly
@@ -359,13 +398,22 @@ const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 							</Button>
 						)}
 
-						{/* Search bar */}
+						{/* Search bar with autocomplete dropdown */}
 						<div className="flex-1 max-w-sm">
 							<div className="relative">
-								<Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+								<Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
 								<Input
+									ref={searchInputRef}
 									value={searchQuery}
-									onChange={(e) => setSearchQuery(e.target.value)}
+									onChange={(e) => {
+										setSearchQuery(e.target.value);
+										setShowSearchDropdown(true);
+									}}
+									onFocus={() => setShowSearchDropdown(true)}
+									onBlur={() => {
+										// Delay hiding to allow click on dropdown items
+										setTimeout(() => setShowSearchDropdown(false), 200);
+									}}
 									placeholder="Search sites..."
 									className="h-9 pl-9 pr-8 bg-card/95 backdrop-blur shadow-md text-sm"
 								/>
@@ -374,10 +422,58 @@ const DesktopSiteExplorer = ({ initialSites, initialZones, initialBounds }: Site
 										size="icon"
 										variant="ghost"
 										className="absolute right-0.5 top-1/2 -translate-y-1/2 h-8 w-8"
-										onClick={() => setSearchQuery("")}
+										onClick={() => {
+											setSearchQuery("");
+											setShowSearchDropdown(false);
+										}}
 									>
 										<X className="h-3.5 w-3.5" />
 									</Button>
+								)}
+
+								{/* Search autocomplete dropdown */}
+								{showSearchDropdown && searchQuery && searchResults.length > 0 && (
+									<div className="absolute top-full left-0 right-0 mt-1 bg-card rounded-xl shadow-xl border border-border/50 overflow-hidden z-[1350] max-h-[50vh] overflow-y-auto">
+										{searchResults.map((site) => {
+											const SiteIcon = getSiteTypeIcon(site.siteType);
+											const isHot = site.heatTier === "hot" || site.heatTier === "rising";
+											return (
+												<button
+													key={site.id}
+													onClick={() => handleSearchSelect(site)}
+													className="w-full px-3 py-2.5 text-left hover:bg-muted/50 transition-colors flex items-center gap-3 border-b border-border/20 last:border-0"
+												>
+													<div
+														className="h-8 w-8 rounded-lg flex items-center justify-center shrink-0"
+														style={{
+															backgroundColor: site.verificationStatus === "verified" ? "hsl(var(--primary) / 0.15)" : "hsl(var(--muted))",
+														}}
+													>
+														<SiteIcon className={cn("h-4 w-4", site.verificationStatus === "verified" ? "text-primary" : "text-muted-foreground")} />
+													</div>
+													<div className="flex-1 min-w-0">
+														<p className="font-medium text-sm truncate flex items-center gap-1.5">
+															{site.name}
+															{isHot && <Flame className="h-3 w-3 text-orange-500" />}
+														</p>
+														<p className="text-xs text-muted-foreground truncate capitalize">{site.siteType.replace(/_/g, " ")}</p>
+													</div>
+													{site.verificationStatus === "verified" && (
+														<Badge variant="secondary" className="text-[10px] shrink-0">
+															✓
+														</Badge>
+													)}
+												</button>
+											);
+										})}
+									</div>
+								)}
+
+								{/* No results message */}
+								{showSearchDropdown && searchQuery && searchQuery.length >= 2 && searchResults.length === 0 && (
+									<div className="absolute top-full left-0 right-0 mt-1 bg-card rounded-xl shadow-xl border border-border/50 p-4 z-[1350] text-center">
+										<p className="text-sm text-muted-foreground">No sites found for &quot;{searchQuery}&quot;</p>
+									</div>
 								)}
 							</div>
 						</div>

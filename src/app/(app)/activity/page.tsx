@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ActivityFeedCard } from "@/components/feed/activity-feed-card";
@@ -12,6 +12,7 @@ import { Activity, Users, ChevronRight, Map, Upload, Image, FileText, Calendar, 
 import { mockFeedItems, mockUserPreferences } from "@/lib/feed/mock-feed-data";
 import { generateFeed } from "@/lib/feed/feed-algorithm";
 import type { FeedFilters, ActivityType } from "@/lib/feed/feed-types";
+import { getFollowedSites, type SiteFollow } from "@/lib/supabase/profile-actions";
 
 // Activity tabs
 const activityTabs = [
@@ -38,11 +39,38 @@ export default function ActivityPage() {
 
 	const [activeTab, setActiveTab] = useState("all");
 	const [activeFilter, setActiveFilter] = useState<ActivityType | "all">("all");
+	const [followedSites, setFollowedSites] = useState<SiteFollow[]>([]);
+	const [isLoadingFollows, setIsLoadingFollows] = useState(false);
+
+	// Fetch user's followed sites on mount
+	useEffect(() => {
+		async function fetchFollowedSites() {
+			setIsLoadingFollows(true);
+			try {
+				const sites = await getFollowedSites();
+				setFollowedSites(sites);
+			} catch (error) {
+				console.error("Failed to fetch followed sites:", error);
+			} finally {
+				setIsLoadingFollows(false);
+			}
+		}
+		fetchFollowedSites();
+	}, []);
 
 	// Clear tag filter
 	const clearTagFilter = () => {
 		router.push("/activity");
 	};
+
+	// Merge real followed sites with mock preferences for filtering
+	const effectivePreferences = useMemo(() => {
+		const realFollowedSiteIds = followedSites.map((f) => f.site_id);
+		return {
+			...mockUserPreferences,
+			followedSites: realFollowedSiteIds.length > 0 ? realFollowedSiteIds : mockUserPreferences.followedSites,
+		};
+	}, [followedSites]);
 
 	// Generate activity feed
 	const feedItems = useMemo(() => {
@@ -56,8 +84,8 @@ export default function ActivityPage() {
 
 		// Filter by tab
 		if (activeTab === "following") {
-			const followedUserIds = mockUserPreferences.followedUsers;
-			const followedSiteIds = mockUserPreferences.followedSites;
+			const followedUserIds = effectivePreferences.followedUsers;
+			const followedSiteIds = effectivePreferences.followedSites;
 			items = items.filter((item) => followedUserIds.includes(item.author.id) || (item.siteId && followedSiteIds.includes(item.siteId)));
 		}
 
@@ -66,8 +94,8 @@ export default function ActivityPage() {
 			items = items.filter((item) => item.tags.some((t) => t.toLowerCase() === tagFilter.toLowerCase()));
 		}
 
-		return generateFeed(items, "new", filters, mockUserPreferences);
-	}, [activeTab, activeFilter, tagFilter]);
+		return generateFeed(items, "new", filters, effectivePreferences);
+	}, [activeTab, activeFilter, tagFilter, effectivePreferences]);
 
 	return (
 		<div className="mx-auto max-w-[1400px] space-y-4 p-3 pb-20 sm:p-4 md:p-6 md:pb-6">

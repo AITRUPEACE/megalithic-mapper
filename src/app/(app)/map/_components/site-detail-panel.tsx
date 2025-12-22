@@ -1,5 +1,9 @@
 "use client";
 
+import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Camera, Heart, MessageSquare, Loader2, ImageIcon } from "lucide-react";
 import type { MapSiteFeature } from "@/entities/map/model/types";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -10,12 +14,26 @@ import { cn, timeAgo } from "@/shared/lib/utils";
 import { CommentThread } from "@/features/discussion/ui/comment-thread";
 import { sampleThreadSnapshot } from "@/shared/mocks/sample-thread";
 import { SiteVoteButtons } from "@/components/voting/site-vote-buttons";
-import Link from "next/link";
+import { SiteFollowButton } from "@/features/sites/site-follow-button";
+import type { SiteMediaItem } from "@/app/api/sites/[id]/media/route";
+
+// Media type for UI display
+interface SiteMedia {
+	id: string;
+	url: string;
+	thumbnail: string;
+	title: string;
+	likes: number;
+	comments: number;
+	uploadedBy: string;
+	uploadedAt: string;
+}
 
 interface SiteDetailPanelProps {
 	site: MapSiteFeature | null;
 	className?: string;
 	variant?: "card" | "flat";
+	isFollowing?: boolean;
 }
 
 const statusVariant: Record<MapSiteFeature["verificationStatus"], "success" | "warning" | "outline"> = {
@@ -37,7 +55,48 @@ const categoryLabel: Record<MapSiteFeature["category"], string> = {
 	text: "Text source",
 };
 
-export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetailPanelProps) => {
+export const SiteDetailPanel = ({ site, className, variant = "card", isFollowing = false }: SiteDetailPanelProps) => {
+	const [siteMedia, setSiteMedia] = useState<SiteMedia[]>([]);
+	const [isLoadingMedia, setIsLoadingMedia] = useState(false);
+
+	// Fetch media for site from API
+	const fetchMedia = useCallback(async (siteId: string) => {
+		setIsLoadingMedia(true);
+		try {
+			const response = await fetch(`/api/sites/${siteId}/media?limit=20`);
+			if (!response.ok) throw new Error("Failed to fetch media");
+			const data = await response.json();
+			
+			// Transform API response to UI format
+			const media: SiteMedia[] = (data.media || []).map((item: SiteMediaItem) => ({
+				id: item.id,
+				url: item.url,
+				thumbnail: item.thumbnail || item.url,
+				title: item.title,
+				likes: item.likes || 0,
+				comments: item.comments || 0,
+				uploadedBy: item.contributor || "contributor",
+				uploadedAt: item.createdAt,
+			}));
+			
+			setSiteMedia(media);
+		} catch (error) {
+			console.error("Error fetching media:", error);
+			setSiteMedia([]);
+		} finally {
+			setIsLoadingMedia(false);
+		}
+	}, []);
+
+	// Fetch media when site changes
+	useEffect(() => {
+		if (site?.id) {
+			fetchMedia(site.id);
+		} else {
+			setSiteMedia([]);
+		}
+	}, [site?.id, fetchMedia]);
+
 	if (!site) {
 		const emptyClasses =
 			variant === "card"
@@ -68,6 +127,11 @@ export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetai
 					{site.verificationStatus === "unverified" && "Unverified submission"}
 				</Badge>
 				<Badge variant={layerBadgeVariant}>{layerBadgeText}</Badge>
+				<SiteFollowButton
+					siteId={site.id}
+					initialIsFollowing={isFollowing}
+					variant="compact"
+				/>
 			</div>
 		</div>
 	);
@@ -189,14 +253,63 @@ export const SiteDetailPanel = ({ site, className, variant = "card" }: SiteDetai
 			</TabsContent>
 
 			<TabsContent value="media" className="flex-1 overflow-y-auto space-y-3 text-sm text-muted-foreground">
-				<p>
-					{site.mediaCount > 0
-						? `Media gallery placeholder - ${site.mediaCount} assets staged for integration.`
-						: "No media have been linked yet. Add photos or videos to strengthen this entry."}
-				</p>
-				<Button size="sm" variant="ghost">
-					Upload media
-				</Button>
+				{isLoadingMedia ? (
+					<div className="flex flex-col items-center justify-center py-8 text-center">
+						<Loader2 className="h-8 w-8 text-muted-foreground/50 mb-3 animate-spin" />
+						<p className="text-sm text-muted-foreground">Loading media...</p>
+					</div>
+				) : siteMedia.length > 0 ? (
+					<div className="space-y-4">
+						{/* Media grid */}
+						<div className="grid grid-cols-2 gap-2">
+							{siteMedia.map((media) => (
+								<div key={media.id} className="group relative aspect-[4/3] overflow-hidden rounded-lg bg-muted cursor-pointer">
+									<Image
+										src={media.thumbnail}
+										alt={media.title}
+										fill
+										className="object-cover transition-transform group-hover:scale-105"
+										sizes="(max-width: 768px) 50vw, 200px"
+										unoptimized={media.thumbnail.includes("wikimedia") || media.thumbnail.includes("wikipedia")}
+									/>
+									{/* Engagement overlay */}
+									<div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+									<div className="absolute bottom-0 left-0 right-0 p-2">
+										<div className="flex items-center justify-between text-white text-xs">
+											<span className="truncate text-[11px]">@{media.uploadedBy}</span>
+											<div className="flex items-center gap-2">
+												<span className="flex items-center gap-0.5">
+													<Heart className="h-3 w-3 fill-red-400 text-red-400" />
+													{media.likes}
+												</span>
+												<span className="flex items-center gap-0.5">
+													<MessageSquare className="h-3 w-3" />
+													{media.comments}
+												</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							))}
+						</div>
+
+						{/* Upload button */}
+						<Button size="sm" variant="ghost" className="w-full">
+							<Camera className="h-4 w-4 mr-2" />
+							Upload media
+						</Button>
+					</div>
+				) : (
+					<div className="flex flex-col items-center justify-center py-8 text-center">
+						<ImageIcon className="h-10 w-10 text-muted-foreground/50 mb-3" />
+						<p className="text-sm text-muted-foreground">No media have been linked yet</p>
+						<p className="text-xs text-muted-foreground mt-1">Add photos or videos to strengthen this entry.</p>
+						<Button size="sm" variant="ghost" className="mt-3">
+							<Camera className="h-4 w-4 mr-2" />
+							Upload media
+						</Button>
+					</div>
+				)}
 			</TabsContent>
 
 			<TabsContent value="documents" className="flex-1 overflow-y-auto space-y-3 text-sm text-muted-foreground">

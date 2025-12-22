@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { X, ExternalLink, MapPin, MessageSquare, Image, FileText, Heart, Camera, Plus } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { X, ExternalLink, MapPin, MessageSquare, Image, Heart, Camera, Plus, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/shared/ui/button";
 import { Badge } from "@/shared/ui/badge";
@@ -13,8 +13,9 @@ import type { MapSiteFeature } from "@/entities/map/model/types";
 import Link from "next/link";
 import NextImage from "next/image";
 import { DrawerComments } from "@/components/discussion/drawer-comments";
+import type { SiteMediaItem } from "@/app/api/sites/[id]/media/route";
 
-// Mock media data - in production this would come from the API
+// Media type for UI display (extends API type with UI-specific fields)
 interface SiteMedia {
 	id: string;
 	url: string;
@@ -24,32 +25,6 @@ interface SiteMedia {
 	comments: number;
 	uploadedBy: string;
 	uploadedAt: string;
-}
-
-// Generate mock media based on site - in production, fetch from API
-function getMockMediaForSite(siteId: string, count: number): SiteMedia[] {
-	// Use deterministic "random" based on site ID for consistent mock data
-	const hash = siteId.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-
-	const mockImages = [
-		"https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=400&h=300&fit=crop",
-		"https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=400&h=300&fit=crop",
-		"https://images.unsplash.com/photo-1503614472-8c93d56e92ce?w=400&h=300&fit=crop",
-		"https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&h=300&fit=crop",
-		"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
-		"https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&h=300&fit=crop",
-	];
-
-	return Array.from({ length: Math.min(count, 6) }, (_, i) => ({
-		id: `media-${siteId}-${i}`,
-		url: mockImages[(hash + i) % mockImages.length],
-		thumbnail: mockImages[(hash + i) % mockImages.length],
-		title: `Photo ${i + 1}`,
-		likes: Math.floor(((hash * (i + 1)) % 100) + 5),
-		comments: Math.floor(((hash * (i + 2)) % 20) + 1),
-		uploadedBy: ["dr.aminah.s", "explorer.maya", "arch.santillan", "citizen.larisa"][(hash + i) % 4],
-		uploadedAt: new Date(Date.now() - (hash + i) * 86400000).toISOString(),
-	}));
 }
 
 interface SiteSlideOverProps {
@@ -75,6 +50,37 @@ const communityTierLabel: Record<NonNullable<MapSiteFeature["trustTier"]>, strin
 export function SiteSlideOver({ site, isOpen, onClose, className }: SiteSlideOverProps) {
 	const panelRef = useRef<HTMLDivElement>(null);
 	const [activeTab, setActiveTab] = useState("overview");
+	const [siteMedia, setSiteMedia] = useState<SiteMedia[]>([]);
+	const [isLoadingMedia, setIsLoadingMedia] = useState(false);
+
+	// Fetch media for site from API
+	const fetchMedia = useCallback(async (siteId: string) => {
+		setIsLoadingMedia(true);
+		try {
+			const response = await fetch(`/api/sites/${siteId}/media?limit=20`);
+			if (!response.ok) throw new Error("Failed to fetch media");
+			const data = await response.json();
+			
+			// Transform API response to UI format
+			const media: SiteMedia[] = (data.media || []).map((item: SiteMediaItem) => ({
+				id: item.id,
+				url: item.url,
+				thumbnail: item.thumbnail || item.url,
+				title: item.title,
+				likes: item.likes || 0,
+				comments: item.comments || 0,
+				uploadedBy: item.contributor || "contributor",
+				uploadedAt: item.createdAt,
+			}));
+			
+			setSiteMedia(media);
+		} catch (error) {
+			console.error("Error fetching media:", error);
+			setSiteMedia([]);
+		} finally {
+			setIsLoadingMedia(false);
+		}
+	}, []);
 
 	// Close on escape key
 	useEffect(() => {
@@ -87,17 +93,21 @@ export function SiteSlideOver({ site, isOpen, onClose, className }: SiteSlideOve
 		}
 	}, [isOpen, onClose]);
 
-	// Reset tab when site changes
+	// Reset tab and fetch media when site changes
 	useEffect(() => {
 		setActiveTab("overview");
-	}, [site?.id]);
+		if (site?.id) {
+			fetchMedia(site.id);
+		} else {
+			setSiteMedia([]);
+		}
+	}, [site?.id, fetchMedia]);
 
 	const isCommunity = site?.layer === "community";
 	const tierLabel = site?.trustTier ? communityTierLabel[site.trustTier] : undefined;
 
-	// Get mock media for preview
-	const siteMedia = site ? getMockMediaForSite(site.id, site.mediaCount) : [];
-	const previewMedia = siteMedia.slice(0, 4); // Show up to 4 in preview
+	// Get preview media (up to 4 for overview)
+	const previewMedia = siteMedia.slice(0, 4);
 
 	return (
 		<AnimatePresence>
@@ -172,16 +182,16 @@ export function SiteSlideOver({ site, isOpen, onClose, className }: SiteSlideOve
 									<p className="text-sm text-muted-foreground leading-relaxed">{site.summary}</p>
 
 									{/* Photo Grid Preview - Desktop only */}
-									{previewMedia.length > 0 && (
+									{!isLoadingMedia && previewMedia.length > 0 && (
 										<div className="hidden sm:block space-y-2">
 											<div className="flex items-center justify-between">
 												<p className="text-xs uppercase tracking-wide text-muted-foreground">
 													<Camera className="inline h-3 w-3 mr-1" />
 													Photos
 												</p>
-												{site.mediaCount > 4 && (
+												{siteMedia.length > 4 && (
 													<button onClick={() => setActiveTab("media")} className="text-xs text-primary hover:underline flex items-center gap-1">
-														Show all {site.mediaCount}
+														Show all {siteMedia.length}
 														<span aria-hidden>→</span>
 													</button>
 												)}
@@ -204,6 +214,7 @@ export function SiteSlideOver({ site, isOpen, onClose, className }: SiteSlideOve
 															fill
 															className="object-cover transition-transform group-hover:scale-105"
 															sizes="(max-width: 768px) 50vw, 200px"
+															unoptimized={media.thumbnail.includes("wikimedia") || media.thumbnail.includes("wikipedia")}
 														/>
 														{/* Overlay with engagement stats */}
 														<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -227,9 +238,9 @@ export function SiteSlideOver({ site, isOpen, onClose, className }: SiteSlideOve
 															</span>
 														</div>
 														{/* Show +N overlay on last image if there are more */}
-														{index === 3 && site.mediaCount > 4 && (
+														{index === 3 && siteMedia.length > 4 && (
 															<div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-[2px]">
-																<span className="text-white font-semibold text-lg">+{site.mediaCount - 4}</span>
+																<span className="text-white font-semibold text-lg">+{siteMedia.length - 4}</span>
 															</div>
 														)}
 													</button>
@@ -328,7 +339,12 @@ export function SiteSlideOver({ site, isOpen, onClose, className }: SiteSlideOve
 								</TabsContent>
 
 								<TabsContent value="media" className="mt-4">
-									{siteMedia.length > 0 ? (
+									{isLoadingMedia ? (
+										<div className="flex flex-col items-center justify-center py-12 text-center">
+											<Loader2 className="h-8 w-8 text-muted-foreground/50 mb-4 animate-spin" />
+											<p className="text-sm text-muted-foreground">Loading media...</p>
+										</div>
+									) : siteMedia.length > 0 ? (
 										<div className="space-y-4">
 											{/* Media grid */}
 											<div className="grid grid-cols-2 gap-2">
@@ -340,6 +356,7 @@ export function SiteSlideOver({ site, isOpen, onClose, className }: SiteSlideOve
 															fill
 															className="object-cover transition-transform group-hover:scale-105"
 															sizes="(max-width: 768px) 50vw, 200px"
+															unoptimized={media.thumbnail.includes("wikimedia") || media.thumbnail.includes("wikipedia")}
 														/>
 														{/* Engagement overlay */}
 														<div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />

@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Compass, Sparkles } from "lucide-react";
+import { Compass, Sparkles, Play } from "lucide-react";
 import { AuthCtas } from "@/components/landing/AuthCtas";
+import { FeatureShowcase } from "@/components/landing/FeatureShowcase";
+import { LandingTour } from "@/components/landing/LandingTour";
+import { Button } from "@/shared/ui/button";
 
 function AnimatedBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -100,9 +103,14 @@ function AnimatedBackground() {
 }
 
 export default function LandingPage() {
+  const [showTour, setShowTour] = useState(false);
+
   return (
     <>
       <AnimatedBackground />
+
+      {/* Tour Modal */}
+      <LandingTour isOpen={showTour} onClose={() => setShowTour(false)} />
 
       <main className="relative z-10 min-h-screen text-foreground">
         {/* Hero */}
@@ -167,8 +175,26 @@ export default function LandingPage() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9, duration: 0.8 }}
+              className="flex flex-col items-center gap-4"
             >
               <AuthCtas />
+              
+              {/* Tour button */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.2, duration: 0.6 }}
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowTour(true)}
+                  className="gap-2 text-muted-foreground hover:text-foreground"
+                >
+                  <Play className="h-3 w-3" />
+                  Take a quick tour
+                </Button>
+              </motion.div>
             </motion.div>
           </motion.div>
 
@@ -232,6 +258,9 @@ export default function LandingPage() {
             <p className="mt-4 text-sm text-muted-foreground">— Faulkner, probably thinking about Göbekli Tepe</p>
           </motion.div>
         </section>
+
+        {/* Feature Showcase with mockups */}
+        <FeatureShowcase />
 
         {/* What you can do - simple list, not feature cards */}
         <section className="relative px-6 py-24">

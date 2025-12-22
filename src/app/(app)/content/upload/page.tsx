@@ -3,13 +3,13 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Label } from "@/shared/ui/label";
+import { Textarea } from "@/shared/ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui/card";
+import { Badge } from "@/shared/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import { useContentStore } from "@/state/content-store";
 import { sampleUsers } from "@/data/sample-content";
 import { ContentType, ContentData } from "@/lib/types";
@@ -416,15 +416,15 @@ function ContentUploadPageContent() {
 						</div>
 
 						<div className="flex gap-3">
-							<Button type="submit" disabled={isSubmitting || !title || !description} className="flex-1">
-								{isSubmitting ? (
-									<>Uploading...</>
-								) : (
-									<>
-										<Upload className="mr-2 h-4 w-4" />
-										Submit Content
-									</>
-								)}
+							<Button 
+								type="submit" 
+								disabled={!title || !description} 
+								loading={isSubmitting}
+								loadingText="Uploading..."
+								className="flex-1"
+							>
+								<Upload className="mr-2 h-4 w-4" />
+								Submit Content
 							</Button>
 							<Button type="button" variant="outline" asChild>
 								<Link href="/browse">Cancel</Link>

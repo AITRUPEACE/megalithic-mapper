@@ -87,8 +87,8 @@ export default function NewPostPage() {
 					<Button variant="ghost" asChild>
 						<Link href="/research">Cancel</Link>
 					</Button>
-					<Button type="submit" form="new-post-form" disabled={isLoading}>
-						{isLoading ? "Publishing..." : "Publish Post"}
+					<Button type="submit" form="new-post-form" loading={isLoading} loadingText="Publishing...">
+						Publish Post
 					</Button>
 				</CardFooter>
 			</Card>

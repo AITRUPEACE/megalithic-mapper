@@ -7,7 +7,7 @@
  * Scale:
  * - Base content: 0-10
  * - Map overlays (above Leaflet controls ~800-1000): 1000-1050
- * - Fixed navigation: 1100-1150
+ * - Fixed navigation: 1100-1120 (sidebar above topbar)
  * - Mobile nav: 1200
  * - Dropdowns/Popovers: 1300-1350
  * - Modals/Dialogs: 1400-1450
@@ -29,8 +29,8 @@ export const Z_INDEX = {
   
   // Fixed navigation
   mobileDrawer: 1100,
-  sidebar: 1110,
-  topbar: 1120,
+  topbar: 1110,
+  sidebar: 1120,
   
   // Mobile bottom nav
   mobileNav: 1200,
@@ -65,8 +65,8 @@ export const zClass = {
   floatingPanel: "z-[1040]",
   
   mobileDrawer: "z-[1100]",
-  sidebar: "z-[1110]",
-  topbar: "z-[1120]",
+  topbar: "z-[1110]",
+  sidebar: "z-[1120]",
   
   mobileNav: "z-[1200]",
   

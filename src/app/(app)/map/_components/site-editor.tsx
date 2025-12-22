@@ -280,8 +280,8 @@ export const SiteEditor = ({ zones, site, onClose, className, pendingCoordinates
 							New site
 						</Button>
 					)}
-					<Button type="submit" size="sm" disabled={isSaving}>
-						{isSaving ? "Saving..." : site ? "Save changes" : "Submit Site"}
+					<Button type="submit" size="sm" loading={isSaving} loadingText="Saving...">
+						{site ? "Save changes" : "Submit Site"}
 					</Button>
 				</div>
 			</div>

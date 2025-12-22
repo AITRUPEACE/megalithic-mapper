@@ -105,3 +105,112 @@ export async function unfollowUser(targetUserId: string) {
   if (error) throw error;
 }
 
+// ============================================================================
+// Site Follow Actions
+// ============================================================================
+
+export type SiteFollow = {
+  site_id: string;
+  notify_updates: boolean;
+  notify_media: boolean;
+  notify_comments: boolean;
+  created_at: string;
+};
+
+export async function followSite(
+  siteId: string,
+  options?: { notifyUpdates?: boolean; notifyMedia?: boolean; notifyComments?: boolean }
+) {
+  const supabase = await getServerClient();
+  const user = await getAuthenticatedUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const payload = {
+    user_id: user.id,
+    site_id: siteId,
+    notify_updates: options?.notifyUpdates ?? true,
+    notify_media: options?.notifyMedia ?? true,
+    notify_comments: options?.notifyComments ?? true,
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase.from("site_follows") as any).insert(payload);
+
+  if (error) throw error;
+}
+
+export async function unfollowSite(siteId: string) {
+  const supabase = await getServerClient();
+  const user = await getAuthenticatedUser();
+  if (!user) throw new Error("Unauthorized");
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase.from("site_follows") as any)
+    .delete()
+    .eq("user_id", user.id)
+    .eq("site_id", siteId);
+
+  if (error) throw error;
+}
+
+export async function isFollowingSite(siteId: string): Promise<boolean> {
+  const supabase = await getServerClient();
+  const user = await getAuthenticatedUser();
+  if (!user) return false;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.from("site_follows") as any)
+    .select("site_id")
+    .eq("user_id", user.id)
+    .eq("site_id", siteId)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Error checking site follow status:", error);
+    return false;
+  }
+
+  return !!data;
+}
+
+export async function getFollowedSites(): Promise<SiteFollow[]> {
+  const supabase = await getServerClient();
+  const user = await getAuthenticatedUser();
+  if (!user) return [];
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase.from("site_follows") as any)
+    .select("site_id, notify_updates, notify_media, notify_comments, created_at")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching followed sites:", error);
+    return [];
+  }
+
+  return data as SiteFollow[];
+}
+
+export async function updateSiteFollowPreferences(
+  siteId: string,
+  preferences: { notifyUpdates?: boolean; notifyMedia?: boolean; notifyComments?: boolean }
+) {
+  const supabase = await getServerClient();
+  const user = await getAuthenticatedUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const updates: Record<string, boolean> = {};
+  if (preferences.notifyUpdates !== undefined) updates.notify_updates = preferences.notifyUpdates;
+  if (preferences.notifyMedia !== undefined) updates.notify_media = preferences.notifyMedia;
+  if (preferences.notifyComments !== undefined) updates.notify_comments = preferences.notifyComments;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase.from("site_follows") as any)
+    .update(updates)
+    .eq("user_id", user.id)
+    .eq("site_id", siteId);
+
+  if (error) throw error;
+}
+
